@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+<!-- Google Analytics -->
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-91531930-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+<!-- End Google Analytics -->
+
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    <meta name="google-site-verification" content="/google097be72e4d8e0638.html">
+    
+    
+    <link rel="canonical" href="https://totoro.pub/bash/linux-minecraft-autorun.html">
+    
+    
+    <title>Linux搭建Minecraft服务器自用免忘教程【带崩溃自动重启】 | TOTORO625 | 呤思者陈 追风者黄</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="minecraft">
+    <meta name="description" content="很久之前写的崩溃自动重启源码因为网站数据丢失找不到了，索性从头开始，写一篇完善的教程。 首先要说的是，我一般用的都是centos6.5 64位或者Debian 8.2 64位。均可使用以下教程，但不排除特殊情况，有奇奇怪怪的错误可以联系我。 其次，不喜欢Windows的主机环境，个人认为服务器就应该用shell，弄个图形界面太占用有限的资源，更主要的是贵、、、 首先,你需要一台服务器或者个人计算机">
+<meta name="keywords" content="minecraft">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux搭建Minecraft服务器自用免忘教程【带崩溃自动重启】">
+<meta property="og:url" content="https://totoro.pub/bash/linux-minecraft-autorun.html">
+<meta property="og:site_name" content="TOTORO625">
+<meta property="og:description" content="很久之前写的崩溃自动重启源码因为网站数据丢失找不到了，索性从头开始，写一篇完善的教程。 首先要说的是，我一般用的都是centos6.5 64位或者Debian 8.2 64位。均可使用以下教程，但不排除特殊情况，有奇奇怪怪的错误可以联系我。 其次，不喜欢Windows的主机环境，个人认为服务器就应该用shell，弄个图形界面太占用有限的资源，更主要的是贵、、、 首先,你需要一台服务器或者个人计算机">
+<meta property="og:image" content="https://img.totoro.pub/images/2017/06/23/TQhn.png">
+<meta property="og:image" content="https://img.totoro.pub/images/2017/06/23/ToY8.png">
+<meta property="og:image" content="https://img.totoro.pub/images/2017/06/23/TDdW.png">
+<meta property="og:image" content="https://img.totoro.pub/images/2017/06/23/T2KZ.png">
+<meta property="og:image" content="https://img.totoro.pub/images/2017/06/23/TBx6.png">
+<meta property="og:image" content="https://img.totoro.pub/images/2017/06/23/TI4x.png">
+<meta property="og:image" content="https://img.totoro.pub/images/2017/06/23/TZ04.png">
+<meta property="og:image" content="https://img.totoro.pub/images/2017/06/23/TKRB.png">
+<meta property="og:image" content="https://img.totoro.pub/images/2017/06/23/Tegw.png">
+<meta property="og:updated_time" content="2017-06-23T17:50:31.377Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Linux搭建Minecraft服务器自用免忘教程【带崩溃自动重启】">
+<meta name="twitter:description" content="很久之前写的崩溃自动重启源码因为网站数据丢失找不到了，索性从头开始，写一篇完善的教程。 首先要说的是，我一般用的都是centos6.5 64位或者Debian 8.2 64位。均可使用以下教程，但不排除特殊情况，有奇奇怪怪的错误可以联系我。 其次，不喜欢Windows的主机环境，个人认为服务器就应该用shell，弄个图形界面太占用有限的资源，更主要的是贵、、、 首先,你需要一台服务器或者个人计算机">
+<meta name="twitter:image" content="https://img.totoro.pub/images/2017/06/23/TQhn.png">
+    
+        <link rel="alternate" type="application/atom+xml" title="TOTORO625" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css?v=1.0.0">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(https://img.totoro.pub/images/2017/07/02/Y0ln.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="https://img.totoro.pub/images/2017/07/14/nE0h.md.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">totoro625</h5>
+          <a href="mailto:hc625@qq.com" title="hc625@qq.com" class="mail">hc625@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/links"  >
+                <i class="icon icon-lg icon-link"></i>
+                小伙伴们
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/about"  >
+                <i class="icon icon-lg icon-info"></i>
+                关于我
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Linux搭建Minecraft服务器自用免忘教程【带崩溃自动重启】</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Linux搭建Minecraft服务器自用免忘教程【带崩溃自动重启】</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-12-23T13:57:10.000Z" itemprop="datePublished" class="page-time">
+  2016-12-23
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/bash/">bash</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#第一部分、java的安装"><span class="post-toc-number">1.</span> <span class="post-toc-text">第一部分、java的安装</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#1、检测是否安装java"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">1、检测是否安装java</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2、安装java"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">2、安装java</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#OpenJDK安装"><span class="post-toc-number">1.2.1.</span> <span class="post-toc-text">//OpenJDK安装</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#OpenJDK卸载"><span class="post-toc-number">1.2.2.</span> <span class="post-toc-text">//OpenJDK卸载</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Java-SE的安装"><span class="post-toc-number">1.2.3.</span> <span class="post-toc-text">//Java SE的安装</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#配置环境变量"><span class="post-toc-number">1.2.4.</span> <span class="post-toc-text">配置环境变量</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#验证是否安装成功"><span class="post-toc-number">1.2.5.</span> <span class="post-toc-text">验证是否安装成功</span></a></li></ol></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#第二部分、游戏服务端的安装"><span class="post-toc-number">2.</span> <span class="post-toc-text">第二部分、游戏服务端的安装</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#1、喜欢新版本，使用spigot端（支持插件、不支持mod）"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">1、喜欢新版本，使用spigot端（支持插件、不支持mod）</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2、选择mod服务器thermos"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">2、选择mod服务器thermos</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#（支持mod与插件，最新版本支持1-7-10、也是最广为使用的版本）"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">（支持mod与插件，最新版本支持1.7.10、也是最广为使用的版本）</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#3、初步运行服务端"><span class="post-toc-number">2.4.</span> <span class="post-toc-text">3、初步运行服务端</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#4、逐步拖入插件与mod文件"><span class="post-toc-number">2.5.</span> <span class="post-toc-text">4、逐步拖入插件与mod文件</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#5、使用screen守护mc进程"><span class="post-toc-number">2.6.</span> <span class="post-toc-text">5、使用screen守护mc进程</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#6、支持盗版登录"><span class="post-toc-number">2.7.</span> <span class="post-toc-text">6、支持盗版登录</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#第三部分、进阶：崩服重启"><span class="post-toc-number">3.</span> <span class="post-toc-text">第三部分、进阶：崩服重启</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#1、长期不维护的自动重启"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">1、长期不维护的自动重启</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#2、长期使用的可维护自动重启"><span class="post-toc-number">3.2.</span> <span class="post-toc-text">2、长期使用的可维护自动重启</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#3、懒得找到这个文件并且修改它"><span class="post-toc-number">3.3.</span> <span class="post-toc-text">3、懒得找到这个文件并且修改它</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#4、懒得输入screen【终极方案】【我在用的方案】"><span class="post-toc-number">3.4.</span> <span class="post-toc-text">4、懒得输入screen【终极方案】【我在用的方案】</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#第四部分、自用简略开服包"><span class="post-toc-number">4.</span> <span class="post-toc-text">第四部分、自用简略开服包</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#1、兼容Win与Linux环境最简略版本"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">1、兼容Win与Linux环境最简略版本</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+    
+<article id="post-bash/linux-minecraft-autorun"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Linux搭建Minecraft服务器自用免忘教程【带崩溃自动重启】</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-12-23 21:57:10" datetime="2016-12-23T13:57:10.000Z"  itemprop="datePublished">2016-12-23</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/bash/">bash</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>很久之前写的崩溃自动重启源码因为网站数据丢失找不到了，索性从头开始，写一篇完善的教程。</p>
+<p>首先要说的是，我一般用的都是centos6.5 64位或者Debian 8.2 64位。均可使用以下教程，但不排除特殊情况，有奇奇怪怪的错误可以联系我。</p>
+<p>其次，不喜欢Windows的主机环境，个人认为服务器就应该用shell，弄个图形界面太占用有限的资源，更主要的是贵、、、</p>
+<p>首先,你需要一台服务器或者个人计算机运行nix系统(比如:Debian,Ubuntu,RHEL,CentOS,Gentoo,ArchLinux及其衍生版nix<br>其次,网速很重要.10M光纤大约可以带动30~50人(有数据表明,客户端平均加载的Chunks为12,20M的对等宽带可以带动100~120人,但是已经有部分玩家出现卡顿…其他的自己算把(所谓100M独享,真实下载速度为100M/8=12.5M/s,上下不对等的上传速度为12.5M/8=1.5625M/s,对等的上传速度就有12.5M/s)<br>最后,内存才是真正的吃,在Linux下2G大约可以带动10~30个人的插件服，5~10个人的小型mod服，2~3人的大型mod服，当你的地图日益庞大之后，请准备3G 4G 6G 8G甚至12G 16G 32G的大型独服。<br><a id="more"></a></p>
+<h1 id="第一部分、java的安装"><a href="#第一部分、java的安装" class="headerlink" title="第一部分、java的安装"></a>第一部分、java的安装</h1><h2 id="1、检测是否安装java"><a href="#1、检测是否安装java" class="headerlink" title="1、检测是否安装java"></a>1、检测是否安装java</h2><p>当然、新拿到的vps几乎没有预装好环境的，除了个别奇葩供应商</p>
+<p>输入<br><code>java -version</code><br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="https://img.totoro.pub/images/2017/06/23/TQhn.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure><br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="https://img.totoro.pub/images/2017/06/23/ToY8.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>如果出现<br><code>bash: /usr/bin/java: No such file or directory</code><br>或者<br><code>-bash: java: command not found</code><br>说明本机没有安装java</p>
+<p>如果出现<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">java version &quot;1.8.0_18&quot;</div><div class="line">OpenJDK Runtime Environment (IcedTea6 1.8.13) (6b18-1.8.13-0+squeeze2)</div><div class="line">OpenJDK Client VM (build 14.0-b16, mixed mode, sharing)</div></pre></td></tr></table></figure></p>
+<p>或者<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">java version &quot;1.8.0_65&quot;</div><div class="line">Java(TM) SE Runtime Environment (build 1.8.0_65-b17)</div><div class="line">Java HotSpot(TM) Client VM (build 25.65-b01, mixed mode)</div></pre></td></tr></table></figure></p>
+<p>说明预装了java</p>
+<h2 id="2、安装java"><a href="#2、安装java" class="headerlink" title="2、安装java"></a>2、安装java</h2><p>强烈建议安装Java SE而不是OpenJDK</p>
+<p>当然针对懒人和小白可以先用着凑合</p>
+<h3 id="OpenJDK安装"><a href="#OpenJDK安装" class="headerlink" title="//OpenJDK安装"></a>//OpenJDK安装</h3><p><code>yum -y install java-1.8.0-openjdk</code> //centos<br><code>sudo apt-get install openjdk-6-jre</code> //debian</p>
+<h3 id="OpenJDK卸载"><a href="#OpenJDK卸载" class="headerlink" title="//OpenJDK卸载"></a>//OpenJDK卸载</h3><p><code>sudo apt-get autoremove openjdk-*</code>  //debian<br><code>yum -y remove java-*</code>//centos<br>查看自己系统版本<br><code>getconf LONG_BIT</code><br>显示64既64位，显示32既32位</p>
+<h3 id="Java-SE的安装"><a href="#Java-SE的安装" class="headerlink" title="//Java SE的安装"></a>//Java SE的安装</h3><p>&nbsp;</p>
+<p>下载JDK，地址：<a href="http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html" target="_blank" rel="external">http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html</a>，我下载的JDK为8,如图所示：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="https://img.totoro.pub/images/2017/06/23/TDdW.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>我们获得了jdk-8u91-linux-x64.tar.gz，使用ftp工具上传。</p>
+<p>//以下是Debian安装方式，当然centos也可以用，但不建议</p>
+<p>a.通过上面准备工作之后，我们现在已经拥有了可以安装JDK的环境。<br>b.然后在Xshell中使用命令跳转到local下面创建者自己的文件夹：例如kencery<br><code>cd usr/local/</code> </p>
+<p><code>mkdir kencery</code></p>
+<p><code>cd kencery/</code><br>c.然后使用Xftp将jdk复制到kencery文件夹下面，如图所示：<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="https://img.totoro.pub/images/2017/06/23/T2KZ.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>将上传的jdk解压，解压之后重命名为javajdk，如图所示：<br> <code>tar -zxv -f  jdk-8u65-linux-i586.gz</code><br> <code>mv jdk1.8.0_65  javajdk</code><br><code>cd javajdk</code><img src="https://img.totoro.pub/images/2017/06/23/TBx6.png" alt=""><br>e.通过上面的步骤，我们的jdk已经全部完成安装了，接下来就是更重要的一步：配置环境变量</p>
+<h3 id="配置环境变量"><a href="#配置环境变量" class="headerlink" title="配置环境变量"></a>配置环境变量</h3><p><code>vim /etc/profile</code><br>打开之后按键盘（i）进入编辑模式,将下面的内容复制到底部</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">JAVA_HOME=/usr/local/kencery/javajdk</div><div class="line">PATH=JAVA_HOME/bin:PATH</div><div class="line">CLASSPATH=JAVA_HOME/jre/lib/ext:JAVA_HOME/lib/tools.jar</div><div class="line">export PATH JAVA_HOME CLASSPATH</div></pre></td></tr></table></figure>
+<p>备注:根据上面的配置信息，我们既可以将环境变量的配置完成，需要注意的是，PATH在配置的哦时候，一定要把AVA_HOME/bin放在最前面，不然使用java命令式，系统会找到以前的JAVA，在不往下找了，这样java这个可执行文件运行的目录其实不在$JAVA_HOME/bin下，而在其它目录下，会造成很大的问题。<br>写完之后我们按键盘（ESC）按钮退出，然后按（:wq）保存并且关闭Vim。</p>
+<p>配置完成之后，最重要的一步就是使文件立即生效：命令如下：<br><code>source /etc/profile</code><br><strong>将系统默认的jdk修改过来</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">$ sudo update-alternatives --install /usr/bin/java java /usr/lib/kencery/jdk1.7.0_05/bin/java 300</div><div class="line">$ sudo update-alternatives --install /usr/bin/javac javac /usr/lib/kencery/jdk1.7.0_05/bin/javac 300</div><div class="line">$ sudo update-alternatives --install /usr/bin/javaws javaws /usr/lib/kencery/jdk1.7.0_05/bin/javaws 300</div><div class="line">$ sudo update-alternatives --config java</div><div class="line">$ sudo update-alternatives --config javac</div><div class="line">$ sudo update-alternatives --config javaws</div></pre></td></tr></table></figure>
+<h3 id="验证是否安装成功"><a href="#验证是否安装成功" class="headerlink" title="验证是否安装成功"></a>验证是否安装成功</h3><p><code>java -version</code><br>出现<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">java version &quot;1.8.0_65&quot;</div><div class="line">Java(TM) SE Runtime Environment (build 1.8.0_65-b17)</div><div class="line">Java HotSpot(TM) Client VM (build 25.65-b01, mixed mode)&lt;/pre&gt;</div><div class="line">&lt;pre class=&quot;lang:default decode:true &quot;&gt;echo $JAVA_HOME</div></pre></td></tr></table></figure></p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="https://img.totoro.pub/images/2017/06/23/TI4x.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>同样可以<br><code>sudo apt-get autoremove jdk*  //debian</code><br>进行卸载</p>
+<p>//如果是centos建议用RPM格式进行安装</p>
+<p>简单、简单、简单、简单、简单、重要的事情说五遍</p>
+<p>同样在<a href="http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html" target="_blank" rel="external">http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html</a>下载</p>
+<p>选择JDK*.rpm<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="https://img.totoro.pub/images/2017/06/23/TZ04.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>上传至网站，<br><code>rpm -ivh jdk-*.rpm</code><br>进行安装</p>
+<p>一样用<br><code>java -version</code><br>检查即可</p>
+<p>可以用<br><code>yum -y uninstall xxx</code><br>进行卸载</p>
+<h1 id="第二部分、游戏服务端的安装"><a href="#第二部分、游戏服务端的安装" class="headerlink" title="第二部分、游戏服务端的安装"></a>第二部分、游戏服务端的安装</h1><h2 id="1、喜欢新版本，使用spigot端（支持插件、不支持mod）"><a href="#1、喜欢新版本，使用spigot端（支持插件、不支持mod）" class="headerlink" title="1、喜欢新版本，使用spigot端（支持插件、不支持mod）"></a>1、喜欢新版本，使用spigot端（支持插件、不支持mod）</h2><p>访问<a href="https://yivesmirror.com/downloads/spigot" target="_blank" rel="external">downloads/spigot</a>选择喜欢的版本进行下载<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="https://img.totoro.pub/images/2017/06/23/TKRB.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>点击红色的部分会有5秒的广告，点击灰色的部分没有广告直接下载</p>
+<p>如图所示为最新版本spigot支持最新版本的Minecraft客户端登录</p>
+<p>请选择20mb左右的版本进行下载</p>
+<h2 id="2、选择mod服务器thermos"><a href="#2、选择mod服务器thermos" class="headerlink" title="2、选择mod服务器thermos"></a>2、选择mod服务器thermos</h2><h2 id="（支持mod与插件，最新版本支持1-7-10、也是最广为使用的版本）"><a href="#（支持mod与插件，最新版本支持1-7-10、也是最广为使用的版本）" class="headerlink" title="（支持mod与插件，最新版本支持1.7.10、也是最广为使用的版本）"></a>（支持mod与插件，最新版本支持1.7.10、也是最广为使用的版本）</h2><p>现阶段thermos最为简单易用、访问<a href="https://yivesmirror.com/downloads/thermos" target="_blank" rel="external">downloads/thermos</a>进行下载</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="https://img.totoro.pub/images/2017/06/23/Tegw.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>建议选择Thermos-1.7.10-1614-58.zip 这是最新版本且支持1.7.10最新forge版本1614，可以获得最大性能与最大兼容性，当然在一些特殊情况下选择1558或者1449也是可行的</p>
+<p>下载完成后将其解压即可</p>
+<p>(thermos端运行后会自动下载一个minecraft_server.1.7.10.jar这是正常的)</p>
+<h2 id="3、初步运行服务端"><a href="#3、初步运行服务端" class="headerlink" title="3、初步运行服务端"></a>3、初步运行服务端</h2><p>将你选择的服务端上传至服务器【不建议本地配置文件上传，Win环境测试兼容性可以，不建议作为conf文件修改环境】</p>
+<p>建立一个单独的目录，在其.jar目录下新建一个Bash文件或者直接手动执行<br><code>java -jar -Xms512m -Xmx1024m spigot*.jar //512与1024分别为最小最大内存，spigot*部分请写完整</code><br>首次运行可能产生eula.txt文件，主要看你运行的什么服务端</p>
+<p>这会使你的服务器开启失败</p>
+<p>修改其中的<br><code>eula=false</code><br>为<br><code>eula=true</code><br>即可。</p>
+<h2 id="4、逐步拖入插件与mod文件"><a href="#4、逐步拖入插件与mod文件" class="headerlink" title="4、逐步拖入插件与mod文件"></a>4、逐步拖入插件与mod文件</h2><p>如果没有经过单机测试请一个一个的拖入并开服测试兼容性，开启失败说明不兼容</p>
+<h2 id="5、使用screen守护mc进程"><a href="#5、使用screen守护mc进程" class="headerlink" title="5、使用screen守护mc进程"></a>5、使用screen守护mc进程</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Debian/Ubuntu:</div><div class="line">apt-get install screen</div><div class="line">CentOS/RHEL</div><div class="line">yum install screen</div></pre></td></tr></table></figure>
+<p>之后使用<br><code>screen -S &quot;name&quot;</code><br>其中name可以任你定,不过尽量使用字母,数字组合<br>然后在里面开服即可(前面有讲解)</p>
+<h2 id="6、支持盗版登录"><a href="#6、支持盗版登录" class="headerlink" title="6、支持盗版登录"></a>6、支持盗版登录</h2><p>别废话，国内不作特别说明都是盗版的<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">nano server.properties //nano修改方式</div><div class="line">vi server.properties //vi修改方式</div><div class="line">vim server.properties //vim修改方式</div></pre></td></tr></table></figure></p>
+<p>//或者ftp下载好用notepad修改，切记不要用Windows记事本<code>找到</code>online-mode=true<code>改为</code>online-mode=false`<br>即可使用盗版登录</p>
+<h1 id="第三部分、进阶：崩服重启"><a href="#第三部分、进阶：崩服重启" class="headerlink" title="第三部分、进阶：崩服重启"></a>第三部分、进阶：崩服重启</h1><p>开服模组插件稳定后可以使用崩服重启命令了</p>
+<p>你需要一个start.sh 能正常稳定的开启服务器</p>
+<p>如前文提到的<br><code>java -jar -Xms512m -Xmx1024m spigot*.jar//512与1024分别为最小最大内存，spigot*部分请写完整</code></p>
+<h2 id="1、长期不维护的自动重启"><a href="#1、长期不维护的自动重启" class="headerlink" title="1、长期不维护的自动重启"></a>1、长期不维护的自动重启</h2><p>在服务端目录建立一个<code>auto.sh</code></p>
+<p>写上<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line">while true </div><div class="line">do</div><div class="line">sh start.sh</div><div class="line">done</div></pre></td></tr></table></figure></p>
+<p><code>chmod +x auto.sh</code><br>添加可执行权限即可</p>
+<h2 id="2、长期使用的可维护自动重启"><a href="#2、长期使用的可维护自动重启" class="headerlink" title="2、长期使用的可维护自动重启"></a>2、长期使用的可维护自动重启</h2><p>上一个脚本最大弊端在于关不掉</p>
+<p>我们于是用这个<code>autostart.sh</code><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">#!bin/sh</div><div class="line">while((`cat auto`==1))</div><div class="line">do</div><div class="line">sh start.sh</div><div class="line">done</div></pre></td></tr></table></figure></p>
+<p>再在当前目录下新建一个名为auto的文件，写入<br><code>1</code><br><code>chmod +x autostart.sh</code><br>添加可执行权限</p>
+<p>于是乎你每次想让他暂停自动重启的时候修改auto这个文件的值即可</p>
+<h2 id="3、懒得找到这个文件并且修改它"><a href="#3、懒得找到这个文件并且修改它" class="headerlink" title="3、懒得找到这个文件并且修改它"></a>3、懒得找到这个文件并且修改它</h2><p>可以的 使用bash就行，新建一个<code>change.sh</code><br><code>perl -p -i -e &quot;s/1/2/g&quot; auto //auto可以写为/xxx/xx/xx/auto</code><br>将auto文件的1改为2，将他保存至一个sh 文件里面就OK啦</p>
+<h2 id="4、懒得输入screen【终极方案】【我在用的方案】"><a href="#4、懒得输入screen【终极方案】【我在用的方案】" class="headerlink" title="4、懒得输入screen【终极方案】【我在用的方案】"></a>4、懒得输入screen【终极方案】【我在用的方案】</h2><p>可以的，你和我一样懒</p>
+<p>解决办法</p>
+<p>mc服务器目录写auto文件，内容为【2】【注意是2不是1】<br><code>2</code><br>写一个start.sh，内容为<br><code>java -d64 -server  -Xms1G -Xmx6G  -Dfile.encoding=UTF-8 -jar Thermos.jar
+//建议服务端名字统一改写为简单的名字，额外写一个文件记录版本号
+//最小内存1G 最大内存6G，针对实际情况填写</code><br>写一个autostart.sh，内容为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">#!bin/sh</div><div class="line">while((`cat auto`==1))</div><div class="line">do</div><div class="line">sh start.sh</div><div class="line">done</div></pre></td></tr></table></figure></p>
+<p>写一个launch.sh，内容为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line">function start_server &#123;</div><div class="line"></div><div class="line">screen -S mc ./autostart.sh</div><div class="line">&#125;</div><div class="line"></div><div class="line">start_server</div></pre></td></tr></table></figure></p>
+<p>写一个<code>open.sh</code>，内容为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line">perl -p -i -e &quot;s/2/1/g&quot; auto</div><div class="line">sh launch.sh</div></pre></td></tr></table></figure></p>
+<p>写一个<code>close.sh</code>，内容为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line">perl -p -i -e &quot;s/1/2/g&quot; auto</div><div class="line">screen -r mc</div></pre></td></tr></table></figure></p>
+<p>以上都是在mc服务器目录所写的文件</p>
+<p>我们再来到/root目录</p>
+<p>写一个<code>b.sh</code>，用于日常返回控制台，内容为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line">screen -r mc</div></pre></td></tr></table></figure></p>
+<p>写一个<code>o.sh</code>，用于开服，内容为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line">cd /mc所在目录</div><div class="line">sh open.sh</div></pre></td></tr></table></figure></p>
+<p>写一个<code>c.sh</code>，用于关服，内容为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">#!/bin/bash</div><div class="line">cd /mc所在目录</div><div class="line">sh close.sh</div></pre></td></tr></table></figure></p>
+<p>当然，以上全部命令都要加上<br><code>chmod +x 名称.sh</code><br>添加可执行权限</p>
+<p>以上就是崩服自动重启的全部内容啦</p>
+<p>更多精彩内容还等等我研究完一键脚本以及其他各种脚本之后才会放出补充教程</p>
+<p>提前挖坑：</p>
+<p>1、有可能搞定的用类似于./mc o   ./mc b    ./mc c等命令进行控制</p>
+<p>2、微小可能搞定的用类似于mc o   mc b  mc c等命令进行控制</p>
+<p>3、几乎不可能搞定的用mc  然后选择1、2、3、4这样的命令进行控制</p>
+<p>请持续关注我的<a href="https://totoro.pub">博客</a></p>
+<h1 id="第四部分、自用简略开服包"><a href="#第四部分、自用简略开服包" class="headerlink" title="第四部分、自用简略开服包"></a>第四部分、自用简略开服包</h1><h2 id="1、兼容Win与Linux环境最简略版本"><a href="#1、兼容Win与Linux环境最简略版本" class="headerlink" title="1、兼容Win与Linux环境最简略版本"></a>1、兼容Win与Linux环境最简略版本</h2><p>第一部分：Windows环境<br>Windows双击launch.bat即可运行<br>Windows环境可以删除全部<code>*.sh</code>文件以及root目录<br>第二部分：Linux环境<br>首先给予全部的可执行权限<br><code>chmod -R 777 /*/*/MC目录</code><br>再将root目录的文件移动到/root<br>参照懒人办法使用<br>找不到链接的话直接的访问<a href="https://totoro.pub/">我的博客</a><br>使用方式：<br>1、长期使用<br>在root目录（即ssh登录目录）执行<code>sh o.sh</code>开服<br>关闭窗口也不会被结束进程，同时开启崩服自动重启<br>在root目录（即ssh登录目录）执行<code>sh b.sh</code>返回之前的控制台<br>即可管理服务器，进行各种操作<br>在root目录（即ssh登录目录）执行<code>sh c.sh</code>关服<br>进行服务器例行维护等管理<br>2、用于测试环境<br><code>cd /*/*/mc目录</code><br><code>sh start.sh</code><br>此时为手动模式，关闭ssh窗口即结束mc进程<br>注明：游戏中op使用/stop命令即可关服，再配合自动重启功能实现免登陆日常重启</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2017-06-23T17:50:31.377Z" itemprop="dateUpdated">2017-06-24 01:50:31</time>
+</span><br>
+
+
+        
+    </div>
+    <footer>
+        <a href="https://totoro.pub">
+            <img src="https://img.totoro.pub/images/2017/07/14/nE0h.md.png" alt="totoro625">
+            totoro625
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/minecraft/">minecraft</a></li></ul>
+
+
+            
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/bim/bim-archicad-vs-revit.html" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">BIM 江湖演义——ArchiCAD vs Revit</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/bash/raspberry-pi-root.html" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">树莓派 Raspberry Pi 启用 root 登陆账户</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+<section class="comments" id="comments">
+    <div id="disqus_thread"></div>
+    <script>
+    var disqus_shortname = 'totoro625';
+    lazyScripts.push('//' + disqus_shortname + '.disqus.com/embed.js')
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">CC4.0协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+			<span>totoro625 &copy; 2015 - 2017</span>       
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> &#124; Theme by <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a> &#124; Made by TOTORO625. </span>
+         </p>
+		 
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: false, REWARD: false };
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.0.0"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.0.0" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'TOTORO625 等你回来!';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

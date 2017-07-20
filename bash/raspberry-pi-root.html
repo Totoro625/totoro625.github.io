@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+<!-- Google Analytics -->
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-91531930-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+<!-- End Google Analytics -->
+
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    <meta name="google-site-verification" content="/google097be72e4d8e0638.html">
+    
+    
+    <link rel="canonical" href="https://totoro.pub/bash/raspberry-pi-root.html">
+    
+    
+    <title>树莓派 Raspberry Pi 启用 root 登陆账户 | TOTORO625 | 呤思者陈 追风者黄</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="raspberry">
+    <meta name="description" content="树莓派系统使用的linux是debian系统，所以树莓派启用root和debian是相同的。 debian里root账户默认没有密码，但账户锁定。 当需要root权限时，由默认账户经由sudo执行，Raspberry pi 系统中的Raspbian 默认主机名是 raspberrypi 默认用户是 pi 密码为 raspberry 为了方便折腾，建议第一时间启用 ROOT 账号吧~ 这个也很简单的">
+<meta name="keywords" content="raspberry">
+<meta property="og:type" content="article">
+<meta property="og:title" content="树莓派 Raspberry Pi 启用 root 登陆账户">
+<meta property="og:url" content="https://totoro.pub/bash/raspberry-pi-root.html">
+<meta property="og:site_name" content="TOTORO625">
+<meta property="og:description" content="树莓派系统使用的linux是debian系统，所以树莓派启用root和debian是相同的。 debian里root账户默认没有密码，但账户锁定。 当需要root权限时，由默认账户经由sudo执行，Raspberry pi 系统中的Raspbian 默认主机名是 raspberrypi 默认用户是 pi 密码为 raspberry 为了方便折腾，建议第一时间启用 ROOT 账号吧~ 这个也很简单的">
+<meta property="og:updated_time" content="2017-06-23T17:38:30.632Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="树莓派 Raspberry Pi 启用 root 登陆账户">
+<meta name="twitter:description" content="树莓派系统使用的linux是debian系统，所以树莓派启用root和debian是相同的。 debian里root账户默认没有密码，但账户锁定。 当需要root权限时，由默认账户经由sudo执行，Raspberry pi 系统中的Raspbian 默认主机名是 raspberrypi 默认用户是 pi 密码为 raspberry 为了方便折腾，建议第一时间启用 ROOT 账号吧~ 这个也很简单的">
+    
+        <link rel="alternate" type="application/atom+xml" title="TOTORO625" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css?v=1.0.0">
+    <script>window.lazyScripts=[]</script>
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(https://img.totoro.pub/images/2017/07/02/Y0ln.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="https://img.totoro.pub/images/2017/07/14/nE0h.md.png">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">totoro625</h5>
+          <a href="mailto:hc625@qq.com" title="hc625@qq.com" class="mail">hc625@qq.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/links"  >
+                <i class="icon icon-lg icon-link"></i>
+                小伙伴们
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/about"  >
+                <i class="icon icon-lg icon-info"></i>
+                关于我
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">树莓派 Raspberry Pi 启用 root 登陆账户</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">树莓派 Raspberry Pi 启用 root 登陆账户</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2016-12-22T10:20:10.000Z" itemprop="datePublished" class="page-time">
+  2016-12-22
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/bash/">bash</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+<article id="post-bash/raspberry-pi-root"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">树莓派 Raspberry Pi 启用 root 登陆账户</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2016-12-22 18:20:10" datetime="2016-12-22T10:20:10.000Z"  itemprop="datePublished">2016-12-22</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/bash/">bash</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>树莓派系统使用的linux是debian系统，所以树莓派启用root和debian是相同的。</p>
+<p>debian里root账户默认没有密码，但账户锁定。</p>
+<p>当需要root权限时，由默认账户经由sudo执行，Raspberry pi 系统中的Raspbian</p>
+<p>默认主机名是 raspberrypi 默认用户是 pi 密码为 raspberry</p>
+<p>为了方便折腾，建议第一时间启用 ROOT 账号吧~ 这个也很简单的，只需要执行一下两句命令即可：</p>
+<ul>
+<li><a href="https://www.dou-bi.co/ss-jc34/" target="_blank" rel="external">利用iptables实现中继（中转）加速</a><a id="more"></a>
+</li>
+</ul>
+<p>// 重新开启root账号，可由pi用户登录后，执行此命令后系统会提示输入两遍的root密码，输入你想设的密码即可。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">pi@raspberrypi:~$ sudo passwd root</div><div class="line">Enter new UNIX password:   #输入第一遍密码</div><div class="line">Retype new UNIX password:  #输入第二遍密码</div></pre></td></tr></table></figure>
+<p>// 启用 root 账号登录</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">pi@raspberrypi:~$ sudo passwd --unlock root</div><div class="line">passwd: password expiry information changed.</div></pre></td></tr></table></figure>
+<p>输入上面第一行代码 第二行是提示错误的代码</p>
+<p>原因是 新版本ssh默认关闭root登陆 你可以修改一下ssh的配置文件<br><code>pi@raspberrypi:~$ sudo nano /etc/ssh/sshd_config</code><br><strong>Ctrl + W 快捷键 搜索 </strong> <strong>PermitRootLogin without-password</strong></p>
+<p><strong>修改 PermitRootLogin without-password 为 PermitRootLogin yes</strong></p>
+<p><strong>Ctrl + O 快捷键 保存</strong></p>
+<p><strong>Ctrl + x 快捷键 退出 Nano 编辑器</strong></p>
+<p>执行完之后，用 reboot 命令重启，这样就可以解锁root账户</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2017-06-23T17:38:30.632Z" itemprop="dateUpdated">2017-06-24 01:38:30</time>
+</span><br>
+
+
+        
+    </div>
+    <footer>
+        <a href="https://totoro.pub">
+            <img src="https://img.totoro.pub/images/2017/07/14/nE0h.md.png" alt="totoro625">
+            totoro625
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/raspberry/">raspberry</a></li></ul>
+
+
+            
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/bash/linux-minecraft-autorun.html" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">Linux搭建Minecraft服务器自用免忘教程【带崩溃自动重启】</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/bash/socat.html" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">利用Socat实现单端口中继（中转）加速</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+<section class="comments" id="comments">
+    <div id="disqus_thread"></div>
+    <script>
+    var disqus_shortname = 'totoro625';
+    lazyScripts.push('//' + disqus_shortname + '.disqus.com/embed.js')
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">CC4.0协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p>
+			<span>totoro625 &copy; 2015 - 2017</span>       
+            <span>Power by <a href="http://hexo.io/" target="_blank">Hexo</a> &#124; Theme by <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a> &#124; Made by TOTORO625. </span>
+         </p>
+		 
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: false, REWARD: false };
+
+
+</script>
+
+<script src="/js/main.min.js?v=1.0.0"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="/js/search.min.js?v=1.0.0" async></script>
+
+
+
+
+
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = 'TOTORO625 等你回来!';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

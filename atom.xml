@@ -1,0 +1,918 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>TOTORO625</title>
+  <subtitle>呤思者陈 追风者黄</subtitle>
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="https://totoro.pub/"/>
+  <updated>2017-07-14T18:46:38.912Z</updated>
+  <id>https://totoro.pub/</id>
+  
+  <author>
+    <name>totoro625</name>
+    
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>一个新的服务器到手后(kvm)</title>
+    <link href="https://totoro.pub/bash/new-kvm-docker.html"/>
+    <id>https://totoro.pub/bash/new-kvm-docker.html</id>
+    <published>2017-07-14T17:58:10.000Z</published>
+    <updated>2017-07-14T18:46:38.912Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="进行环境配置"><a href="#进行环境配置" class="headerlink" title="进行环境配置"></a>进行环境配置</h2><p><code>yum -y install screen git htop nano vim</code></p>
+<h2 id="更好的上网配置"><a href="#更好的上网配置" class="headerlink" title="更好的上网配置"></a>更好的上网配置</h2><p><code>wget -N --no-check-certificate https://raw.githubusercontent.com/91yun/shadowsocks_install/master/ssr-install.sh &amp;&amp; bash ssr-install.sh</code>     来自 <a href="https://www.91yun.co/archives/14321" target="_blank" rel="external">91yun</a></p>
+<p><code>vi /home/ssr/mudb.json</code></p>
+<p>修改<code>chacha20</code>为<code>chacha20-ietf</code> 以更适合移动设备等运算能力低或者有省电需求的设备</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">添加用户： ssr adduser</div><div class="line">删除用户： ssr deluser</div><div class="line">启动 SSR ： ssr start</div><div class="line">停止 SSR ： ssr stop</div><div class="line">重启 SSR ： ssr restart</div><div class="line">卸载 SSR ： ssr uninstall</div><div class="line">更新 SSR ： ssr update</div></pre></td></tr></table></figure>
+<a id="more"></a>
+<h2 id="开启BBR"><a href="#开启BBR" class="headerlink" title="开启BBR"></a>开启BBR</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">wget --no-check-certificate https://github.com/teddysun/across/raw/master/bbr.sh</div><div class="line">chmod +x bbr.sh</div><div class="line">./bbr.sh</div></pre></td></tr></table></figure>
+<p>来自<a href="https://teddysun.com/489.html" target="_blank" rel="external">秋水逸冰</a></p>
+<h3 id="开启成功验证方法（可省略"><a href="#开启成功验证方法（可省略" class="headerlink" title="开启成功验证方法（可省略"></a>开启成功验证方法（可省略</h3><p>重启完成后，进入 VPS，验证一下是否成功安装最新内核并开启 TCP BBR，输入以下命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">uname -r</div></pre></td></tr></table></figure>
+<p>查看内核版本，含有 4.11 就表示 OK 了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sysctl net.ipv4.tcp_available_congestion_control</div></pre></td></tr></table></figure>
+<p>返回值一般为：<br>net.ipv4.tcp_available_congestion_control = bbr cubic reno</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sysctl net.ipv4.tcp_congestion_control</div></pre></td></tr></table></figure>
+<p>返回值一般为：<br>net.ipv4.tcp_congestion_control = bbr</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">sysctl net.core.default_qdisc</div></pre></td></tr></table></figure>
+<p>返回值一般为：<br>net.core.default_qdisc = fq</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">lsmod | grep bbr</div></pre></td></tr></table></figure>
+<p>返回值有 tcp_bbr 模块即说明bbr已启动</p>
+<h2 id="Resilio-Sync搭建"><a href="#Resilio-Sync搭建" class="headerlink" title="Resilio Sync搭建"></a>Resilio Sync搭建</h2><p>新建一个<code>/etc/yum.repos.d/resilio-sync.repo</code></p>
+<p>写入</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">[resilio-sync]</div><div class="line">name=Resilio Sync $basearch</div><div class="line">baseurl=http://linux-packages.resilio.com/resilio-sync/rpm/$basearch</div><div class="line">enabled=1</div><div class="line">gpgcheck=1</div></pre></td></tr></table></figure>
+<p>再导入密钥<code>rpm --import https://linux-packages.resilio.com/resilio-sync/key.asc</code></p>
+<p><code>yum -y update</code></p>
+<p><code>yum -y install resilio-sync</code></p>
+<p>就算安装成功了</p>
+<p><code>rslsync --webui.listen 0.0.0.0:8888</code>    开启网页访问</p>
+<p>树莓派参考<a href="https://totoro.pub/bash/raspberry-resilio-sync.html">这个方法</a></p>
+<p>或者使用</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">wget https://download-cdn.resilio.com/stable/linux-x64/resilio-sync_x64.tar.gz</div><div class="line">tar -zxvf  resilio-sync_x64.tar.gz</div><div class="line">./rslsync --webui.listen 0.0.0.0:8888</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">管理命令：</div><div class="line">sudo service resilio-sync start</div><div class="line">sudo service resilio-sync stop</div><div class="line">sudo service resilio-sync restart</div><div class="line">卸载：</div><div class="line">sudo yum remove btsync</div></pre></td></tr></table></figure>
+<p>更多请参照<a href="https://help.resilio.com/hc/en-us/articles/206178924" target="_blank" rel="external">官方说明文档</a></p>
+<h3 id="导入Resilio-Sync密钥并等待同步"><a href="#导入Resilio-Sync密钥并等待同步" class="headerlink" title="导入Resilio Sync密钥并等待同步"></a>导入Resilio Sync密钥并等待同步</h3><p>需要注意的是：</p>
+<ul>
+<li>网站数据文件同步</li>
+<li>数据库导出导入</li>
+<li>Nginx文件导出导入</li>
+<li>旧域名301</li>
+</ul>
+<h2 id="lnmp的安装"><a href="#lnmp的安装" class="headerlink" title="lnmp的安装"></a>lnmp的安装</h2><p><code>screen -S lnmp</code></p>
+<p><code>wget -c http://soft.vpser.net/lnmp/lnmp1.4.tar.gz &amp;&amp; tar zxf lnmp1.4.tar.gz &amp;&amp; cd lnmp1.4 &amp;&amp; ./install.sh lnmp</code></p>
+<p>根据需要来就行，建议使用<strong>MySQL 5.5</strong>  我比较喜欢<strong>PHP7</strong></p>
+<p>参考<a href="https://lnmp.org/install.html" target="_blank" rel="external">lnmp一键包</a></p>
+<h2 id="用daocloud进行docker集群管理"><a href="#用daocloud进行docker集群管理" class="headerlink" title="用daocloud进行docker集群管理"></a>用daocloud进行docker集群管理</h2><p>进入 <a href="https://www.daocloud.io/" target="_blank" rel="external">daocloud</a> 之后，我们在控制台进行<a href="http://dashboard.daocloud.io/cluster" target="_blank" rel="external">集群管理</a> </p>
+<p>不用怕，就算我们只有一台服务器也是可以j进行集群管理的</p>
+<p>点击可爱的添加主机键</p>
+<p>咦，等一下，我的docker是不是还没有安装？</p>
+<p>对于网络好的国外服务器可以使用 <code>curl -sSL https://get.docker.com/ | sh</code> 进行安装</p>
+<p>对于其他服务器大可使用<a href="http://get.daocloud.io/#install-docker" target="_blank" rel="external">DaoCloud提供的镜像</a> <code>curl -sSL https://get.daocloud.io/docker | sh</code> 进行安装</p>
+<p>当然他们还提供了<a href="http://get.daocloud.io/" target="_blank" rel="external">各种加速服务</a>给国内的服务器</p>
+<p>之后进行安装主机监控程序</p>
+<p>执行DaoCloud给的命令将你的服务器与DaoCloud相连接</p>
+<h2 id="部署docker"><a href="#部署docker" class="headerlink" title="部署docker"></a>部署docker</h2><h3 id="简要说明"><a href="#简要说明" class="headerlink" title="简要说明"></a>简要说明</h3><p>h5ai是一个精致的文件目录浏览程序，但是配置复杂</p>
+<p>owncloud是一个网盘程序，但是在Nginx环境下各种坑</p>
+<p>Resilio Sync是一个bt同步程序</p>
+<p>但是我为什么不用docker来部署Resilio Sync呢？因为docker部署的Resilio Sync需要额外的权限配置，不利于全局的文件同步</p>
+<p>在发现镜像中找到<a href="http://dashboard.daocloud.io/packages/d6c0f231-d83d-44f9-89fa-f1c237fd4dfd" target="_blank" rel="external">corfr/h5ai</a> 和<a href="http://dashboard.daocloud.io/packages/7d1b2f49-c52a-4a8d-b678-b917f6c0ccd2" target="_blank" rel="external">library/owncloud</a> 即可选择部署</p>
+<p>在容器端口选项中将动态端口改为好记的固定端口</p>
+<h3 id="对于Volumes"><a href="#对于Volumes" class="headerlink" title="对于Volumes"></a>对于Volumes</h3><p>h5ai为</p>
+<table>
+<thead>
+<tr>
+<th>容器路径</th>
+<th>主机路径</th>
+<th>是否可写</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>/var/www</td>
+<td>/home/sync/h5ai</td>
+<td>是</td>
+</tr>
+</tbody>
+</table>
+<p>这样你在/home/sync/h5ai添加的文件将会直接展示出来</p>
+<p>owncloud为</p>
+<table>
+<thead>
+<tr>
+<th>容器路径</th>
+<th>主机路径</th>
+<th>是否可写</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>/var/www/html/apps</td>
+<td>/home/sync/owncloud/apps</td>
+<td>是</td>
+</tr>
+<tr>
+<td>/var/www/html/config</td>
+<td>/home/sync/owncloud/config</td>
+<td>是</td>
+</tr>
+<tr>
+<td>/var/www/html/data</td>
+<td>/home/sync/owncloud/data</td>
+<td>是</td>
+</tr>
+</tbody>
+</table>
+<p>这样你的owncloud数据处理数据库都在这里了</p>
+<p>进入yourip/phpmyadmin/ 进行数据库管理，导入备份过的数据库再去owncloud配置即可正常使用了</p>
+<h2 id="开启nginx反向代理实现SSL以及HSTS"><a href="#开启nginx反向代理实现SSL以及HSTS" class="headerlink" title="开启nginx反向代理实现SSL以及HSTS"></a>开启nginx反向代理实现SSL以及HSTS</h2><p><code>lnmp vhost add</code> 先添加虚拟主机，按照流程并选择添加Letsencrypt的证书</p>
+<p>成功后在<code>/usr/local/nginx/conf/vhost</code> 修改配置信息</p>
+<p>示例：<a href="https://pan.totoro.pub" target="_blank" rel="external">https://pan.totoro.pub</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line">server</div><div class="line">    &#123;</div><div class="line">        listen 80;</div><div class="line">        #listen [::]:80;</div><div class="line">        server_name pan.totot.net ;</div><div class="line">		return	  301 https://pan.totot.net$request_uri;		//重定向http到https</div><div class="line">&#125;</div><div class="line"></div><div class="line">server</div><div class="line">    &#123;</div><div class="line">        listen 443 ssl http2;</div><div class="line">        #listen [::]:443 ssl http2;</div><div class="line">        server_name pan.totoro.pub ;</div><div class="line">        index index.html index.htm index.php default.html default.htm default.php;</div><div class="line">        root  html;			//修改为html</div><div class="line">		add_header Strict-Transport-Security &quot;max-age=18036000; includeSubdomains; preload&quot;;	//HSTS 180天</div><div class="line">        ssl on;</div><div class="line">        ssl_certificate /etc/letsencrypt/live/pan.totoro.pub/fullchain.pem;</div><div class="line">        ssl_certificate_key /etc/letsencrypt/live/pan.totoro.pub/privkey.pem;</div><div class="line">        ssl_session_timeout 5m;</div><div class="line">        ssl_protocols TLSv1 TLSv1.1 TLSv1.2;</div><div class="line">        ssl_prefer_server_ciphers on;</div><div class="line">        ssl_ciphers &quot;EECDH+CHACHA20:EECDH+CHACHA20-draft:EECDH+AES128:RSA+AES128:EECDH+AES256:RSA+AES256:EECDH+3DES:RSA+3DES:!MD5&quot;;</div><div class="line">        ssl_session_cache builtin:1000 shared:SSL:10m;</div><div class="line">        # openssl dhparam -out /usr/local/nginx/conf/ssl/dhparam.pem 2048</div><div class="line">        ssl_dhparam /usr/local/nginx/conf/ssl/dhparam.pem;</div><div class="line"></div><div class="line">        #error_page   404   /404.html;</div><div class="line"></div><div class="line">		location / &#123;</div><div class="line">        proxy_pass http://127.0.0.1:你的端口;  //本地的端口</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">        access_log off;</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<p>对于3个需要使用端口访问的服务使用反向代理并添加SSL加密使得数据的传输更加安全</p>
+<h2 id="博客程序的部署"><a href="#博客程序的部署" class="headerlink" title="博客程序的部署"></a>博客程序的部署</h2><h3 id="hexo"><a href="#hexo" class="headerlink" title="hexo"></a>hexo</h3><p>我所使用的是hexo是在本地计算机创建的静态页面直接用sync同步过去即可，更多hexo的使用请参照你所使用的主题说明文档或者本博客其他文章</p>
+<h3 id="chevereto图床"><a href="#chevereto图床" class="headerlink" title="chevereto图床"></a>chevereto图床</h3><p>参考<a href="https://chevereto.com/" target="_blank" rel="external">官网</a> ，我是用的是<a href="https://github.com/Chevereto/Chevereto-Free" target="_blank" rel="external">chevereto free</a> 版本</p>
+<p>同样这里可以使用<a href="http://dashboard.daocloud.io/packages/e9b826c3-3184-440c-a3f3-17c80ed3a8e2" target="_blank" rel="external">furiousgeorge/chevereto</a> docker，但是我的数据积累较多暂时没迁移</p>
+<p>主要是懒得看说明不想配置Volumes啦</p>
+<p>使用sync同步所有数据之后，导入数据库</p>
+<p>Nginx的conf需要增加一段</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"></div><div class="line">location / &#123;</div><div class="line">if (-f $request_filename/index.html)&#123;</div><div class="line">rewrite (.*) $1/index.html break;</div><div class="line">&#125;</div><div class="line">if (-f $request_filename/index.php)&#123;</div><div class="line">rewrite (.*) $1/index.php;</div><div class="line">&#125;</div><div class="line">if (!-f $request_filename)&#123;</div><div class="line">rewrite (.*) /index.php;</div><div class="line">&#125;</div><div class="line">try_files $uri $uri/ /api.php;</div><div class="line">&#125;</div><div class="line">location /admin &#123;</div><div class="line">try_files $uri /admin/index.php?$args;</div><div class="line">&#125;</div><div class="line"></div><div class="line">#location / &#123;</div><div class="line">#try_files $uri $uri/ /index.php?$query_string;</div><div class="line">#&#125;</div></pre></td></tr></table></figure>
+<p>当然使用docker不用这么麻烦，直接使用上文的方法即可</p>
+<h2 id="reboot之后需要做的"><a href="#reboot之后需要做的" class="headerlink" title="reboot之后需要做的"></a>reboot之后需要做的</h2><p><code>rslsync --webui.listen 0.0.0.0:8888</code>  开启Resilio Sync</p>
+<p><code>service docker start</code> 开启docker使用</p>
+<p><strong>（加入开机启动偶尔会不执行，手动输入一下吧</strong></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;进行环境配置&quot;&gt;&lt;a href=&quot;#进行环境配置&quot; class=&quot;headerlink&quot; title=&quot;进行环境配置&quot;&gt;&lt;/a&gt;进行环境配置&lt;/h2&gt;&lt;p&gt;&lt;code&gt;yum -y install screen git htop nano vim&lt;/code&gt;&lt;/p&gt;
+&lt;h2 id=&quot;更好的上网配置&quot;&gt;&lt;a href=&quot;#更好的上网配置&quot; class=&quot;headerlink&quot; title=&quot;更好的上网配置&quot;&gt;&lt;/a&gt;更好的上网配置&lt;/h2&gt;&lt;p&gt;&lt;code&gt;wget -N --no-check-certificate https://raw.githubusercontent.com/91yun/shadowsocks_install/master/ssr-install.sh &amp;amp;&amp;amp; bash ssr-install.sh&lt;/code&gt;     来自 &lt;a href=&quot;https://www.91yun.co/archives/14321&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;91yun&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;vi /home/ssr/mudb.json&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;修改&lt;code&gt;chacha20&lt;/code&gt;为&lt;code&gt;chacha20-ietf&lt;/code&gt; 以更适合移动设备等运算能力低或者有省电需求的设备&lt;/p&gt;
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;添加用户： ssr adduser&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;删除用户： ssr deluser&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;启动 SSR ： ssr start&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;停止 SSR ： ssr stop&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;重启 SSR ： ssr restart&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;卸载 SSR ： ssr uninstall&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;更新 SSR ： ssr update&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+    
+    </summary>
+    
+      <category term="bash" scheme="https://totoro.pub/categories/bash/"/>
+    
+    
+      <category term="docker" scheme="https://totoro.pub/tags/docker/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>ingress6月29日镇江蓝绿聚会</title>
+    <link href="https://totoro.pub/ingress/629zhenjiang-met.html"/>
+    <id>https://totoro.pub/ingress/629zhenjiang-met.html</id>
+    <published>2017-07-01T18:41:10.000Z</published>
+    <updated>2017-07-01T18:49:46.508Z</updated>
+    
+    <content type="html"><![CDATA[<p>期末考试结束，紧张了一个多月的我们正好放松放松<br>于是乎约了饭<br>然而由于镇江蓝绿都很少，最终来了8个人，只有2蓝2绿有8级，也就是说翻毒两次才能有8。。。。。<br>我们还是认真吃饭吧<br><a id="more"></a><br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="https://img.totoro.pub/images/2017/07/02/nqtM.md.jpg" alt="nqtM.jpg" title="">
+                </div>
+                <div class="image-caption">nqtM.jpg</div>
+            </figure><br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="https://img.totoro.pub/images/2017/07/02/nr4C.md.jpg" alt="nr4C.jpg" title="">
+                </div>
+                <div class="image-caption">nr4C.jpg</div>
+            </figure><br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="https://img.totoro.pub/images/2017/07/02/nnKU.md.jpg" alt="nnKU.jpg" title="">
+                </div>
+                <div class="image-caption">nnKU.jpg</div>
+            </figure></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;期末考试结束，紧张了一个多月的我们正好放松放松&lt;br&gt;于是乎约了饭&lt;br&gt;然而由于镇江蓝绿都很少，最终来了8个人，只有2蓝2绿有8级，也就是说翻毒两次才能有8。。。。。&lt;br&gt;我们还是认真吃饭吧&lt;br&gt;
+    
+    </summary>
+    
+      <category term="ingress" scheme="https://totoro.pub/categories/ingress/"/>
+    
+    
+      <category term="ingress" scheme="https://totoro.pub/tags/ingress/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>树莓派上安装 resilio-sync</title>
+    <link href="https://totoro.pub/bash/raspberry-resilio-sync.html"/>
+    <id>https://totoro.pub/bash/raspberry-resilio-sync.html</id>
+    <published>2017-06-28T08:05:10.000Z</published>
+    <updated>2017-07-02T13:37:53.858Z</updated>
+    
+    <content type="html"><![CDATA[<p>​    这篇教程参考了 Resilio 官网教程 <a href="https://help.getsync.com/hc/en-us/articles/206178924-Installing-Sync-package-on-Linux" target="_blank" rel="external">Installing Sync Package On Linux</a> ，并针对<a href="http://nodis.cn/tag/%e6%a0%91%e8%8e%93%e6%b4%be/" target="_blank" rel="external">树莓派</a>进行了优化，使用套件库安装的优点是自动配置好 Sync 相关服务，无需手动配置。</p>
+<h2 id="准备工作："><a href="#准备工作：" class="headerlink" title="准备工作："></a>准备工作：</h2><ol>
+<li><a href="http://nodis.cn/tag/%e6%a0%91%e8%8e%93%e6%b4%be/" target="_blank" rel="external">树莓派</a>3b一台（其他版本类似），系统为 Raspbian；</li>
+<li>挂载好硬盘，因为同步或下载需要空间，TF 卡显然放不下；</li>
+<li>树莓派连接到局域网，并可以通过 SSH 访问。</li>
+</ol>
+<h2 id="安装-resilio-sync"><a href="#安装-resilio-sync" class="headerlink" title="安装 resilio-sync"></a>安装 resilio-sync</h2><p>根据官方教程，在树莓派上面安装 resilio-sync 套件，只需三步：</p>
+<ol>
+<li>添加库；</li>
+<li>添加用于套件验证的PGP公钥；</li>
+<li>安装套件。<a id="more"></a>
+由于树莓派的 Raspbian 系统基于 Debian ，所以我们要按照下面的教程安装：</li>
+</ol>
+<h3 id="添加库"><a href="#添加库" class="headerlink" title="添加库"></a>添加库</h3><p>创建文件 <code>/etc/apt/sources.list.d/resilio-sync.list</code> 并写入下面的内容以注册 Resilio 套件库：</p>
+<p><code>deb http://linux-packages.resilio.com/resilio-sync/deb resilio-sync non-free</code></p>
+<h3 id="添加公钥"><a href="#添加公钥" class="headerlink" title="添加公钥"></a>添加公钥</h3><p>使用下面的命令添加公钥：</p>
+<p><code>wget -qO - https://linux-packages.resilio.com/resilio-sync/key.asc | sudo apt-key add -</code></p>
+<p>对于树莓派2和3（ arm64 架构） 还要运行下面的命令</p>
+<p><code>sudo dpkg --add-architecture armhf</code></p>
+<p><code>sudo apt-get update</code></p>
+<p>然后将 <code>/etc/apt/sources.list</code> 中的内容修改为</p>
+<p><code>deb [arch=armhf] http://linux-packages.resilio.com/resilio-sync/deb resilio-sync non-free</code></p>
+<p>对于树莓派1则运行下面的命令</p>
+<p><code>sudo dpkg –-add-architecture armel</code></p>
+<h3 id="安装-resilio-sync-套件"><a href="#安装-resilio-sync-套件" class="headerlink" title="安装 resilio-sync 套件"></a>安装 resilio-sync 套件</h3><p>使用下面的命令</p>
+<p><code>sudo apt-get update</code></p>
+<p><code>sudo apt-get install resilio-sync</code></p>
+<p>对于树莓派1则运行</p>
+<p><code>sudo apt-get update</code></p>
+<p><code>sudo apt-get install resilio-sync:armel</code></p>
+<p>安装完成后，使用下面的命令删除旧版 btsync（可选）</p>
+<p><code>sudo apt-get purge btsync</code></p>
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><p><code>rslsync --webui.listen 0.0.0.0:8888</code></p>
+<p>使用 IP 加端口号即可进入管理页面，默认端口号为 <code>8888</code>，例如访问 <code>127.0.0.1:8888</code>，第一次使用需要创建用户名和密码（请务必牢记），其他设置和桌面版类似，包括免费使用PRO的方法。</p>
+<h2 id="备注"><a href="#备注" class="headerlink" title="备注"></a>备注</h2><p>使用上面的方法安装完 Sync 之后，再次运行 <code>sudo apt-get update</code> 会提示下面的警告信息：</p>
+<blockquote>
+<p>W: Duplicate sources.list entry <a href="http://linux-packages.resilio.com/resilio-sync/deb/" target="_blank" rel="external">http://linux-packages.resilio.com/resilio-sync/deb/</a> resilio-sync/non-free armhf Packages (/var/lib/apt/lists/linux-packages.resilio.com_resilio-sync_deb_dists_resilio-sync_non-free_binary-armhf_Packages)</p>
+<p>W: You may want to run apt-get update to correct these problems</p>
+</blockquote>
+<p>解决方法是删除第一步里面创建的这个这个文件 <code>/etc/apt/sources.list.d/resilio-sync.list</code>。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;​    这篇教程参考了 Resilio 官网教程 &lt;a href=&quot;https://help.getsync.com/hc/en-us/articles/206178924-Installing-Sync-package-on-Linux&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Installing Sync Package On Linux&lt;/a&gt; ，并针对&lt;a href=&quot;http://nodis.cn/tag/%e6%a0%91%e8%8e%93%e6%b4%be/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;树莓派&lt;/a&gt;进行了优化，使用套件库安装的优点是自动配置好 Sync 相关服务，无需手动配置。&lt;/p&gt;
+&lt;h2 id=&quot;准备工作：&quot;&gt;&lt;a href=&quot;#准备工作：&quot; class=&quot;headerlink&quot; title=&quot;准备工作：&quot;&gt;&lt;/a&gt;准备工作：&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;&lt;a href=&quot;http://nodis.cn/tag/%e6%a0%91%e8%8e%93%e6%b4%be/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;树莓派&lt;/a&gt;3b一台（其他版本类似），系统为 Raspbian；&lt;/li&gt;
+&lt;li&gt;挂载好硬盘，因为同步或下载需要空间，TF 卡显然放不下；&lt;/li&gt;
+&lt;li&gt;树莓派连接到局域网，并可以通过 SSH 访问。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&quot;安装-resilio-sync&quot;&gt;&lt;a href=&quot;#安装-resilio-sync&quot; class=&quot;headerlink&quot; title=&quot;安装 resilio-sync&quot;&gt;&lt;/a&gt;安装 resilio-sync&lt;/h2&gt;&lt;p&gt;根据官方教程，在树莓派上面安装 resilio-sync 套件，只需三步：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;添加库；&lt;/li&gt;
+&lt;li&gt;添加用于套件验证的PGP公钥；&lt;/li&gt;
+&lt;li&gt;安装套件。
+    
+    </summary>
+    
+      <category term="bash" scheme="https://totoro.pub/categories/bash/"/>
+    
+    
+      <category term="raspberry" scheme="https://totoro.pub/tags/raspberry/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>hexo安装</title>
+    <link href="https://totoro.pub/bash/hexo-blog.html"/>
+    <id>https://totoro.pub/bash/hexo-blog.html</id>
+    <published>2017-06-20T18:38:10.000Z</published>
+    <updated>2017-06-23T16:15:45.000Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="开始"><a href="#开始" class="headerlink" title="开始"></a>开始</h1><p>centos：<code>yum -y install git gcc gcc-c++ curl wget screen htop</code></p>
+<p>ubuntu：<code>apt-get -y install git gcc gcc-c++ curl wget screen htop</code></p>
+<h1 id="安装nodejs"><a href="#安装nodejs" class="headerlink" title="安装nodejs"></a>安装nodejs</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">git clone https://github.com/cnpm/nvm.git &amp;&amp; cd nvm &amp;&amp; sh ./install.sh ; source $HOME/nvm/nvm.sh ; source $HOME/.nvm/nvm.sh</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">nvm install v0.10.32 &amp;&amp; nvm use 0.10</div></pre></td></tr></table></figure>
+<a id="more"></a>
+<h1 id="安装hexo"><a href="#安装hexo" class="headerlink" title="安装hexo"></a>安装hexo</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">npm install -g hexo</div></pre></td></tr></table></figure>
+<p>使用mkdir创建目录</p>
+<p>使用hexo init初始化</p>
+<p>示例</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mkdir /home/wwwroot &amp;&amp; hexo init /home/wwwroot</div></pre></td></tr></table></figure>
+<h1 id="部署-Hexo-—-配置文件"><a href="#部署-Hexo-—-配置文件" class="headerlink" title="部署 Hexo — 配置文件"></a>部署 Hexo — 配置文件</h1><p>title站点标题</p>
+<p>subtitle站点子标题</p>
+<p>description站点描述信息</p>
+<p>author站点管理员</p>
+<p>language: zh-CN</p>
+<p>theme: 选择主题</p>
+<h1 id="lnmp"><a href="#lnmp" class="headerlink" title="lnmp"></a>lnmp</h1><p>来源<a href="https://lnmp.org/install.html" target="_blank" rel="external">lnmp.org</a></p>
+<figure class="highlight plain"><figcaption><span>-S lnmp```</span></figcaption><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"></div></pre></td></tr></table></figure>
+<p>wget -c <a href="http://soft.vpser.net/lnmp/lnmp1.4.tar.gz" target="_blank" rel="external">http://soft.vpser.net/lnmp/lnmp1.4.tar.gz</a> &amp;&amp; tar zxf lnmp1.4.tar.gz &amp;&amp; cd lnmp1.4 &amp;&amp; ./install.sh lnmp<br>```</p>
+<p>由于内存较低选择MySQL5.5即可，PHP大可追求最新版</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;开始&quot;&gt;&lt;a href=&quot;#开始&quot; class=&quot;headerlink&quot; title=&quot;开始&quot;&gt;&lt;/a&gt;开始&lt;/h1&gt;&lt;p&gt;centos：&lt;code&gt;yum -y install git gcc gcc-c++ curl wget screen htop&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;ubuntu：&lt;code&gt;apt-get -y install git gcc gcc-c++ curl wget screen htop&lt;/code&gt;&lt;/p&gt;
+&lt;h1 id=&quot;安装nodejs&quot;&gt;&lt;a href=&quot;#安装nodejs&quot; class=&quot;headerlink&quot; title=&quot;安装nodejs&quot;&gt;&lt;/a&gt;安装nodejs&lt;/h1&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;git clone https://github.com/cnpm/nvm.git &amp;amp;&amp;amp; cd nvm &amp;amp;&amp;amp; sh ./install.sh ; source $HOME/nvm/nvm.sh ; source $HOME/.nvm/nvm.sh&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;nvm install v0.10.32 &amp;amp;&amp;amp; nvm use 0.10&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+    
+    </summary>
+    
+      <category term="bash" scheme="https://totoro.pub/categories/bash/"/>
+    
+    
+      <category term="hexo" scheme="https://totoro.pub/tags/hexo/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>IOS 服务器管理软件 HyperApp 推荐，Linux 上自动化部署 Docker，附上 EFB 教程</title>
+    <link href="https://totoro.pub/bash/ios-hyperapp-docker-efb.html"/>
+    <id>https://totoro.pub/bash/ios-hyperapp-docker-efb.html</id>
+    <published>2017-06-19T23:30:10.000Z</published>
+    <updated>2017-06-23T17:56:06.114Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="一、前言"><a href="#一、前言" class="headerlink" title="一、前言"></a>一、前言</h1><blockquote>
+<p>对于从来没接触过linux的人来说，HyperApp绝对不是你选择尝试Linux的理由，请相信我。不然你可能连服务器都登不上<br>上面是一个FLAG，不管你信不信，反正我是信的</p>
+</blockquote>
+<p>对于一个新手小白来说，Linux的困难甚至是ssh登录层面的</p>
+<a id="more"></a>
+<p>在这里我的建议是找一家可以按量付费的IDC，先开一台，认真读读几篇说明文档，弄懂如何使用ssh，还有进阶的ssh key的使用。这里我推荐的是<a href="https://www.qcloud.com/" target="_blank" rel="external">国内的腾讯云</a>，原因是阿里云的按量付费要预充值￥100+</p>
+<p>腾讯云对于学生用户更加友好，虽然服务不及阿里云，但是感觉态度上是友好的（<a href="https://www.qcloud.com/act/campus" target="_blank" rel="external">学生优惠政策</a>，1元学生机，可选HK）</p>
+<p>能够一键生成SSH KEY这一点感觉挺好用，不放心的可以下载puttygen.exe（<a href="https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html" target="_blank" rel="external">下载地址</a>）自行生成密钥对</p>
+<p><img src="https://img.totoro.pub/images/2017/06/23/TqtN.png" alt="enter description here"></p>
+<p>这是我的KEY ，选择一个点击进去就可以看到公钥（也是腾讯云带我走进密钥登录这个坑的，这里表扬一下）</p>
+<p>公钥差不多ssh-rsa AAAXXXX……..这种形式，记住这个应该不会用错了吧（当然是我曾经搞错过）</p>
+<p>多用ssh登录几次服务器，再换成密钥登陆几次差不多就粗略熟悉了Linux的最最最基本的登录操作了，就相当于你会给Windows开机了</p>
+<p>&nbsp;</p>
+<h1 id="二、HyperAPP"><a href="#二、HyperAPP" class="headerlink" title="二、HyperAPP"></a>二、HyperAPP</h1><p>本文是介绍HyperAPP这个软件的，在APP STORE搜索HyperAPP，中国售价￥25，<a href="https://itunes.apple.com/us/app/hyperapp/id1179750280" target="_blank" rel="external">美区$3.99</a></p>
+<p><img src="https://img.totoro.pub/images/2017/06/23/Tr4u.jpg" alt="enter description here"></p>
+<p>一杯咖啡不是么？毕竟是独立开发首个docker管理APP，界面挺简洁，支持不支持？（不支持我也没办法：淘宝美区兑换码，封号几率30%）</p>
+<p>唯一比较遗憾的是并不支持openvz架构（因为依赖docker）</p>
+<p><img src="https://img.totoro.pub/images/2017/06/23/T9Qg.jpg" alt="enter description here"></p>
+<p>这是我在用的界面</p>
+<p><img src="https://img.totoro.pub/images/2017/06/23/TUg9.png" alt="enter description here"></p>
+<p>当然是可以简单管理SS的，适合少量端口的私人机场</p>
+<p>为什么我要推荐这个APP呢？</p>
+<p>原因是<del>他的widget简直太好看了</del></p>
+<p><img src="https://img.totoro.pub/images/2017/06/23/TE0H.jpg" alt="enter description here"></p>
+<p>不，可以使用EFB</p>
+<h1 id="三、EFB食用说明"><a href="#三、EFB食用说明" class="headerlink" title="三、EFB食用说明"></a>三、EFB食用说明</h1><blockquote>
+<p>EH Forwarder Bot（简称 EFB）是一个可扩展的聊天平台隧道框架，基于 Python 3。目前已内置了 Telegram 主端 (Master Channel) 和微信从端 (Slave Channel)，用来在 Telegram 收发微信消息。<br>也就是说，有了EFB我们现在就可以使用telegram来收发WeChat的全部消息啦</p>
+</blockquote>
+<p>这种好事一定要支持</p>
+<p>奈何目前EFB的教程非常少，我作为一个资深蠢货手动安装总是失败，偶然拾得HyperApp的一键docker简直不要太爽（懒人专属）</p>
+<h2 id="3-1创建-Telegram-Bot"><a href="#3-1创建-Telegram-Bot" class="headerlink" title="3.1创建 Telegram Bot"></a>3.1创建 Telegram Bot</h2><p>使用 <a href="https://telegram.me/botfather" target="_blank" rel="external">@BotBrother</a> 创建一个新的机器人（点击<a href="https://telegram.me/botfather" target="_blank" rel="external">链接</a>即可，不要像我一样蠢到在搜索栏里面搜索）</p>
+<p>发送指令 <code>/newbot</code>，根据提示完成创建，之后得到一个 <code>token</code></p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="https://www.totot.net/wp-content/uploads/2017/06/1496590696ios服务器管理软件hyperapp推荐，linux上自动化部署docker，附上efb.png" alt="IOS服务器管理软件HyperApp推荐，Linux上自动化部署Docker，附上EFB教程" title="IOS服务器管理软件HyperApp推荐，Linux上自动化部署Docker，附上EFB教程">
+                </div>
+                <div class="image-caption">IOS服务器管理软件HyperApp推荐，Linux上自动化部署Docker，附上EFB教程</div>
+            </figure>
+<p>接下来还要对刚刚启用的 Bot 进行进一步的配置：允许 Bot 读取非指令信息、允许将 Bot 添加进群组、以及提供指令列表：</p>
+<ul>
+<li>发送 <code>/setprivacy</code> 到 @BotFather，选择刚刚创建好的 Bot 用户名，然后选择 Disable；</li>
+<li>发送 <code>/setjoingroups</code> 到 @BotFather，选择刚刚创建好的 Bot 用户名，然后选择 Enable；</li>
+<li><p>发送 <code>/setcommands</code> 到 @BotFather，选择刚刚创建好的 Bot 用户名，然后发送如下内容：</p>
+<p>link - 将会话绑定到 Telegram 群组<br>chat - 生成会话头<br>recog - 回复语音消息以进行识别<br>extra - 获取更多功能    `<br>这里先告一段落，我们然后还需要获取你自己的 Telegram ID，向 <a href="https://t.me/get_id_bot" target="_blank" rel="external">@get_id_bot</a> （点这个<a href="https://t.me/get_id_bot" target="_blank" rel="external">链接</a>）发起会话便可。</p>
+<p>Your Chat ID :后面的一串数字就是你的ID啦</p>
+<p>此时我们拥有两个东西</p>
+</li>
+</ul>
+<ol>
+<li><p>机器人的token</p>
+</li>
+<li><p>自己的chat id<br>接下来我们配置服务器上的EFB</p>
+<h2 id="3-2服务端EFB配置（HyperApp）"><a href="#3-2服务端EFB配置（HyperApp）" class="headerlink" title="3.2服务端EFB配置（HyperApp）"></a>3.2服务端EFB配置（HyperApp）</h2><p>在HyperApp的docker商店找到EFB并安装，配置文件填入之前获得的token及chat id等待安装好即可使用</p>
+<p>[<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="https://www.totot.net/wp-content/uploads/2017/06/photo_2017-06-04_14-57-42.jpg" alt="](https://www.totot.net/wp-content/uploads/2017/06/photo_2017-06-04_14-57-42.jpg)" title="">
+                </div>
+                <div class="image-caption">](https://www.totot.net/wp-content/uploads/2017/06/photo_2017-06-04_14-57-42.jpg)</div>
+            </figure></p>
+</li>
+<li><p>安装完毕后点击“查看日志” -&gt; 点击右上角的 “Term” 在终端中打开，然后点击右上角的”A-“ 缩小字体直到能看见二维码。</p>
+</li>
+<li><p>使用微信扫描该二维码。注意不能截图保存到相册中然后选择图片扫描，只能扫描屏幕。但你可以截图后发到另外一台设备（比如通过QQ/微信发到PC版上）然后用微信扫描。</p>
+<h2 id="3-3服务端EFB配置（手动）"><a href="#3-3服务端EFB配置（手动）" class="headerlink" title="3.3服务端EFB配置（手动）"></a>3.3服务端EFB配置（手动）</h2><p><a href="https://alanoy.com/post/send-and-receive-wechat-message-with-telegram/" target="_blank" rel="external">教程1</a>    <a href="https://blog.1a23.com/2017/01/09/EFB-How-to-Send-and-Receive-Messages-from-WeChat-on-Telegram-zh-CN/" target="_blank" rel="external">教程2</a></p>
+<p>大致上是</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">git clone https://github.com/blueset/ehForwarderBot.git</div><div class="line">cd ehForwarderBot</div><div class="line">pip3 install -r requirements.txt</div><div class="line">mkdir storage chmod 777 storage</div><div class="line">cp config.sample.py config.py</div><div class="line">editor config.py</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>手动出问题的都是python3的安装上出现的问题（没错我就是）</p>
+<p>更多docker应用教程见<a href="https://github.com/waylybaye/HyperApp-Guide" target="_blank" rel="external">GITHUB</a></p>
+<h2 id="3-4-EFB的使用"><a href="#3-4-EFB的使用" class="headerlink" title="3.4 EFB的使用"></a>3.4 EFB的使用</h2><p>刚刚得到EFB的我也是不太会用</p>
+<p>对你的机器人说</p>
+<p>“/chat ”可以选择一个新的对话</p>
+<p>“ /chat 乌龟” 就可以查找通讯录里名字带乌龟的人</p>
+<p>你可以通过长按新会话选择回复来跟那个人聊天</p>
+<p>人太多会显得混乱？</p>
+<p>在电脑上新建一个群组把你和你的机器人拉进去</p>
+<p>然后对你的机器人说“/link”选择联系人或者群组“/link 乌龟”选择带乌龟的联系人或者群组到一个群，这样你直接在哪个群组里面说话而不需要长按回复了，不建议在群组里拉入第三人除非你要被人查岗</p>
+<p>“/group”可以将公众号拉入群组</p>
+<p>这样你可以给他们设置不同的通知提醒</p>
+<p>建议吧公众号拉倒一个群组，因为你也不需要给公众号发消息</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;一、前言&quot;&gt;&lt;a href=&quot;#一、前言&quot; class=&quot;headerlink&quot; title=&quot;一、前言&quot;&gt;&lt;/a&gt;一、前言&lt;/h1&gt;&lt;blockquote&gt;
+&lt;p&gt;对于从来没接触过linux的人来说，HyperApp绝对不是你选择尝试Linux的理由，请相信我。不然你可能连服务器都登不上&lt;br&gt;上面是一个FLAG，不管你信不信，反正我是信的&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;对于一个新手小白来说，Linux的困难甚至是ssh登录层面的&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="bash" scheme="https://totoro.pub/categories/bash/"/>
+    
+    
+      <category term="docker" scheme="https://totoro.pub/tags/docker/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>如何使用hexo</title>
+    <link href="https://totoro.pub/how-to-use.html"/>
+    <id>https://totoro.pub/how-to-use.html</id>
+    <published>2017-06-19T18:38:10.000Z</published>
+    <updated>2017-06-20T08:38:29.000Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h1><h1 id="fontawesome图标"><a href="#fontawesome图标" class="headerlink" title="fontawesome图标"></a>fontawesome图标</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">&lt;!-- 1.3倍大小 --&gt;</div><div class="line">&lt;i class=&quot;icon icon-book icon-lg&quot;&gt;&lt;/i&gt;</div><div class="line">&lt;!-- 2倍大小 --&gt;</div><div class="line">&lt;i class=&quot;icon icon-book icon-2x&quot;&gt;&lt;/i&gt;</div><div class="line">&lt;!-- 3倍大小 --&gt;</div><div class="line">&lt;i class=&quot;icon icon-book icon-3x&quot;&gt;&lt;/i&gt;</div><div class="line">&lt;!-- 4倍大小 --&gt;</div><div class="line">&lt;i class=&quot;icon icon-book icon-4x&quot;&gt;&lt;/i&gt;</div><div class="line">&lt;!-- 5倍大小 --&gt;</div><div class="line">&lt;i class=&quot;icon icon-book icon-5x&quot;&gt;&lt;/i&gt;</div><div class="line">&lt;!-- 5px右边距 --&gt;</div><div class="line">&lt;i class=&quot;icon icon-book icon-pr&quot;&gt;&lt;/i&gt;</div><div class="line">&lt;!-- 5px左边距 --&gt;</div><div class="line">&lt;i class=&quot;icon icon-book icon-pl&quot;&gt;&lt;/i&gt;</div></pre></td></tr></table></figure>
+<a id="more"></a>
+<h1 id="自定义页面"><a href="#自定义页面" class="headerlink" title="自定义页面"></a>自定义页面</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">hexo new page 链接后缀</div></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">---</div><div class="line">layout: page </div><div class="line">title: 关于我</div><div class="line">description: 一些介绍</div><div class="line">comments: false</div><div class="line">---</div></pre></td></tr></table></figure>
+<h1 id="文章页"><a href="#文章页" class="headerlink" title="文章页"></a>文章页</h1><p><code>hexo new &quot;链接后缀&quot;</code> </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">---</div><div class="line">title: IOS </div><div class="line">date: 2017-06-20 07:30:10</div><div class="line">tags: </div><div class="line">  - hyperapp</div><div class="line">  - docker</div><div class="line">  - EFB</div><div class="line">comments: false</div><div class="line">---</div></pre></td></tr></table></figure>
+<p><code>&lt;!-- more --&gt;</code>设置文章摘要</p>
+<p><code>hexo deploy</code> 推送到远程</p>
+<p><code>tags: [a, b, c]</code>设置标签</p>
+<p><code>hexo clean</code> 清除缓存</p>
+<p><code>hexo generate</code>生成新的页面</p>
+<h1 id="还可能会用到"><a href="#还可能会用到" class="headerlink" title="还可能会用到"></a>还可能会用到</h1><p><a href="http://www.atool.org/html2markdown.php" target="_blank" rel="external">makedown与html互转</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;常用命令&quot;&gt;&lt;a href=&quot;#常用命令&quot; class=&quot;headerlink&quot; title=&quot;常用命令&quot;&gt;&lt;/a&gt;常用命令&lt;/h1&gt;&lt;h1 id=&quot;fontawesome图标&quot;&gt;&lt;a href=&quot;#fontawesome图标&quot; class=&quot;headerlink&quot; title=&quot;fontawesome图标&quot;&gt;&lt;/a&gt;fontawesome图标&lt;/h1&gt;&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;3&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;4&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;5&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;6&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;7&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;8&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;9&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;10&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;11&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;12&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;13&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;14&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;&amp;lt;!-- 1.3倍大小 --&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;lt;i class=&amp;quot;icon icon-book icon-lg&amp;quot;&amp;gt;&amp;lt;/i&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;lt;!-- 2倍大小 --&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;lt;i class=&amp;quot;icon icon-book icon-2x&amp;quot;&amp;gt;&amp;lt;/i&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;lt;!-- 3倍大小 --&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;lt;i class=&amp;quot;icon icon-book icon-3x&amp;quot;&amp;gt;&amp;lt;/i&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;lt;!-- 4倍大小 --&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;lt;i class=&amp;quot;icon icon-book icon-4x&amp;quot;&amp;gt;&amp;lt;/i&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;lt;!-- 5倍大小 --&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;lt;i class=&amp;quot;icon icon-book icon-5x&amp;quot;&amp;gt;&amp;lt;/i&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;lt;!-- 5px右边距 --&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;lt;i class=&amp;quot;icon icon-book icon-pr&amp;quot;&amp;gt;&amp;lt;/i&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;lt;!-- 5px左边距 --&amp;gt;&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;&amp;lt;i class=&amp;quot;icon icon-book icon-pl&amp;quot;&amp;gt;&amp;lt;/i&amp;gt;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+    
+    </summary>
+    
+    
+      <category term="hexo" scheme="https://totoro.pub/tags/hexo/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>新的开始</title>
+    <link href="https://totoro.pub/My-New-Post.html"/>
+    <id>https://totoro.pub/My-New-Post.html</id>
+    <published>2017-06-19T18:30:10.000Z</published>
+    <updated>2017-06-21T15:47:42.302Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="试试静态博客hexo"><a href="#试试静态博客hexo" class="headerlink" title="试试静态博客hexo"></a>试试静态博客hexo</h1><p>感觉还不错<br>稳定的话就可以把整个博客迁移过来啦</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;试试静态博客hexo&quot;&gt;&lt;a href=&quot;#试试静态博客hexo&quot; class=&quot;headerlink&quot; title=&quot;试试静态博客hexo&quot;&gt;&lt;/a&gt;试试静态博客hexo&lt;/h1&gt;&lt;p&gt;感觉还不错&lt;br&gt;稳定的话就可以把整个博客迁移过来啦&lt;/p&gt;
+
+    
+    </summary>
+    
+    
+      <category term="hexo" scheme="https://totoro.pub/tags/hexo/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Hello World</title>
+    <link href="https://totoro.pub/hello-world.html"/>
+    <id>https://totoro.pub/hello-world.html</id>
+    <published>2017-06-18T17:30:10.000Z</published>
+    <updated>2017-06-23T17:40:06.409Z</updated>
+    
+    <content type="html"><![CDATA[<p>Welcome to <a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a><br><a id="more"></a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo server</div></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo generate</div></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo deploy</div></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;Welcome to &lt;a href=&quot;https://hexo.io/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Hexo&lt;/a&gt;! This is your very first post. Check &lt;a href=&quot;https://hexo.io/docs/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;documentation&lt;/a&gt; for more info. If you get any problems when using Hexo, you can find the answer in &lt;a href=&quot;https://hexo.io/docs/troubleshooting.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;troubleshooting&lt;/a&gt; or you can ask me on &lt;a href=&quot;https://github.com/hexojs/hexo/issues&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;GitHub&lt;/a&gt;.&lt;/p&gt;
+&lt;h2 id=&quot;Quick-Start&quot;&gt;&lt;a href=&quot;#Quick-Start&quot; class=&quot;headerlink&quot; title=&quot;Quick Start&quot;&gt;&lt;/a&gt;Quick Start&lt;/h2&gt;&lt;h3 id=&quot;Create-a-new-post&quot;&gt;&lt;a href=&quot;#Create-a-new-post&quot; class=&quot;headerlink&quot; title=&quot;Create a new post&quot;&gt;&lt;/a&gt;Create a new post&lt;/h3&gt;&lt;figure class=&quot;highlight bash&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;$ hexo new &lt;span class=&quot;string&quot;&gt;&quot;My New Post&quot;&lt;/span&gt;&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;p&gt;More info: &lt;a href=&quot;https://hexo.io/docs/writing.html&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;Writing&lt;/a&gt;&lt;br&gt;
+    
+    </summary>
+    
+    
+      <category term="hexo" scheme="https://totoro.pub/tags/hexo/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>ingress610在苏州参加mission day</title>
+    <link href="https://totoro.pub/ingress/610suzhou.html"/>
+    <id>https://totoro.pub/ingress/610suzhou.html</id>
+    <published>2017-06-11T17:12:10.000Z</published>
+    <updated>2017-07-01T18:35:16.854Z</updated>
+    
+    <content type="html"><![CDATA[<blockquote>
+<p>我敢肯定这次mission day我一定会印象深刻–因为那滂沱大雨<br>这是我玩ingress以来最惨的一次了！暴雨！暴雨！暴雨！啊<br>不过好在风景还不赖，小姐姐也很好看（真~小姐姐）</p>
+</blockquote>
+<a id="more"></a>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="https://img.totoro.pub/images/2017/07/02/jmQx.jpg" alt="jmQx.jpg" title="">
+                </div>
+                <div class="image-caption">jmQx.jpg</div>
+            </figure>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="https://img.totoro.pub/images/2017/07/02/jS46.jpg" alt="jS46.jpg" title="">
+                </div>
+                <div class="image-caption">jS46.jpg</div>
+            </figure>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="https://img.totoro.pub/images/2017/07/02/jOtZ.jpg" alt="jOtZ.jpg" title="">
+                </div>
+                <div class="image-caption">jOtZ.jpg</div>
+            </figure>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="https://img.totoro.pub/images/2017/07/02/j40B.jpg" alt="j40B.jpg" title="">
+                </div>
+                <div class="image-caption">j40B.jpg</div>
+            </figure>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="https://img.totoro.pub/images/2017/07/02/jVc4.jpg" alt="jVc4.jpg" title="">
+                </div>
+                <div class="image-caption">jVc4.jpg</div>
+            </figure>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="https://img.totoro.pub/images/2017/07/02/nTLO.jpg" alt="nTLO.jpg" title="">
+                </div>
+                <div class="image-caption">nTLO.jpg</div>
+            </figure>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="https://img.totoro.pub/images/2017/07/02/n6dQ.jpg" alt="n6dQ.jpg" title="">
+                </div>
+                <div class="image-caption">n6dQ.jpg</div>
+            </figure>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="https://img.totoro.pub/images/2017/07/02/jz9w.jpg" alt="jz9w.jpg" title="">
+                </div>
+                <div class="image-caption">jz9w.jpg</div>
+            </figure>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="https://img.totoro.pub/images/2017/07/02/njYv.jpg" alt="njYv.jpg" title="">
+                </div>
+                <div class="image-caption">njYv.jpg</div>
+            </figure>
+<p>从早上8点多的火车抵达苏州站开始，雨就不是那种淅淅沥沥的小雨了，而是—-黑大帅的花洒、哗哗哗的<br>飞快的做完了苏州火车站的任务，接下来，按照计划坐公交车去苏州博物馆<br>然而–半个小时下去了都没能找到正确方向的公交车站（两个方向的车分开的）<br>内心崩溃。。。。<br>大抵预示了这一天的悲剧<br>迷路，走错路，绕路，不知道还有没有谁能比我惨<br>最后在4点多的时候淋着倾盆大雨来到签退点签退回家<br>呜呜呜</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;blockquote&gt;
+&lt;p&gt;我敢肯定这次mission day我一定会印象深刻–因为那滂沱大雨&lt;br&gt;这是我玩ingress以来最惨的一次了！暴雨！暴雨！暴雨！啊&lt;br&gt;不过好在风景还不赖，小姐姐也很好看（真~小姐姐）&lt;/p&gt;
+&lt;/blockquote&gt;
+    
+    </summary>
+    
+      <category term="ingress" scheme="https://totoro.pub/categories/ingress/"/>
+    
+    
+      <category term="ingress" scheme="https://totoro.pub/tags/ingress/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>VPN服务器一键搭建教程(ipsec,ikev2)</title>
+    <link href="https://totoro.pub/bash/vpn-ikev2.html"/>
+    <id>https://totoro.pub/bash/vpn-ikev2.html</id>
+    <published>2017-06-01T16:56:10.000Z</published>
+    <updated>2017-06-23T17:50:31.385Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="安装部分"><a href="#安装部分" class="headerlink" title="安装部分"></a>安装部分</h1><p>使用 <a href="https://github.com/quericy/one-key-ikev2-vpn" target="_blank" rel="external">一键包</a></p>
+<p>先下载</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">wget --no-check-certificate https://raw.githubusercontent.com/quericy/one-key-ikev2-vpn/master/one-key-ikev2.sh</div><div class="line">chmod +x one-key-ikev2.sh</div></pre></td></tr></table></figure>
+<p>准备好 SSL 证书（单域名的，那么多免费的，随意撸一个一年的呗）<br><a id="more"></a><br>在脚本所在的目录新建 3 个文件</p>
+<ol>
+<li><strong>ca.cert.pem</strong> 证书颁发机构的 CA；</li>
+<li><strong>server.cert.pem</strong> 签发的域名证书；（注意检查两个证书不要颠倒）</li>
+<li><strong>server.pem</strong> 签发域名证书时用的私钥；</li>
+</ol>
+<p>决定以后都不改 ip 之后就把 SNAT 规则打开</p>
+<p>看到 install Complete 字样即表示安装完成。默认用户名密码将以黄字显示，可根据提示自行修改配置文件中的用户名密码, 多用户则在配置文件中按格式一行一个 (多用户时用户名不能使用%any), 保存并重启服务生效。</p>
+<p>最终跑完之后 连接信息是：</p>
+<p>服务器地址：域名 ip</p>
+<p>账户：myUserName</p>
+<p>密码：myUserPass</p>
+<p>这么愚蠢的默认连接方式怎么能用？</p>
+<p><code>vi /usr/local/etc/ipsec.secrets</code></p>
+<p>修改 myUserName %any : EAP “myUserPass” 为对应的用户名与密码</p>
+<p>可以添加多用户（封锁这么严重了，顶多给你家妹子用就行了）</p>
+<p>把： /usr/local/sbin/ipsec 加入到：/etc/rc.local 来实现需要开机自启</p>
+<p>不怕麻烦的可以（当然有些奇怪的问题的时候也可以用）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">ipsec start   #启动服务</div><div class="line">ipsec stop    #关闭服务</div><div class="line">ipsec restart #重启服务</div><div class="line">ipsec reload  #重新读取</div><div class="line">ipsec status  #查看状态</div><div class="line">ipsec --help  #查看帮助</div></pre></td></tr></table></figure>
+<p>或者用 /etc/init.d/ipsec_vpn start|stop|restart 来彰显高端</p>
+<p>更多问题请去 <a href="https://github.com/quericy/one-key-ikev2-vpn/issues" target="_blank" rel="external">gtihub</a></p>
+<h1 id="IOS-配置"><a href="#IOS-配置" class="headerlink" title="IOS 配置"></a>IOS 配置</h1><p>找到设置=》VPN=》添加配置，</p>
+<p>默认类型都是 IKEv2 了吧，描述随便写，服务器与远程 ID 填写上面说到的 域名 ，用户鉴定为 用户名 ，分别填写你 设置的用户名与密码或者默认的 myUserName   myUserPass</p>
+<p>然后就可以愉快的玩耍啦</p>
+<p>打游戏什么的还是 VPN 靠谱</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;安装部分&quot;&gt;&lt;a href=&quot;#安装部分&quot; class=&quot;headerlink&quot; title=&quot;安装部分&quot;&gt;&lt;/a&gt;安装部分&lt;/h1&gt;&lt;p&gt;使用 &lt;a href=&quot;https://github.com/quericy/one-key-ikev2-vpn&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;一键包&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;先下载&lt;/p&gt;
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;1&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;2&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;div class=&quot;line&quot;&gt;wget --no-check-certificate https://raw.githubusercontent.com/quericy/one-key-ikev2-vpn/master/one-key-ikev2.sh&lt;/div&gt;&lt;div class=&quot;line&quot;&gt;chmod +x one-key-ikev2.sh&lt;/div&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+&lt;p&gt;准备好 SSL 证书（单域名的，那么多免费的，随意撸一个一年的呗）&lt;br&gt;
+    
+    </summary>
+    
+      <category term="bash" scheme="https://totoro.pub/categories/bash/"/>
+    
+    
+      <category term="network" scheme="https://totoro.pub/tags/network/"/>
+    
+      <category term="vpn" scheme="https://totoro.pub/tags/vpn/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>APlayer and DPlayer</title>
+    <link href="https://totoro.pub/player.html"/>
+    <id>https://totoro.pub/player.html</id>
+    <published>2017-05-22T13:53:10.000Z</published>
+    <updated>2017-07-01T18:18:41.764Z</updated>
+    
+    <content type="html"><![CDATA[<p>作为一个热爱生活的土木男<br>当然要多听听音乐看看视频啦<br>很是喜欢<a href="https://www.anotherhome.net/" target="_blank" rel="external">DIYgod</a>的两个播放器<a href="https://github.com/DIYgod/APlayer" target="_blank" rel="external">APlayer</a>和<a href="https://github.com/DIYgod/DPlayer" target="_blank" rel="external">DPlayer</a></p>
+<h1 id="Typecho里面的插件并不是很智能"><a href="#Typecho里面的插件并不是很智能" class="headerlink" title="Typecho里面的插件并不是很智能"></a>Typecho里面的插件并不是很智能</h1><p>所以我得记录下他们的用法</p>
+<a id="more"></a>
+<h2 id="APlayer"><a href="#APlayer" class="headerlink" title="APlayer"></a>APlayer</h2><p><code>[[player url=&quot;http://xxx.com/xxx.mp3&quot; artist=&quot;Someone&quot; title=&quot;Title&quot; showlrc=&quot;false&quot;/]]</code></p>
+<p>网易云音乐：<br><code>[[player id=&quot;29947420&quot;/]]</code></p>
+<p>属性说明<br><code>url: mp3文件的链接，必需
+lrc: 歌词的lrc链接，非必需
+lrcoffset: 歌词整体提前时间（ms）若这个值为负数则为歌词整体延后的时间
+title: 歌曲的标题，若值为空则显示 Unknown
+artist: 歌曲的艺术家，若值为空则显示 Unknown
+cover: 封面图片链接，非必需</code></p>
+<h3 id="我会怎么用？"><a href="#我会怎么用？" class="headerlink" title="我会怎么用？"></a>我会怎么用？</h3><p>网易云音乐<code>[[player id=&quot;29947420&quot; autoplay=&quot;true&quot; cover=&quot;http://xxx.com/xxx.png&quot;/]]</code><br>注：网易云封面用的是http<br>其他音乐<code>[[player url=&quot;http://xxx.com/xxx.mp3&quot; artist=&quot;Someone&quot; title=&quot;Title&quot; autoplay=&quot;true&quot; cover=&quot;http://xxx.com/xxx.png&quot;/]]</code></p>
+<p>[player url=”<a href="https://player.tot.ac.cn/music/34723470.mp3" target="_blank" rel="external">https://player.tot.ac.cn/music/34723470.mp3</a>“ artist=”囧菌” title=”东京不太热” autoplay=”false” cover=”<a href="https://player.tot.ac.cn/music/34723470.jpg&quot;/" target="_blank" rel="external">https://player.tot.ac.cn/music/34723470.jpg&quot;/</a>]<br><code>[[player url=&quot;https://player.tot.ac.cn/music/34723470.mp3&quot; artist=&quot;囧菌&quot; title=&quot;东京不太热&quot; autoplay=&quot;false&quot; cover=&quot;https://player.tot.ac.cn/music/34723470.jpg&quot;/]]</code><br>注：关闭了自动播放</p>
+<p>(还是wordpress插件丰富啊，<a href="https://github.com/liwanglin12/Hermit-X" target="_blank" rel="external">Hermit-X</a>很简单,网易云也能完美支持ssl）</p>
+<h2 id="DPlayer"><a href="#DPlayer" class="headerlink" title="DPlayer"></a>DPlayer</h2><p>我是这样用的<br><code>[[dplayer url=&quot;http://xxx.com/xxx.mp4&quot; pic=&quot;http://xxx.com/xxx.jpg&quot; danmu=&quot;false&quot; autoplay=&quot;true&quot;/]]</code><br>谁让我不会搭弹幕呢<br>[dplayer url=”<a href="https://player.tot.ac.cn/miku/freely-tomorrow.mp4" target="_blank" rel="external">https://player.tot.ac.cn/miku/freely-tomorrow.mp4</a>“ pic=”<a href="https://player.tot.ac.cn/miku/freely-tomorrow.png" target="_blank" rel="external">https://player.tot.ac.cn/miku/freely-tomorrow.png</a>“ danmu=”false” autoplay=”false”/]<br><code>[[dplayer url=&quot;https://player.tot.ac.cn/miku/freely-tomorrow.mp4&quot; pic=&quot;https://player.tot.ac.cn/miku/freely-tomorrow.png&quot; danmu=&quot;false&quot; autoplay=&quot;false&quot;/]]</code><br>注：关闭了自动播放</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;作为一个热爱生活的土木男&lt;br&gt;当然要多听听音乐看看视频啦&lt;br&gt;很是喜欢&lt;a href=&quot;https://www.anotherhome.net/&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;DIYgod&lt;/a&gt;的两个播放器&lt;a href=&quot;https://github.com/DIYgod/APlayer&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;APlayer&lt;/a&gt;和&lt;a href=&quot;https://github.com/DIYgod/DPlayer&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;DPlayer&lt;/a&gt;&lt;/p&gt;
+&lt;h1 id=&quot;Typecho里面的插件并不是很智能&quot;&gt;&lt;a href=&quot;#Typecho里面的插件并不是很智能&quot; class=&quot;headerlink&quot; title=&quot;Typecho里面的插件并不是很智能&quot;&gt;&lt;/a&gt;Typecho里面的插件并不是很智能&lt;/h1&gt;&lt;p&gt;所以我得记录下他们的用法&lt;/p&gt;
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>519宿舍垃圾通道失火</title>
+    <link href="https://totoro.pub/519fire.html"/>
+    <id>https://totoro.pub/519fire.html</id>
+    <published>2017-05-19T17:26:10.000Z</published>
+    <updated>2017-07-01T18:17:44.013Z</updated>
+    
+    <content type="html"><![CDATA[<p>夜已深，早睡的人儿肯定都不知道自己刚刚经历了一场小火<br>让他们安静的继续睡吧<br>一开始大家闻到烧焦塑料的味道(有毒)，都以为5楼在烧东西，探出脑袋在询问，后来有人扔垃圾发现垃圾通道里浓烟滚滚<br>才知道垃圾通道着火了</p>
+<a id="more"></a>
+<p>机智地同学们端出一盆盆水，拉出洗地面用的软管接了自来水就往里面灌<br><img src="https://img.totoro.pub/images/2017/07/02/j5J8.jpg" alt="IMG_9024.JPG"><br>还有放在楼梯口终于派上用场的干粉灭火器，<br>是的，地面上全是干粉和水的混合物<br><img src="https://img.totoro.pub/images/2017/07/02/jgYn.jpg" alt="IMG_9022.JPG"><br>明天打扫卫生的阿姨要崩溃了<br>注意安全啦</p>
+<p>不知名的小伙伴报了火警？<br>消防车因为演唱会刚刚结束被堵在路上？<br>一切安好<br>夜猫子们快睡吧<br>明天又是一个特殊的日子<br>你<br>准备好了么？</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;夜已深，早睡的人儿肯定都不知道自己刚刚经历了一场小火&lt;br&gt;让他们安静的继续睡吧&lt;br&gt;一开始大家闻到烧焦塑料的味道(有毒)，都以为5楼在烧东西，探出脑袋在询问，后来有人扔垃圾发现垃圾通道里浓烟滚滚&lt;br&gt;才知道垃圾通道着火了&lt;/p&gt;
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>ingress519印象镇江任务上线</title>
+    <link href="https://totoro.pub/ingress/519zhenjiang-missions.html"/>
+    <id>https://totoro.pub/ingress/519zhenjiang-missions.html</id>
+    <published>2017-05-19T17:12:10.000Z</published>
+    <updated>2017-07-01T18:15:59.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>镇江的拼图任务除了江苏科技大学的那一行以外就没有啦<br>于是乎我自己就申请了一个印象镇江的拼图任务<br><img src="https://img.totoro.pub/images/2017/07/02/jhcH.jpg" alt="IMG_9021.PNG"></p>
+<a id="more"></a>
+<p><img src="https://img.totoro.pub/images/2017/07/02/jLvg.jpg" alt="IMG_9017.PNG"><br>刚刚上线自己就迫不及待的试了试</p>
+<p>然而路过了一家自助牛排<br><img src="https://img.totoro.pub/images/2017/07/02/j8Qu.jpg" alt="IMG_9016.JPG"><br>吃的差点忘了po<br><img src="https://img.totoro.pub/images/2017/07/02/jk99.png" alt="IMG_9014.PNG"><br>想起来也没啥用，饭po始终差1m</p>
+<p>今天是个好日子，明天就是520<br>镇江又是张学友演唱会又是三中文艺汇演<br><img src="https://img.totoro.pub/images/2017/07/02/jGWk.jpg" alt="IMG_9020.JPG"><br><img src="https://img.totoro.pub/images/2017/07/02/jMLW.jpg" alt="IMG_9019.JPG"><br>在这里必须感谢若干家单位，活动没有挡住我的po<br>不然摸不到多难受<br>任务艰巨的完成了<br>行走距离+11km，该不会是弄错了吧<br>反正我画图加多重顺便任务用了4个小时<br>qaq镇江po少，我不是故意让你们走那么远的</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;镇江的拼图任务除了江苏科技大学的那一行以外就没有啦&lt;br&gt;于是乎我自己就申请了一个印象镇江的拼图任务&lt;br&gt;&lt;img src=&quot;https://img.totoro.pub/images/2017/07/02/jhcH.jpg&quot; alt=&quot;IMG_9021.PNG&quot;&gt;&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="ingress" scheme="https://totoro.pub/categories/ingress/"/>
+    
+    
+      <category term="ingress" scheme="https://totoro.pub/tags/ingress/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>ingress513日在芜湖拿到3113金牌</title>
+    <link href="https://totoro.pub/ingress/513wuhu-3113.html"/>
+    <id>https://totoro.pub/ingress/513wuhu-3113.html</id>
+    <published>2017-05-19T16:50:10.000Z</published>
+    <updated>2017-07-01T18:14:04.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>官方的插脚活动开始啦，怎么能不做呢？<br>跟蓝军约了去芜湖雕塑公园<br>说实话，芜湖事实是我籍贯所在地<br>然而我从小到大从来没有去过</p>
+<a id="more"></a>
+<p><img src="https://img.totoro.pub/images/2017/07/02/jwWJ.jpg" alt="79E21E07-4EDF-4936-923E-5028A4EAF1B8.JPG"><br>感觉还不错<br>然而这些都是表层现象<br>从火车站8点打烊的KFC到路边10点打烊的KFC<br>这里简直不适合生存好嘛<br>还有某个奇怪的雕塑，居然在底下放一个灯<br><img src="https://img.totoro.pub/images/2017/07/02/jf8p.jpg" alt="44DB5D44-3599-42B9-9EFD-CFAD3DE6F5A4.JPG"><br>好在我尽力了千辛万苦终于拿到了3113<br>不枉此行，仓库空无<br><img src="https://img.totoro.pub/images/2017/07/02/jPy3.png" alt="IMG_8938.PNG"></p>
+<p>我会说我还额外做了一个吸猫之旅的任务么？<br>做了1找不到2啊喂，做了4找不到5你妈妈知道么<br>痛哭<br>随便做了一排就不敢再做了，还好不影响美观<br><img src="https://img.totoro.pub/images/2017/07/02/jtTi.jpg" alt="IMG_9007.JPG"><br>这就是芜湖之旅啦</p>
+<p>当然不可能只是这些<br>下面是大新闻<br><img src="https://img.totoro.pub/images/2017/07/02/jxJo.png" alt="IMG_9035.PNG"><br><img src="https://img.totoro.pub/images/2017/07/02/j1iX.png" alt="IMG_9034.PNG"><br><img src="https://img.totoro.pub/images/2017/07/02/j3mN.jpg" alt="IMG_9039.JPG"><br>我也是屏障组的一员啦</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;官方的插脚活动开始啦，怎么能不做呢？&lt;br&gt;跟蓝军约了去芜湖雕塑公园&lt;br&gt;说实话，芜湖事实是我籍贯所在地&lt;br&gt;然而我从小到大从来没有去过&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="ingress" scheme="https://totoro.pub/categories/ingress/"/>
+    
+    
+      <category term="ingress" scheme="https://totoro.pub/tags/ingress/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>ingress57定的biocard到货啦</title>
+    <link href="https://totoro.pub/ingress/my-biocard.html"/>
+    <id>https://totoro.pub/ingress/my-biocard.html</id>
+    <published>2017-05-07T14:56:10.000Z</published>
+    <updated>2017-07-01T18:52:15.297Z</updated>
+    
+    <content type="html"><![CDATA[<p>印刷了一周的biocard终于到货了<br><img src="https://img.totoro.pub/images/2017/07/02/jFmr.md.jpg" alt="IMG_8859.JPG"><br>看上去还不错<br>到手之后立刻剪了角</p>
+<a id="more"></a>
+<p>手动裁剪<br>毛毛的边角<br><img src="https://img.totoro.pub/images/2017/07/02/jCiC.md.jpg" alt="IMG_8858(20170507-225147).jpg"><br>最后看了一下<br>和电脑上确实有些色差<br><img src="https://img.totoro.pub/images/2017/07/02/jdIM.md.jpg" alt="IMG_8861.JPG"><img src="https://img.totoro.pub/images/2017/07/02/jvvl.png" alt="TOTORO625_biocard_front.png"><br><img src="https://img.totoro.pub/images/2017/07/02/jbDh.md.jpg" alt="IMG_8860.JPG"><img src="https://img.totoro.pub/images/2017/07/02/j0cY.png" alt="TOTORO625_biocard_back.png"><br>还算能看<br>还好啦<br>见面可以发卡了<br>毕竟ingress是个卡牌游戏</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;印刷了一周的biocard终于到货了&lt;br&gt;&lt;img src=&quot;https://img.totoro.pub/images/2017/07/02/jFmr.md.jpg&quot; alt=&quot;IMG_8859.JPG&quot;&gt;&lt;br&gt;看上去还不错&lt;br&gt;到手之后立刻剪了角&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="ingress" scheme="https://totoro.pub/categories/ingress/"/>
+    
+    
+      <category term="ingress" scheme="https://totoro.pub/tags/ingress/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>ingress53摸八又爆仓</title>
+    <link href="https://totoro.pub/ingress/53hackfull.html"/>
+    <id>https://totoro.pub/ingress/53hackfull.html</id>
+    <published>2017-05-03T16:46:10.000Z</published>
+    <updated>2017-07-01T18:00:08.935Z</updated>
+    
+    <content type="html"><![CDATA[<p>焦山有三个八po当然要多摸啦<br><img src="https://img.totoro.pub/images/2017/07/02/jWTU.png" alt="IMG_8813.PNG"><br>日常爆满啦</p>
+<a id="more"></a>
+<p><img src="https://img.totoro.pub/images/2017/07/02/jl8v.png" alt="IMG_8814.PNG"></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;焦山有三个八po当然要多摸啦&lt;br&gt;&lt;img src=&quot;https://img.totoro.pub/images/2017/07/02/jWTU.png&quot; alt=&quot;IMG_8813.PNG&quot;&gt;&lt;br&gt;日常爆满啦&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="ingress" scheme="https://totoro.pub/categories/ingress/"/>
+    
+    
+      <category term="ingress" scheme="https://totoro.pub/tags/ingress/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>ingress52断焦山-滁州Link</title>
+    <link href="https://totoro.pub/ingress/52link.html"/>
+    <id>https://totoro.pub/ingress/52link.html</id>
+    <published>2017-05-02T12:23:10.000Z</published>
+    <updated>2017-07-01T17:58:15.575Z</updated>
+    
+    <content type="html"><![CDATA[<p>5月1日一觉醒来，镇江南京都被盖蓝<br>浸泡在蓝色的海洋中令我感到非常的不快<br><img src="https://img.totoro.pub/images/2017/07/02/jQIZ.jpg" alt="IMG_8793(20170502-202255).jpg"><br>但是由于我正处于牙疼之中，揭盖的活就没我事了<br>但是<br>因为一个承诺<br>焦山到滁州的Link需要我去打断<br><img src="https://img.totoro.pub/images/2017/07/02/jD68.jpg" alt="cn.png"><br>对，我是救世主</p>
+<a id="more"></a>
+<p>正好今天下午没课了<br>算好公交车的时间去了焦山<br><img src="https://img.totoro.pub/images/2017/07/02/ja8n.jpg" alt="IMG_8776.JPG"><br>呼呼的江风差点没把我吹傻<br>点开一看<br>哇 好多7级po吖<br><img src="https://img.totoro.pub/images/2017/07/02/jRi6.png" alt="IMG_8779.PNG"><br>发了发了<br>一定要摸回本<br>摸着摸着<br>用在敌方po上摸到的武器对付敌方的po<br>突然看到一堆po居然都没盾<br>点进去一看<br><img src="https://img.totoro.pub/images/2017/07/02/joXx.jpg" alt="mod.png"><br>什么鬼<br>有隐情<br>哇塞 居然是8级po唉<br>唔 还好没连Link 不是今天的主要目标<br>小心点打 别误伤了<br>呜呜呜 炸弹威力太大了 要被打死了<br>不行 这等极品8po不能打掉<br>掏出压箱底的绿毒<br>Jarvis Virus你还会回来的 对么<br>qaq 再见了 我的Jarvis<br>毒掉两个靠在边缘的8po<br><img src="https://img.totoro.pub/images/2017/07/02/jBDB.png" alt="IMG_8791.PNG"><br><img src="https://img.totoro.pub/images/2017/07/02/jIb4.png" alt="IMG_8790.PNG"><br>剩下一个中间的8po在我尽可能的不碰到的情况下<br>还剩一丝丝血<br><img src="https://img.totoro.pub/images/2017/07/02/jJMw.png" alt="IMG_8782.PNG"><br>临走的时候还不忘艾特了敌军叫充电<br><img src="https://img.totoro.pub/images/2017/07/02/jZyQ.jpg" alt="233.png"><br><img src="https://img.totoro.pub/images/2017/07/02/jeAO.png" alt="IMG_8792.PNG"><br>最终，镇江蓝绿留下了3个8po<br>鉴于镇江玩家这么少的情况下，能出8po非常难<br>这3个8po在一圈里面都升到了顶级<br>留下来会对镇江方面的发展起到非常大的促进作用<br>毕竟58秒的冷却时间分到3个po就是一个po19秒<br>能摸16轮<br>就是说我们最快也要16分钟纯hack才能摸完 这都不带歇的<br>更何况还要画图<br>约薯条吧2333</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;5月1日一觉醒来，镇江南京都被盖蓝&lt;br&gt;浸泡在蓝色的海洋中令我感到非常的不快&lt;br&gt;&lt;img src=&quot;https://img.totoro.pub/images/2017/07/02/jQIZ.jpg&quot; alt=&quot;IMG_8793(20170502-202255).jpg&quot;&gt;&lt;br&gt;但是由于我正处于牙疼之中，揭盖的活就没我事了&lt;br&gt;但是&lt;br&gt;因为一个承诺&lt;br&gt;焦山到滁州的Link需要我去打断&lt;br&gt;&lt;img src=&quot;https://img.totoro.pub/images/2017/07/02/jD68.jpg&quot; alt=&quot;cn.png&quot;&gt;&lt;br&gt;对，我是救世主&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="ingress" scheme="https://totoro.pub/categories/ingress/"/>
+    
+    
+      <category term="ingress" scheme="https://totoro.pub/tags/ingress/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>51牙疼</title>
+    <link href="https://totoro.pub/toothache.html"/>
+    <id>https://totoro.pub/toothache.html</id>
+    <published>2017-04-30T19:27:10.000Z</published>
+    <updated>2017-07-01T17:55:20.878Z</updated>
+    
+    <content type="html"><![CDATA[<p>牙疼不是病，疼起来真要命<br>慢性牙根尖周炎，左边脸肿的不能出门见人</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;牙疼不是病，疼起来真要命&lt;br&gt;慢性牙根尖周炎，左边脸肿的不能出门见人&lt;/p&gt;
+
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>ingress的biocard制作</title>
+    <link href="https://totoro.pub/ingress/ingress-biocard.html"/>
+    <id>https://totoro.pub/ingress/ingress-biocard.html</id>
+    <published>2017-04-28T16:49:10.000Z</published>
+    <updated>2017-07-01T17:54:00.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>既然收到了别人的ingress biocard<br>那么自己当然也要做一张啦<br>初步设计是这样的<br><img src="https://img.totoro.pub/images/2017/07/02/jErk.png" alt="TOTORO625_biocard_front_old.png"></p>
+<a id="more"></a>
+<p><img src="https://img.totoro.pub/images/2017/07/02/jyM9.png" alt="TOTORO625_biocard_back_old.png"><br>后来又改成这样<br><img src="https://img.totoro.pub/images/2017/07/02/jrbH.png" alt="TOTORO625_biocard_front.png"><br><img src="https://img.totoro.pub/images/2017/07/02/jUAW.png" alt="TOTORO625_biocard_back.png"><br>总之做的很丑啦<del>~~(&gt;_&lt;)</del>~~</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;既然收到了别人的ingress biocard&lt;br&gt;那么自己当然也要做一张啦&lt;br&gt;初步设计是这样的&lt;br&gt;&lt;img src=&quot;https://img.totoro.pub/images/2017/07/02/jErk.png&quot; alt=&quot;TOTORO625_biocard_front_old.png&quot;&gt;&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="ingress" scheme="https://totoro.pub/categories/ingress/"/>
+    
+    
+      <category term="ingress" scheme="https://totoro.pub/tags/ingress/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>ingress420所以说我毒掉了大佬的成就po</title>
+    <link href="https://totoro.pub/ingress/420dalao.html"/>
+    <id>https://totoro.pub/ingress/420dalao.html</id>
+    <published>2017-04-28T16:30:10.000Z</published>
+    <updated>2017-07-01T17:51:54.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>既然说到了绿妹，那么怎么能没有蓝妹呢<br>其实早在我进入游戏的第15天就遇上啦<br>4月20日盖多重的时候，有条link挡着了，为了顺利刷AP升7，策划了超级多重计划<br><img src="https://img.totoro.pub/images/2017/07/02/Y4rJ.jpg" alt="IMG_8741(20170429-003329).jpg"></p>
+<a id="more"></a>
+<p><img src="https://img.totoro.pub/images/2017/07/02/YXG3.jpg" alt="IMG_8743(20170429-003421).jpg"><br><img src="https://img.totoro.pub/images/2017/07/02/YSbY.jpg" alt="IMG_8744(20170429-003433).jpg"><br><img src="https://img.totoro.pub/images/2017/07/02/YVlp.jpg" alt="IMG_8745(20170429-003443).jpg"><br>反正数不清的楚有多少field啦<br>花掉了某个端点30多的key<br>然而，其中有个po正好碍事<br><img src="https://img.totoro.pub/images/2017/07/02/Yp7i.jpg" alt="IMG_8742(20170429-003350).jpg"><br>按照计划毒掉了，很心疼的<br>毕竟是个毒嘛<br><img src="https://img.totoro.pub/images/2017/07/02/j66o.png" alt="IMG_8737.PNG"><br>不过是一个快升8的po看上去不是很亏<br>最终是这样的<br><img src="https://img.totoro.pub/images/2017/07/02/jTBX.jpg" alt="IMG_8555.JPG"><br>高高兴兴的盖了大多重<br>然后(^o^)/~<br>晚上<br>大佬找上门了<br><img src="https://img.totoro.pub/images/2017/07/02/jYfN.jpg" alt="21.png"><br><img src="https://img.totoro.pub/images/2017/07/02/jjXu.jpg" alt="22.png"><br><img src="https://img.totoro.pub/images/2017/07/02/jqug.jpg" alt="23.png"><br>我是真的不知道那个是成就啊<br>真的知道的话或许会丢炸弹留个脚<br>后来知道她是个蓝妹<br>原来是个300多天的成就<br>唔<br>还是镇江的<br>有空约啊（x</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;既然说到了绿妹，那么怎么能没有蓝妹呢&lt;br&gt;其实早在我进入游戏的第15天就遇上啦&lt;br&gt;4月20日盖多重的时候，有条link挡着了，为了顺利刷AP升7，策划了超级多重计划&lt;br&gt;&lt;img src=&quot;https://img.totoro.pub/images/2017/07/02/Y4rJ.jpg&quot; alt=&quot;IMG_8741(20170429-003329).jpg&quot;&gt;&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="ingress" scheme="https://totoro.pub/categories/ingress/"/>
+    
+    
+      <category term="ingress" scheme="https://totoro.pub/tags/ingress/"/>
+    
+  </entry>
+  
+</feed>
