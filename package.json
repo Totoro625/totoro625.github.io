@@ -1,0 +1,19 @@
+{
+  "name": "hexo-theme-totoro",
+  "version": "1.0.0",
+  "description": "totoro625 Design theme for Hexo.",
+  "keywords": [
+    "hexo",
+    "theme",
+    "totoro625 design"
+  ],
+  "author": {
+    "name": "totoro625",
+    "email": "hc625@qq.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "url": "xxx",
+    "type": "git"
+  }
+}
