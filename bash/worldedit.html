@@ -1,0 +1,2276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/avatar.jpg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/avatar.jpg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/avatar.jpg">
+  <link rel="mask-icon" href="/avatar.jpg" color="#222">
+  <meta name="google-site-verification" content="1p0EsRqqrxXK9MKusHQddZLU3uRKR39HAJc0nv9cCPY">
+  <meta name="baidu-site-verification" content="p98fiVOwSW">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('https://totoro.ink').hostname,
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.7.1',
+    exturl: false,
+    sidebar: {"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":"flat"},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":true,"nav":{"disqus":{"text":"Load Disqus","order":-1}}},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="从入门到跑路 一定要好好学习指令，免得把世界弄崩溃 &#x2F;&#x2F;undo和&#x2F;&#x2F;redo要抓好，指令输错可挽回 我最喜欢用的是   命令 描述    &#x2F;&#x2F;set id 改变选区方块   &#x2F;&#x2F;replace 替换选区方块   &#x2F;&#x2F;walls 选区设置围墙   &#x2F;&#x2F;stack 复制选区   &#x2F;repl 把右键变成小刷子   &#x2F;brush clipboard 绑定一个工具为大刷子   &#x2F;jumpto 传送   &#x2F;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="我的世界worldedit常用命令">
+<meta property="og:url" content="https://totoro.ink/bash/worldedit.html">
+<meta property="og:site_name" content="TOTORO625">
+<meta property="og:description" content="从入门到跑路 一定要好好学习指令，免得把世界弄崩溃 &#x2F;&#x2F;undo和&#x2F;&#x2F;redo要抓好，指令输错可挽回 我最喜欢用的是   命令 描述    &#x2F;&#x2F;set id 改变选区方块   &#x2F;&#x2F;replace 替换选区方块   &#x2F;&#x2F;walls 选区设置围墙   &#x2F;&#x2F;stack 复制选区   &#x2F;repl 把右键变成小刷子   &#x2F;brush clipboard 绑定一个工具为大刷子   &#x2F;jumpto 传送   &#x2F;">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2017-12-19T14:43:00.000Z">
+<meta property="article:modified_time" content="2021-01-18T10:12:51.590Z">
+<meta property="article:author" content="totoro625">
+<meta property="article:tag" content="minecraft">
+<meta property="article:tag" content="worldedit">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://totoro.ink/bash/worldedit.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>我的世界worldedit常用命令 | TOTORO625</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="TOTORO625" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">TOTORO625</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-友链">
+
+    <a href="/link.html" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about.html" rel="section"><i class="fa fa-fw fa-user-circle-o"></i>关于</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://totoro.ink/bash/worldedit.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/avatar.jpg">
+      <meta itemprop="name" content="totoro625">
+      <meta itemprop="description" content="龙猫不在家">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="TOTORO625">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          我的世界worldedit常用命令
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2017-12-19 22:43:00" itemprop="dateCreated datePublished" datetime="2017-12-19T22:43:00+08:00">2017-12-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-01-18 18:12:51" itemprop="dateModified" datetime="2021-01-18T18:12:51+08:00">2021-01-18</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/bash/" itemprop="url" rel="index">
+                    <span itemprop="name">bash</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><em>从入门到跑路</em></p>
+<p>一定要好好学习指令，免得把世界弄崩溃</p>
+<p><code>//undo</code>和<code>//redo</code>要抓好，指令输错可挽回</p>
+<h2 id="我最喜欢用的是"><a href="#我最喜欢用的是" class="headerlink" title="我最喜欢用的是"></a>我最喜欢用的是</h2><table>
+<thead>
+<tr>
+<th>命令</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>//set id</td>
+<td>改变选区方块</td>
+</tr>
+<tr>
+<td>//replace</td>
+<td>替换选区方块</td>
+</tr>
+<tr>
+<td>//walls</td>
+<td>选区设置围墙</td>
+</tr>
+<tr>
+<td>//stack</td>
+<td>复制选区</td>
+</tr>
+<tr>
+<td>/repl</td>
+<td>把右键变成小刷子</td>
+</tr>
+<tr>
+<td>/brush clipboard</td>
+<td>绑定一个工具为大刷子</td>
+</tr>
+<tr>
+<td>/jumpto</td>
+<td>传送</td>
+</tr>
+<tr>
+<td>//copy</td>
+<td>复制</td>
+</tr>
+<tr>
+<td>//paste</td>
+<td>粘贴</td>
+</tr>
+<tr>
+<td>//save</td>
+<td>保存剪贴板</td>
+</tr>
+<tr>
+<td>//load</td>
+<td>导入剪贴板</td>
+</tr>
+</tbody></table>
+<a id="more"></a>
+
+<h2 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h2><p><em>至少学会这些才能开始愉快的玩耍</em></p>
+<table>
+<thead>
+<tr>
+<th><strong>命令</strong></th>
+<th><strong>参数</strong></th>
+<th><strong>描述</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>//wand</td>
+<td></td>
+<td>给你一个设置选区工具（默认为木斧）。单击左键设置点1；右键设置点2。</td>
+</tr>
+<tr>
+<td>//set id</td>
+<td></td>
+<td>将选中的区域变为某物品(如果是不可放置或者没有放置点的物品会成为被扔出的状态)</td>
+</tr>
+<tr>
+<td>//undo</td>
+<td></td>
+<td>撤销上一次的WorldEdit行动</td>
+</tr>
+<tr>
+<td>//redo</td>
+<td></td>
+<td>还原上一次的//undo</td>
+</tr>
+<tr>
+<td>//move x</td>
+<td></td>
+<td>将区域移动x块。移动时需正对着你要移动的区域，他就会帮你移动到你正对的地方</td>
+</tr>
+<tr>
+<td>//move x up</td>
+<td></td>
+<td>将区域向上移动x块</td>
+</tr>
+<tr>
+<td>//move x down</td>
+<td></td>
+<td>将区域向下移动x块</td>
+</tr>
+<tr>
+<td>//limit</td>
+<td>&lt;限制值&gt;</td>
+<td>设置最大操作方块数量，只对你生效。这是为了防止操作失误引起的灾难性事故，它不会将配置参数覆盖。</td>
+</tr>
+<tr>
+<td>/clearhistory</td>
+<td></td>
+<td>清理所有历史记录</td>
+</tr>
+<tr>
+<td>//replace</td>
+<td><to-block></td>
+<td>替换选区内所有方块（不包含空气）</td>
+</tr>
+<tr>
+<td>//replace</td>
+<td><from-block> <to-block></td>
+<td>将选区内的某一种方块替换为另外一种方块</td>
+</tr>
+<tr>
+<td>//walls</td>
+<td><block></td>
+<td>填充选区边界（仅包含Z轴）</td>
+</tr>
+<tr>
+<td>//outline</td>
+<td><block></td>
+<td>填充选区边界（常规的建筑体，内部空心）</td>
+</tr>
+<tr>
+<td>/jumpto</td>
+<td></td>
+<td>传送到指向的方块上</td>
+</tr>
+<tr>
+<td>//stack</td>
+<td></td>
+<td>复制选区x份，向指向方向</td>
+</tr>
+<tr>
+<td>//copy</td>
+<td></td>
+<td>复制选区</td>
+</tr>
+<tr>
+<td>//cut</td>
+<td></td>
+<td>剪切选区</td>
+</tr>
+<tr>
+<td>//paste</td>
+<td>[-ao]</td>
+<td>粘贴选区</td>
+</tr>
+<tr>
+<td>//rotate</td>
+<td><angle-in-degrees></td>
+<td>旋转剪切板内容</td>
+</tr>
+<tr>
+<td>//flip</td>
+<td>[dir]</td>
+<td>翻转剪切板内容</td>
+</tr>
+<tr>
+<td>//load</td>
+<td><filename></td>
+<td>读取一个剪切板文件内容</td>
+</tr>
+<tr>
+<td>//save</td>
+<td><filename></td>
+<td>将剪切板内容保存为文件（可以尝试选择一座建筑保存为单独的文件，然后使用时读取）</td>
+</tr>
+<tr>
+<td>/clearclipboard</td>
+<td></td>
+<td>清除剪切板</td>
+</tr>
+<tr>
+<td>//regen</td>
+<td></td>
+<td>重置选区</td>
+</tr>
+<tr>
+<td>/repl</td>
+<td><block></td>
+<td>工具右键替换为某个方块</td>
+</tr>
+<tr>
+<td>/brush clipboard</td>
+<td></td>
+<td>设定刷子形状为剪贴板内容</td>
+</tr>
+</tbody></table>
+<h2 id="快速生成"><a href="#快速生成" class="headerlink" title="快速生成"></a>快速生成</h2><h3 id="生成指令"><a href="#生成指令" class="headerlink" title="生成指令"></a>生成指令</h3><table>
+<thead>
+<tr>
+<th><strong>命令</strong></th>
+<th><strong>参数</strong></th>
+<th><strong>描述</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>//hcyl</td>
+<td><block> <radius> [height]</td>
+<td>创建一个垂直空心圆柱</td>
+</tr>
+<tr>
+<td>//cyl</td>
+<td><block> <radius> [height]</td>
+<td>创建一个垂直圆柱</td>
+</tr>
+<tr>
+<td>//sphere</td>
+<td><block> <radius> [raised?]</td>
+<td>创建一个球体</td>
+</tr>
+<tr>
+<td>//hsphere</td>
+<td><block> <radius> [raised?]</td>
+<td>创建一个空心球体</td>
+</tr>
+<tr>
+<td>/forestgen</td>
+<td>[size] [type] [density]</td>
+<td>创建一片森林</td>
+</tr>
+<tr>
+<td>/pumpkins</td>
+<td>[size]</td>
+<td>创建一片南瓜森林</td>
+</tr>
+<tr>
+<td>//fill</td>
+<td><block> <radius> [depth]</td>
+<td>圆柱</td>
+</tr>
+<tr>
+<td>//fillr</td>
+<td><block> <radius></td>
+<td>半圆球</td>
+</tr>
+</tbody></table>
+<h3 id="模板刷子"><a href="#模板刷子" class="headerlink" title="模板刷子"></a>模板刷子</h3><table>
+<thead>
+<tr>
+<th><strong>命令</strong></th>
+<th><strong>参数</strong></th>
+<th><strong>描述</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>/none</td>
+<td></td>
+<td>切换无工具</td>
+</tr>
+<tr>
+<td>/info</td>
+<td></td>
+<td>显示工具信息</td>
+</tr>
+<tr>
+<td>/tree</td>
+<td>[type]</td>
+<td>工具右键创建树或其他， [tree, regular, big, bigtree, redwood, sequoia, tallredwood, tallsequoia, birch, white, whitebark, pine, randredwood, randomredwood, anyredwood, rand, random]</td>
+</tr>
+<tr>
+<td>/repl</td>
+<td><block></td>
+<td>工具右键替换为某个方块</td>
+</tr>
+<tr>
+<td>/cycler</td>
+<td></td>
+<td>切换方块的其他类型，如各种原木、树叶、泥土</td>
+</tr>
+<tr>
+<td>/brush sphere</td>
+<td>[-h] <type> <radius></td>
+<td>设定刷子形状为球体</td>
+</tr>
+<tr>
+<td>/brush cylinder</td>
+<td>[-h] <type> <radius> [height]</td>
+<td>设定刷子形状为圆柱</td>
+</tr>
+<tr>
+<td>/brush clipboard</td>
+<td></td>
+<td>设定刷子形状为剪贴板内容</td>
+</tr>
+<tr>
+<td>/brush smooth</td>
+<td><radius> [iterations]</td>
+<td>设定刷子形状为光滑的平面</td>
+</tr>
+<tr>
+<td>/size</td>
+<td><size></td>
+<td>设置笔刷大小</td>
+</tr>
+<tr>
+<td>/mat</td>
+<td><mat></td>
+<td>改变当前刷子使用的材料</td>
+</tr>
+<tr>
+<td>/mask</td>
+<td></td>
+<td>清除遮罩</td>
+</tr>
+<tr>
+<td>/mask</td>
+<td><mask></td>
+<td>设置一个遮罩</td>
+</tr>
+</tbody></table>
+<h3 id="生成的太快人得传送出来"><a href="#生成的太快人得传送出来" class="headerlink" title="生成的太快人得传送出来"></a>生成的太快人得传送出来</h3><table>
+<thead>
+<tr>
+<th><strong>命令</strong></th>
+<th><strong>参数</strong></th>
+<th><strong>描述</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>/unstuck</td>
+<td></td>
+<td>去一个空旷的地方</td>
+</tr>
+<tr>
+<td>/ascend</td>
+<td></td>
+<td>向上传送一层</td>
+</tr>
+<tr>
+<td>/descend</td>
+<td></td>
+<td>向下传送一层</td>
+</tr>
+<tr>
+<td>/ceil</td>
+<td>[clearance]</td>
+<td>传送到顶部</td>
+</tr>
+<tr>
+<td>/thru</td>
+<td></td>
+<td>穿过障碍物</td>
+</tr>
+<tr>
+<td>/jumpto</td>
+<td></td>
+<td>传送到指向的方块上</td>
+</tr>
+<tr>
+<td>/up</td>
+<td>[distance]</td>
+<td>向上传送</td>
+</tr>
+</tbody></table>
+<p>​          </p>
+<h2 id="部分指令翻译"><a href="#部分指令翻译" class="headerlink" title="部分指令翻译"></a>部分指令翻译</h2><p><em>不完整</em></p>
+<p>来源：<a target="_blank" rel="noopener" href="http://minecraft.yxzoo.com/38477">我的世界游戏园</a></p>
+<table>
+<thead>
+<tr>
+<th><strong>命令</strong></th>
+<th><strong>参数</strong></th>
+<th><strong>描述</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>//limit</td>
+<td>&lt;限制值&gt;</td>
+<td>设置最大操作方块数量，只对你生效。这是为了防止操作失误引起的灾难性事故，它不会将配置参数覆盖。</td>
+</tr>
+<tr>
+<td><strong>历史</strong></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>//undo</td>
+<td>[步骤值]</td>
+<td>撤销上一次操作</td>
+</tr>
+<tr>
+<td>//redo</td>
+<td>[步骤值]</td>
+<td>还原操作，仅还原上一次操作，不能重复上一次命令</td>
+</tr>
+<tr>
+<td>/clearhistory</td>
+<td></td>
+<td>清理所有历史记录</td>
+</tr>
+<tr>
+<td><strong>选择</strong></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>//wand</td>
+<td></td>
+<td>给你一个设置选区工具（默认为木斧）。单击左键设置点1；右键设置点2。</td>
+</tr>
+<tr>
+<td>/toggleeditwand</td>
+<td></td>
+<td>设置编辑选区工具的模式，可以让工具恢复正常。</td>
+</tr>
+<tr>
+<td>//sel</td>
+<td>&lt;cuboid\poly&gt;</td>
+<td>选择选区的形状</td>
+</tr>
+<tr>
+<td>//pos1</td>
+<td></td>
+<td>将玩家脚下的方块设置为点1</td>
+</tr>
+<tr>
+<td>//pos2</td>
+<td></td>
+<td>将玩家脚下的方块设置为点2</td>
+</tr>
+<tr>
+<td>//hpos1</td>
+<td></td>
+<td>将玩家指向的方块设置为点1</td>
+</tr>
+<tr>
+<td>//hpos2</td>
+<td></td>
+<td>将玩家指向的方块设置为点2</td>
+</tr>
+<tr>
+<td>//chunk</td>
+<td></td>
+<td>将选区修改为你附近的16<em>16</em>Max大小的区域（PS：MAX指Z轴最大化）</td>
+</tr>
+<tr>
+<td>//expand</td>
+<td><amount></td>
+<td>根据玩家朝向扩大选区</td>
+</tr>
+<tr>
+<td>//expand</td>
+<td><amount> <direction></td>
+<td>根据参数设定方向扩大（north, east, south, west, up, down）</td>
+</tr>
+<tr>
+<td>//expand</td>
+<td><amount> <reverse-amount> [direction]</td>
+<td>将选区朝两个方向同时扩大</td>
+</tr>
+<tr>
+<td>//expand</td>
+<td>vert</td>
+<td>扩大选区（包含地壳）</td>
+</tr>
+<tr>
+<td>//contract</td>
+<td><amount></td>
+<td>根据玩家朝向缩小选区</td>
+</tr>
+<tr>
+<td>//contract</td>
+<td><amount> [direction]</td>
+<td>根据参数设定方向缩小选区（north, east, south, west）</td>
+</tr>
+<tr>
+<td>//contract</td>
+<td><amount> <reverse-amount> [direction]</td>
+<td>将选区朝两个方向同时缩小</td>
+</tr>
+<tr>
+<td>//outset</td>
+<td>[-hv] <amount></td>
+<td>按照参数整体放大选区</td>
+</tr>
+<tr>
+<td>//inset</td>
+<td>[-hv] <amount></td>
+<td>按照参数整体缩小选区</td>
+</tr>
+<tr>
+<td>//shift</td>
+<td><amount> [direction]</td>
+<td>移动选区，但不移动选区内的方块</td>
+</tr>
+<tr>
+<td>//size</td>
+<td></td>
+<td>获得选区内的方块数量</td>
+</tr>
+<tr>
+<td>//count</td>
+<td><block></td>
+<td>获取选区内某一种方块的数量</td>
+</tr>
+<tr>
+<td>//distr</td>
+<td>[-c]</td>
+<td>获取选区内方块的分布情况</td>
+</tr>
+<tr>
+<td><strong>选区操作</strong></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>//set</td>
+<td><block></td>
+<td>修改区域内所有方块</td>
+</tr>
+<tr>
+<td>//replace</td>
+<td><to-block></td>
+<td>替换选区内所有方块（不包含空气）</td>
+</tr>
+<tr>
+<td>//replace</td>
+<td><from-block> <to-block></td>
+<td>将选区内的某一种方块替换为另外一种方块</td>
+</tr>
+<tr>
+<td>//overlay</td>
+<td><block></td>
+<td>在选区内的方块上放置方块</td>
+</tr>
+<tr>
+<td>//walls</td>
+<td><block></td>
+<td>填充选区边界（仅包含Z轴）</td>
+</tr>
+<tr>
+<td>//outline</td>
+<td><block></td>
+<td>填充选区边界（常规的建筑体，内部空心）</td>
+</tr>
+<tr>
+<td>//smooth</td>
+<td>[iterations]</td>
+<td>向下压缩选区</td>
+</tr>
+<tr>
+<td>//regen</td>
+<td></td>
+<td>重置选区</td>
+</tr>
+<tr>
+<td>//move</td>
+<td>[count] [direction] [leave-id]</td>
+<td>移动选区</td>
+</tr>
+<tr>
+<td>//stack</td>
+<td>[count] [direction]</td>
+<td>叠加选择</td>
+</tr>
+<tr>
+<td><strong>剪切板</strong></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>//copy</td>
+<td></td>
+<td>复制选区</td>
+</tr>
+<tr>
+<td>//cut</td>
+<td></td>
+<td>剪切选区</td>
+</tr>
+<tr>
+<td>//paste</td>
+<td>[-ao]</td>
+<td>粘贴选区</td>
+</tr>
+<tr>
+<td>//rotate</td>
+<td><angle-in-degrees></td>
+<td>旋转剪切板内容</td>
+</tr>
+<tr>
+<td>//flip</td>
+<td>[dir]</td>
+<td>翻转剪切板内容</td>
+</tr>
+<tr>
+<td>//load</td>
+<td><filename></td>
+<td>读取一个剪切板文件内容</td>
+</tr>
+<tr>
+<td>//save</td>
+<td><filename></td>
+<td>将剪切板内容保存为文件（可以尝试选择一座建筑保存为单独的文件，然后使用时读取）</td>
+</tr>
+<tr>
+<td>/clearclipboard</td>
+<td></td>
+<td>清楚剪切板</td>
+</tr>
+<tr>
+<td><strong>快速创建</strong></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>//hcyl</td>
+<td><block> <radius> [height]</td>
+<td>创建一个垂直空心圆柱</td>
+</tr>
+<tr>
+<td>//cyl</td>
+<td><block> <radius> [height]</td>
+<td>创建一个垂直圆柱</td>
+</tr>
+<tr>
+<td>//sphere</td>
+<td><block> <radius> [raised?]</td>
+<td>创建一个球体</td>
+</tr>
+<tr>
+<td>//hsphere</td>
+<td><block> <radius> [raised?]</td>
+<td>创建一个空心球体</td>
+</tr>
+<tr>
+<td>/forestgen</td>
+<td>[size] [type] [density]</td>
+<td>创建一片森林</td>
+</tr>
+<tr>
+<td>/pumpkins</td>
+<td>[size]</td>
+<td>创建一片南瓜森林</td>
+</tr>
+<tr>
+<td><strong>公共</strong></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>/toggleplace</td>
+<td></td>
+<td>设置两点（不太明白，求补充……）Toggle between using pos #1 or your current position.</td>
+</tr>
+<tr>
+<td>//fill</td>
+<td><block> <radius> [depth]</td>
+<td>Fill a hole.</td>
+</tr>
+<tr>
+<td>//fillr</td>
+<td><block> <radius></td>
+<td>Fill a hole fully recursively.</td>
+</tr>
+<tr>
+<td>//drain</td>
+<td><radius></td>
+<td>删除周围的水和岩浆</td>
+</tr>
+<tr>
+<td>/fixwater</td>
+<td><radius></td>
+<td>修正玩家附近水池内的水流为水源</td>
+</tr>
+<tr>
+<td>/fixlava</td>
+<td><radius></td>
+<td>修正玩家附近岩浆池内的流动岩浆为岩浆源</td>
+</tr>
+<tr>
+<td>/removeabove</td>
+<td>[size] [height]</td>
+<td>删除玩家头顶的方块</td>
+</tr>
+<tr>
+<td>/removebelow</td>
+<td>[size] [height]</td>
+<td>删除玩家脚下的方块</td>
+</tr>
+<tr>
+<td>/replacenear</td>
+<td><size> <from-id> <to-id></td>
+<td>替换玩家周围的某种方块</td>
+</tr>
+<tr>
+<td>/removenear</td>
+<td>[block] [size]</td>
+<td>删除玩家周围的方块</td>
+</tr>
+<tr>
+<td>/snow</td>
+<td>[radius]</td>
+<td>在玩家周围创建积雪</td>
+</tr>
+<tr>
+<td>/thaw</td>
+<td>[radius]</td>
+<td>删除玩家周围的积雪</td>
+</tr>
+<tr>
+<td>/ex</td>
+<td>[size]</td>
+<td>扑灭玩家周围的火灾</td>
+</tr>
+<tr>
+<td>/butcher</td>
+<td>[radius]</td>
+<td>杀死玩家周围的怪物</td>
+</tr>
+<tr>
+<td>/remove</td>
+<td><type> <radius></td>
+<td>删除玩家周围一切实体</td>
+</tr>
+<tr>
+<td><strong>块工具</strong></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>/chunkinfo</td>
+<td></td>
+<td>获取玩家所处块的文件名</td>
+</tr>
+<tr>
+<td>/listchunks</td>
+<td></td>
+<td>显示所有块列表</td>
+</tr>
+<tr>
+<td>/delchunks</td>
+<td></td>
+<td>使用一个shell脚本删除块</td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th><strong>命令</strong></th>
+<th><strong>参数</strong></th>
+<th><strong>描述</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>超级工具</strong></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>//</td>
+<td></td>
+<td>设置超级工具</td>
+</tr>
+<tr>
+<td>/sp single</td>
+<td></td>
+<td>切换到单块超级工具</td>
+</tr>
+<tr>
+<td>/sp area</td>
+<td><range></td>
+<td>切换到大面积超级工具</td>
+</tr>
+<tr>
+<td>/sp recur</td>
+<td><Range></td>
+<td>切换到超级递归工具</td>
+</tr>
+<tr>
+<td><strong>工具</strong></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>/none</td>
+<td></td>
+<td>切换无工具</td>
+</tr>
+<tr>
+<td>/info</td>
+<td></td>
+<td>显示工具信息</td>
+</tr>
+<tr>
+<td>/tree</td>
+<td>[type]</td>
+<td>工具右键创建树或其他， [tree, regular, big, bigtree, redwood, sequoia, tallredwood, tallsequoia, birch, white, whitebark, pine, randredwood, randomredwood, anyredwood, rand, random]</td>
+</tr>
+<tr>
+<td>/repl</td>
+<td><block></td>
+<td>工具右键替换为某个方块</td>
+</tr>
+<tr>
+<td>/cycler</td>
+<td></td>
+<td>Block data cycler tool.</td>
+</tr>
+<tr>
+<td><strong>刷子</strong></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>/brush sphere</td>
+<td>[-h] <type> <radius></td>
+<td>设定刷子形状为球体</td>
+</tr>
+<tr>
+<td>/brush cylinder</td>
+<td>[-h] <type> <radius> [height]</td>
+<td>设定刷子形状为圆柱</td>
+</tr>
+<tr>
+<td>/brush clipboard</td>
+<td></td>
+<td>设定刷子形状为剪贴板内容</td>
+</tr>
+<tr>
+<td>/brush smooth</td>
+<td><radius> [iterations]</td>
+<td>设定刷子形状为光滑的平面</td>
+</tr>
+<tr>
+<td>/size</td>
+<td><size></td>
+<td>设置笔刷大小</td>
+</tr>
+<tr>
+<td>/mat</td>
+<td><mat></td>
+<td>改变当前刷子使用的材料</td>
+</tr>
+<tr>
+<td>/mask</td>
+<td></td>
+<td>清除遮罩</td>
+</tr>
+<tr>
+<td>/mask</td>
+<td><mask></td>
+<td>设置一个遮罩</td>
+</tr>
+<tr>
+<td><strong>传送</strong></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>/unstuck</td>
+<td></td>
+<td>去一个空旷的地方</td>
+</tr>
+<tr>
+<td>/ascend</td>
+<td></td>
+<td>向上传送一层</td>
+</tr>
+<tr>
+<td>/descend</td>
+<td></td>
+<td>向下传送一层</td>
+</tr>
+<tr>
+<td>/ceil</td>
+<td>[clearance]</td>
+<td>传送到顶部</td>
+</tr>
+<tr>
+<td>/thru</td>
+<td></td>
+<td>穿过障碍物</td>
+</tr>
+<tr>
+<td>/jumpto</td>
+<td></td>
+<td>传送到指向的方块上</td>
+</tr>
+<tr>
+<td>/up</td>
+<td>[distance]</td>
+<td>向上传送</td>
+</tr>
+<tr>
+<td><strong>花絮</strong></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>//restore</td>
+<td>[snapshot]</td>
+<td>还原到指定的快照</td>
+</tr>
+<tr>
+<td>/snap use</td>
+<td><snapshot></td>
+<td>使用特定的快照</td>
+</tr>
+<tr>
+<td>/snap list</td>
+<td>[num]</td>
+<td>显示快照列表</td>
+</tr>
+<tr>
+<td>/snap before</td>
+<td><date></td>
+<td>回到上一个快照</td>
+</tr>
+<tr>
+<td>/snap after</td>
+<td><date></td>
+<td>进入下一个快照</td>
+</tr>
+<tr>
+<td><strong>脚本</strong></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>/cs</td>
+<td></td>
+<td>执行一个脚本</td>
+</tr>
+<tr>
+<td>/.s</td>
+<td>[args]</td>
+<td>重新执行最后一个脚本</td>
+</tr>
+<tr>
+<td>/xxx.js</td>
+<td>[args]</td>
+<td>执行一个JS脚本</td>
+</tr>
+<tr>
+<td><strong>通用命令</strong></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>/search</td>
+<td><item></td>
+<td>搜索物品名称</td>
+</tr>
+<tr>
+<td>/worldedit reload</td>
+<td></td>
+<td>重置WorldEdit配置</td>
+</tr>
+<tr>
+<td>/worldedit version</td>
+<td></td>
+<td>显示WorldEdit版本</td>
+</tr>
+<tr>
+<td>/worldedit tz</td>
+<td></td>
+<td>设置时区（暂时）</td>
+</tr>
+</tbody></table>
+<h2 id="完整英文指令"><a href="#完整英文指令" class="headerlink" title="完整英文指令"></a>完整英文指令</h2><p>相对完整，来自<a target="_blank" rel="noopener" href="http://wiki.sk89q.com/wiki/WorldEdit/Reference">wiki参考版</a>。同时可以查看<a target="_blank" rel="noopener" href="http://wiki.sk89q.com/wiki/WorldEdit/Permissions">wiki权威版</a> 获取更加精确的描述</p>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Parameters</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>//limit</td>
+<td><limit></td>
+<td>Set a maximum number of blocks to change at most for all operations. This only affects you. Use this to prevent catastrophic accidents. This command will not override the limit in the <a target="_blank" rel="noopener" href="http://wiki.sk89q.com/wiki/WorldEdit/Configuration">configuration</a> if it is set.</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="http://wiki.sk89q.com/wiki/WorldEdit/Features#History">History</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>//undo</td>
+<td>[num-steps] [player]</td>
+<td>Undo your last action.</td>
+</tr>
+<tr>
+<td>//redo</td>
+<td>[num-steps] [player]</td>
+<td>Redo your last (undone) action. This command replays back history and does not repeat the command.</td>
+</tr>
+<tr>
+<td>/clearhistory</td>
+<td></td>
+<td>Clear your history.</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="http://wiki.sk89q.com/wiki/WorldEdit/Selection">Selection</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>//wand</td>
+<td></td>
+<td>Gives you the “edit wand” (by default, a wooden axe). Left click with this tool to select position 1 and right click to selection position 2.</td>
+</tr>
+<tr>
+<td>/toggleeditwand</td>
+<td></td>
+<td>Toggles the edit wand selection mode, allowing you to use the edit wand item normally.</td>
+</tr>
+<tr>
+<td>//sel</td>
+<td>[-d]</td>
+<td>Choose the region shape to use for selections. &lt;cuboid\extend\poly\ellipsoid\sphere\cyl\convex&gt;</td>
+</tr>
+<tr>
+<td>//desel</td>
+<td></td>
+<td>Deselects the current selection.</td>
+</tr>
+<tr>
+<td>//pos1</td>
+<td>[x,y,z]</td>
+<td>Set selection position #1 to the block above the one that you are standing on.</td>
+</tr>
+<tr>
+<td>//pos2</td>
+<td>[x,y,z]</td>
+<td>Set selection position #2 to the block above the one that you are standing on.</td>
+</tr>
+<tr>
+<td>//hpos1</td>
+<td></td>
+<td>Set selection position #1 to the block that you are looking at.</td>
+</tr>
+<tr>
+<td>//hpos2</td>
+<td></td>
+<td>Set selection position #2 to the block that you are looking at.</td>
+</tr>
+<tr>
+<td>//chunk</td>
+<td>[-sc] [x,z]</td>
+<td>Select the chunk that you are within for your selection.</td>
+</tr>
+<tr>
+<td>//expand</td>
+<td><amount></td>
+<td>Expands the selection in the direction that you are looking.</td>
+</tr>
+<tr>
+<td>//expand</td>
+<td><amount> <direction></td>
+<td>Expands the selection in the specified direction (north, east, south, west, up, down).</td>
+</tr>
+<tr>
+<td>//expand</td>
+<td><amount> <reverse-amount> [direction]</td>
+<td>Expands the selection in two directions at once.</td>
+</tr>
+<tr>
+<td>//expand</td>
+<td>vert</td>
+<td>Expands the selection to include sky to bedrock.</td>
+</tr>
+<tr>
+<td>//contract</td>
+<td><amount></td>
+<td>Contracts the selection in the direction that you are looking.</td>
+</tr>
+<tr>
+<td>//contract</td>
+<td><amount> [direction]</td>
+<td>Contracts the selection in the specified direction (north, east, south, west, up, down).</td>
+</tr>
+<tr>
+<td>//contract</td>
+<td><amount> <reverse-amount> [direction]</td>
+<td>Contracts the selection in two directions at once.</td>
+</tr>
+<tr>
+<td>//outset</td>
+<td>[-hv] <amount></td>
+<td>Outset the selection in every direction.</td>
+</tr>
+<tr>
+<td>//inset</td>
+<td>[-hv] <amount></td>
+<td>Inset the selection in every direction.</td>
+</tr>
+<tr>
+<td>//shift</td>
+<td><amount> [direction]</td>
+<td>Moves the selection region. It does not move the selection’s contents.</td>
+</tr>
+<tr>
+<td>//size</td>
+<td>[-c]</td>
+<td>Get the size of selected region.</td>
+</tr>
+<tr>
+<td>//count</td>
+<td>[-d] <block></td>
+<td>Count the number of blocks in the region.</td>
+</tr>
+<tr>
+<td>//distr</td>
+<td>[-cd]</td>
+<td>Get the block distribution in the selection.</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="http://wiki.sk89q.com/wiki/WorldEdit/Region_operations">Region operations</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>//set</td>
+<td><block></td>
+<td>Set all blocks inside the selection region to a specified block.</td>
+</tr>
+<tr>
+<td>//replace</td>
+<td><to-block></td>
+<td>Replace all non-air blocks inside the region.</td>
+</tr>
+<tr>
+<td>//replace</td>
+<td><from-block> <to-block></td>
+<td>Replace all blocks of the specified block(s) with another block inside the region.</td>
+</tr>
+<tr>
+<td>//overlay</td>
+<td><block></td>
+<td>Place a block on top of blocks inside the region.</td>
+</tr>
+<tr>
+<td>//walls</td>
+<td><block></td>
+<td>Build the walls of the region (not including ceiling and floor).</td>
+</tr>
+<tr>
+<td>//outline</td>
+<td><block></td>
+<td>Build walls, floor, and ceiling.</td>
+</tr>
+<tr>
+<td>//center</td>
+<td><block></td>
+<td>Set the center block(s).</td>
+</tr>
+<tr>
+<td>//smooth</td>
+<td>[-n] [iterations]</td>
+<td>Smooth the selection’s heightmap.</td>
+</tr>
+<tr>
+<td>//deform</td>
+<td>[-ro] <expression></td>
+<td>Deforms a selected region with an expression.</td>
+</tr>
+<tr>
+<td>//hollow</td>
+<td>[thickness] [block]</td>
+<td>Hollows out objects contained in the selection.</td>
+</tr>
+<tr>
+<td>//regen</td>
+<td></td>
+<td>Regenerate the selection region.</td>
+</tr>
+<tr>
+<td>//move</td>
+<td>[-s] [count] [direction] [leave-id]</td>
+<td>Move the selection’s contents. A block can be specified to fill in the left over area.</td>
+</tr>
+<tr>
+<td>//stack</td>
+<td>[-sa] [count] [direction]</td>
+<td>Stacks the selection.</td>
+</tr>
+<tr>
+<td>//naturalize</td>
+<td></td>
+<td>Sets 3 layers of dirt on top of the surface of the selection, and then rock below.</td>
+</tr>
+<tr>
+<td>//line</td>
+<td>[-h] <block> [thickness]</td>
+<td>Draws a line segment between cuboid selection corners.</td>
+</tr>
+<tr>
+<td>//curve</td>
+<td>[-h] <block> [thickness]</td>
+<td>Draws a spline between cuboid selection corners.</td>
+</tr>
+<tr>
+<td>//forest</td>
+<td>[type] [density]</td>
+<td>Make a forest within the region.</td>
+</tr>
+<tr>
+<td>//flora</td>
+<td>[density]</td>
+<td>Make flora within the region.</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="http://wiki.sk89q.com/wiki/WorldEdit/Clipboard">Clipboard</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>//copy</td>
+<td>[-m]</td>
+<td>Copies the currently selected region. Be aware that it stores your position relative to the selection when copying.</td>
+</tr>
+<tr>
+<td>//cut</td>
+<td>[-m]</td>
+<td>Cuts the currently selected region.</td>
+</tr>
+<tr>
+<td>//paste</td>
+<td>[-sao] [-a]</td>
+<td>Pastes the clipboard. If you paste with -a, air blocks are being ignored.</td>
+</tr>
+<tr>
+<td>//rotate</td>
+<td><y-axis> [x-axis] [z-axis]</td>
+<td>Rotate the clipboard.</td>
+</tr>
+<tr>
+<td>//flip</td>
+<td>[direction]</td>
+<td>Flip the clipboard.</td>
+</tr>
+<tr>
+<td>//schematic or //schem</td>
+<td>save [<format>] <filename></td>
+<td>Save clipboard to .schematic. (mcedit is currently the only format)</td>
+</tr>
+<tr>
+<td>//schematic or //schem</td>
+<td>delete <filename></td>
+<td>Delete a saved schematic.</td>
+</tr>
+<tr>
+<td>//schematic or //schem</td>
+<td>load [<format>] <filename></td>
+<td>Load .schematic to clipboard.</td>
+</tr>
+<tr>
+<td>//schematic or //schem</td>
+<td>list [-dn] [-p <page>]</td>
+<td>List all available schematics.</td>
+</tr>
+<tr>
+<td>//schematic or //schem</td>
+<td>formats</td>
+<td>Display available schematic formats.</td>
+</tr>
+<tr>
+<td>/clearclipboard</td>
+<td></td>
+<td>Clear your clipboard.</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="http://wiki.sk89q.com/wiki/WorldEdit/Generation">Generation</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>//generate</td>
+<td>[-hroc] <block> <expression></td>
+<td>Generates a shape according to a given formula.</td>
+</tr>
+<tr>
+<td>//generatebiome</td>
+<td>[-hroc] <block> <expression></td>
+<td>Sets biome according to a given formula.</td>
+</tr>
+<tr>
+<td>//hcyl</td>
+<td><block> <radius>[,<radius>] [height]</td>
+<td>Create a vertical hollow cylinder.</td>
+</tr>
+<tr>
+<td>//cyl</td>
+<td>[-h] <block> <radius>[,<radius>] [height]</td>
+<td>Create a vertical cylinder.</td>
+</tr>
+<tr>
+<td>//sphere</td>
+<td>[-h] <block> <radius>[,<radius>,<radius>]</td>
+<td>Create a sphere.   [raised? true\false (default)]</td>
+</tr>
+<tr>
+<td>//hsphere</td>
+<td><block> <radius>[,<radius>,<radius>]</td>
+<td>Create a hollow sphere.  [raised? true\false (default)]</td>
+</tr>
+<tr>
+<td>//pyramid</td>
+<td>[-h] <block> <size></td>
+<td>Create a pyramid.</td>
+</tr>
+<tr>
+<td>//hpyramid</td>
+<td><block> <size></td>
+<td>Create a hollow pyramid.</td>
+</tr>
+<tr>
+<td>/forestgen</td>
+<td>[size] [type] [density]</td>
+<td>Make a forest.</td>
+</tr>
+<tr>
+<td>/pumpkins</td>
+<td>[size]</td>
+<td>Make a pumpkin forest</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="http://wiki.sk89q.com/wiki/WorldEdit/Utilities">Utilities</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>/toggleplace</td>
+<td></td>
+<td>Toggle between using pos #1 or your current position.</td>
+</tr>
+<tr>
+<td>//fill</td>
+<td><block> <radius> [depth]</td>
+<td>Fill a hole.</td>
+</tr>
+<tr>
+<td>//fillr</td>
+<td><block> <radius> [depth]</td>
+<td>Fill a hole fully recursively.</td>
+</tr>
+<tr>
+<td>//drain</td>
+<td><radius></td>
+<td>Drain nearby water/lava pools.</td>
+</tr>
+<tr>
+<td>/fixwater</td>
+<td><radius></td>
+<td>Level nearby pools of water.</td>
+</tr>
+<tr>
+<td>/fixlava</td>
+<td><radius></td>
+<td>Level nearby pools of lava.</td>
+</tr>
+<tr>
+<td>/removeabove</td>
+<td>[size] [height]</td>
+<td>Remove blocks above your head.</td>
+</tr>
+<tr>
+<td>/removebelow</td>
+<td>[size] [height]</td>
+<td>Remove blocks below your feet.</td>
+</tr>
+<tr>
+<td>/replacenear</td>
+<td>[-f] <size> <from-id> <to-id></td>
+<td>Replace all existing blocks nearby.</td>
+</tr>
+<tr>
+<td>/removenear</td>
+<td><block> [size]</td>
+<td>Remove blocks near you.</td>
+</tr>
+<tr>
+<td>/snow</td>
+<td>[radius]</td>
+<td>Simulate snow cover.</td>
+</tr>
+<tr>
+<td>/thaw</td>
+<td>[radius]</td>
+<td>Thaw/remove snow.</td>
+</tr>
+<tr>
+<td>/ex</td>
+<td>[radius]</td>
+<td>Extinguish fires.</td>
+</tr>
+<tr>
+<td>/butcher</td>
+<td>[-plangbtfr] [radius]</td>
+<td>Kill nearby mobs.</td>
+</tr>
+<tr>
+<td>/remove</td>
+<td><type> <radius></td>
+<td>Remove nearby entities. Type can be “items” for loose items/drops, arrows, boats, minecarts, tnt, or xp.</td>
+</tr>
+<tr>
+<td>/green</td>
+<td>[-f] [radius]</td>
+<td>Greens the area.</td>
+</tr>
+<tr>
+<td>//calc</td>
+<td><expression></td>
+<td>Evaluate a mathematical expression.</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="http://wiki.sk89q.com/wiki/WorldEdit/Chunk_tools">Chunk tools</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>/chunkinfo</td>
+<td></td>
+<td>Get the filename of the chunk that you are in.</td>
+</tr>
+<tr>
+<td>/listchunks</td>
+<td></td>
+<td>Print a list of used chunks.</td>
+</tr>
+<tr>
+<td>/delchunks</td>
+<td></td>
+<td>Generate a shell script to delete chunks.</td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Parameters</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><a target="_blank" rel="noopener" href="http://wiki.sk89q.com/wiki/WorldEdit/Super_pickaxe">Super pickaxe</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>//</td>
+<td></td>
+<td>Toggle the super pick axe.</td>
+</tr>
+<tr>
+<td>/sp single</td>
+<td></td>
+<td>Switch to single block super pickaxe mode.</td>
+</tr>
+<tr>
+<td>/sp area</td>
+<td><range></td>
+<td>Switch to area super pickaxe mode.</td>
+</tr>
+<tr>
+<td>/sp recur</td>
+<td><range></td>
+<td>Switch to recursive super pickaxe mode.</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="http://wiki.sk89q.com/wiki/WorldEdit/Tools">Tools</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>/tool</td>
+<td></td>
+<td>Select a tool to bind. &lt;repl\cycler\floodfill\brush\lrbuild\tree\deltree\farward\info\none&gt;</td>
+</tr>
+<tr>
+<td>/none</td>
+<td></td>
+<td>Switch to no tool.</td>
+</tr>
+<tr>
+<td>/info</td>
+<td></td>
+<td>Switch to the info tool.</td>
+</tr>
+<tr>
+<td>/farwand</td>
+<td></td>
+<td>Wand at a distance tool.</td>
+</tr>
+<tr>
+<td>/lrbuild</td>
+<td><leftclick block> <rightclick block></td>
+<td>Long-range building tool.</td>
+</tr>
+<tr>
+<td>/tree</td>
+<td>[type]</td>
+<td>Switch to the tree tool. Available types [tree, regular, big, bigtree, redwood, sequoia, tallredwood, tallsequoia, birch, white, whitebark, pine, randredwood, randomredwood, anyredwood, rand, random]</td>
+</tr>
+<tr>
+<td>/deltree</td>
+<td></td>
+<td>Floating tree remover tool.</td>
+</tr>
+<tr>
+<td>/repl</td>
+<td><block></td>
+<td>Switch to the block replacer tool.</td>
+</tr>
+<tr>
+<td>/cycler</td>
+<td></td>
+<td>Block data cycler tool.</td>
+</tr>
+<tr>
+<td>/flood</td>
+<td><pattern> <range></td>
+<td>Flood fill tool.</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="http://wiki.sk89q.com/wiki/WorldEdit/Brushes">Brushes</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>/brush sphere</td>
+<td>[-h] <type> [radius]</td>
+<td>Switch to the sphere brush tool.</td>
+</tr>
+<tr>
+<td>/brush cylinder</td>
+<td>[-h] <type> [radius] [height]</td>
+<td>Switch to the cylinder brush tool.</td>
+</tr>
+<tr>
+<td>/brush clipboard</td>
+<td>[-ap]</td>
+<td>Switch to the clipboard tool.</td>
+</tr>
+<tr>
+<td>/brush smooth</td>
+<td>[-n] [radius] [iterations]</td>
+<td>Smooth the region.</td>
+</tr>
+<tr>
+<td>/brush extinguish</td>
+<td>[radius]</td>
+<td>Switch to the fire extinguisher brush tool.</td>
+</tr>
+<tr>
+<td>/brush gravity</td>
+<td>[-h] [radius]</td>
+<td>Switch to the gravity simulator brush tool.</td>
+</tr>
+<tr>
+<td>/brush butcher</td>
+<td>[-plangbtfr] [radius]</td>
+<td>Switch to the entity butcher brush tool.</td>
+</tr>
+<tr>
+<td>/size</td>
+<td><size></td>
+<td>Change the size of the current brushes</td>
+</tr>
+<tr>
+<td>/mat</td>
+<td><pattern></td>
+<td>Change the material used by your current brush.</td>
+</tr>
+<tr>
+<td>/range</td>
+<td><range></td>
+<td>Set the brush range.</td>
+</tr>
+<tr>
+<td>/mask</td>
+<td></td>
+<td>Clear the mask</td>
+</tr>
+<tr>
+<td>/mask</td>
+<td><mask></td>
+<td>Set a mask</td>
+</tr>
+<tr>
+<td>//gmask</td>
+<td><mask></td>
+<td>Set the global mask.</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="http://wiki.sk89q.com/wiki/WorldEdit/Getting_around">Getting around</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>/unstuck</td>
+<td></td>
+<td>Go up to the first free spot.</td>
+</tr>
+<tr>
+<td>/ascend</td>
+<td>[num-levels]</td>
+<td>Go up levels.</td>
+</tr>
+<tr>
+<td>/descend</td>
+<td>[num-levels]</td>
+<td>Go down levels.</td>
+</tr>
+<tr>
+<td>/ceil</td>
+<td>[clearance]</td>
+<td>Get to the ceiling.</td>
+</tr>
+<tr>
+<td>/thru</td>
+<td></td>
+<td>Go through the wall that you are looking at.</td>
+</tr>
+<tr>
+<td>/jumpto</td>
+<td></td>
+<td>Jump to the block that you are looking at.</td>
+</tr>
+<tr>
+<td>/up</td>
+<td>[-fg] [distance]</td>
+<td>Go up some distance.</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="http://wiki.sk89q.com/wiki/WorldEdit/Snapshots">Snapshots</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>//restore</td>
+<td>[snapshot]</td>
+<td>Restore a particular snapshot.</td>
+</tr>
+<tr>
+<td>//snapshot use</td>
+<td><snapshot></td>
+<td>Use a particular snapshot.</td>
+</tr>
+<tr>
+<td>//snapshot sel</td>
+<td><index></td>
+<td>Choose the snapshot based on the list id.</td>
+</tr>
+<tr>
+<td>//snapshot list</td>
+<td>[num]</td>
+<td>List the 5 newest snapshots.</td>
+</tr>
+<tr>
+<td>//snapshot before</td>
+<td><date></td>
+<td>Find the first snapshot before the given date.</td>
+</tr>
+<tr>
+<td>//snapshot after</td>
+<td><date></td>
+<td>Find the first snapshot after the given date.</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="http://wiki.sk89q.com/wiki/WorldEdit/Scripting">Scripting</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>/cs</td>
+<td></td>
+<td>Executes a script.</td>
+</tr>
+<tr>
+<td>/.s</td>
+<td>[args]</td>
+<td>Re-executes last script with new arguments.</td>
+</tr>
+<tr>
+<td>/xxx.js</td>
+<td>[args]</td>
+<td>Executes a JS script.</td>
+</tr>
+<tr>
+<td><a target="_blank" rel="noopener" href="http://wiki.sk89q.com/wiki/WorldEdit/General_commands">General commands</a></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>/searchitem</td>
+<td></td>
+<td>Search for an item by its name.</td>
+</tr>
+<tr>
+<td>/worldedit</td>
+<td></td>
+<td>WorldEdit commands.</td>
+</tr>
+<tr>
+<td>/worldedit help</td>
+<td>[command]</td>
+<td>Displays help documentation for the given command, or lists all commands if none are given (aliased to //help).</td>
+</tr>
+<tr>
+<td>/worldedit reload</td>
+<td></td>
+<td>Reloads WorldEdit’s configuration.</td>
+</tr>
+<tr>
+<td>/worldedit version</td>
+<td></td>
+<td>Gets WorldEdit’s version.</td>
+</tr>
+<tr>
+<td>/worldedit tz</td>
+<td></td>
+<td>Set your time zone. This is temporary.</td>
+</tr>
+<tr>
+<td>//fast</td>
+<td></td>
+<td>Toggles fastmode performance.</td>
+</tr>
+<tr>
+<td>Biomes</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>/biomelist</td>
+<td>[page]</td>
+<td>List the available biome types</td>
+</tr>
+<tr>
+<td>/biomeinfo</td>
+<td>[-pt]</td>
+<td>Get the biome of the targeted block.</td>
+</tr>
+<tr>
+<td>//setbiome</td>
+<td>[-p] <biome type></td>
+<td>Set the selected area to the specified biome type.The -p flag changes the block (column) you are standing in.</td>
+</tr>
+</tbody></table>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>totoro625
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://totoro.ink/bash/worldedit.html" title="我的世界worldedit常用命令">https://totoro.ink/bash/worldedit.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/minecraft/" rel="tag"><i class="fa fa-tag"></i> minecraft</a>
+              <a href="/tags/worldedit/" rel="tag"><i class="fa fa-tag"></i> worldedit</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/bash/chevereto.html" rel="prev" title="chevereto 图床的迁移">
+      <i class="fa fa-chevron-left"></i> chevereto 图床的迁移
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/hi2018.html" rel="next" title="2018 元旦快乐">
+      2018 元旦快乐 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%88%91%E6%9C%80%E5%96%9C%E6%AC%A2%E7%94%A8%E7%9A%84%E6%98%AF"><span class="nav-number">1.</span> <span class="nav-text">我最喜欢用的是</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4"><span class="nav-number">2.</span> <span class="nav-text">常用命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BF%AB%E9%80%9F%E7%94%9F%E6%88%90"><span class="nav-number">3.</span> <span class="nav-text">快速生成</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%9F%E6%88%90%E6%8C%87%E4%BB%A4"><span class="nav-number">3.1.</span> <span class="nav-text">生成指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A8%A1%E6%9D%BF%E5%88%B7%E5%AD%90"><span class="nav-number">3.2.</span> <span class="nav-text">模板刷子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%9F%E6%88%90%E7%9A%84%E5%A4%AA%E5%BF%AB%E4%BA%BA%E5%BE%97%E4%BC%A0%E9%80%81%E5%87%BA%E6%9D%A5"><span class="nav-number">3.3.</span> <span class="nav-text">生成的太快人得传送出来</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%83%A8%E5%88%86%E6%8C%87%E4%BB%A4%E7%BF%BB%E8%AF%91"><span class="nav-number">4.</span> <span class="nav-text">部分指令翻译</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%8C%E6%95%B4%E8%8B%B1%E6%96%87%E6%8C%87%E4%BB%A4"><span class="nav-number">5.</span> <span class="nav-text">完整英文指令</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="totoro625"
+      src="/avatar.jpg">
+  <p class="site-author-name" itemprop="name">totoro625</p>
+  <div class="site-description" itemprop="description">龙猫不在家</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">67</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Totoro625" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Totoro625" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:hc625@qq.com" title="E-Mail → mailto:hc625@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://t.me/totoro625" title="Telegram → http:&#x2F;&#x2F;t.me&#x2F;totoro625" rel="noopener" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/hc625" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;hc625" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS订阅 → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS订阅</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/sitemap.xml" title="SiteMap → &#x2F;sitemap.xml"><i class="fa fa-fw fa-sitemap"></i>SiteMap</a>
+      </span>
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 2015 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">totoro625 | 龙猫不在家</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://totoro.ink/bash/worldedit.html";
+    this.page.identifier = "bash/worldedit.html";
+    this.page.title = "我的世界worldedit常用命令";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://totoro625.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>

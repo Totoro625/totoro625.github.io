@@ -1,0 +1,7 @@
+https://nodejs.org/en/
+https://git-scm.com/
+npm install hexo-cli -g 
+https://github.com/hexojs/hexo-generator-feed
+npm install hexo-generator-feed --save
+https://github.com/ludoviclefevre/hexo-generator-seo-friendly-sitemap 
+npm install hexo-generator-seo-friendly-sitemap --save

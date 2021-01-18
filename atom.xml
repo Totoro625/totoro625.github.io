@@ -1,0 +1,478 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>TOTORO625</title>
+  
+  
+  <link href="https://totoro.ink/atom.xml" rel="self"/>
+  
+  <link href="https://totoro.ink/"/>
+  <updated>2021-01-18T10:12:51.590Z</updated>
+  <id>https://totoro.ink/</id>
+  
+  <author>
+    <name>totoro625</name>
+    
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>小米智能插座版本问题</title>
+    <link href="https://totoro.ink/life/xiaomi.html"/>
+    <id>https://totoro.ink/life/xiaomi.html</id>
+    <published>2021-01-18T08:12:10.000Z</published>
+    <updated>2021-01-18T10:12:51.590Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;p&gt;最近在布置智能家居，发现小米智能插座好多个版本，我按型号找了一下，如下表&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;宣传名称&lt;/th&gt;
+&lt;th align=&quot;center&quot;&gt;型号&lt;/th&gt;
+&lt;th align=&quot;center&quot;&gt;电量统计&lt;/th&gt;
+&lt;th</summary>
+        
+      
+    
+    
+    
+    <category term="life" scheme="https://totoro.ink/categories/life/"/>
+    
+    
+    <category term="xiaomi" scheme="https://totoro.ink/tags/xiaomi/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>纪念我的朋友</title>
+    <link href="https://totoro.ink/memory/in-memory-of-my-friend.html"/>
+    <id>https://totoro.ink/memory/in-memory-of-my-friend.html</id>
+    <published>2020-12-24T06:43:00.000Z</published>
+    <updated>2021-01-18T10:12:51.590Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;p&gt;互联网的记忆有多久？&lt;/p&gt;
+&lt;p&gt;以前有七秒&lt;/p&gt;
+&lt;p&gt;现在一秒都没有&lt;/p&gt;
+&lt;p&gt;从前车马很慢，书信很远，一生只够爱一个人</summary>
+        
+      
+    
+    
+    
+    <category term="memory" scheme="https://totoro.ink/categories/memory/"/>
+    
+    
+    <category term="memory" scheme="https://totoro.ink/tags/memory/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>龙猫不知道什么是爱</title>
+    <link href="https://totoro.ink/life/love2020.html"/>
+    <id>https://totoro.ink/life/love2020.html</id>
+    <published>2020-05-04T00:00:00.000Z</published>
+    <updated>2021-01-18T10:12:51.590Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;p&gt;大家都是第一回做人，谁也不知道该如何谈恋爱，不是么&lt;/p&gt;
+&lt;p&gt;我挺喜欢看描述爱情的片段的，因为我不懂爱是什么&lt;/p&gt;
+&lt;p&gt;大概就是一种感觉，说不出，道不明&lt;/p&gt;
+&lt;p&gt;山盟海誓，如胶似漆，轰轰烈烈，举案齐眉……没有哪个是标准答案&lt;/p&gt;
+&lt;p&gt;女生问我为什么喜欢她，</summary>
+        
+      
+    
+    
+    
+    <category term="life" scheme="https://totoro.ink/categories/life/"/>
+    
+    
+    <category term="love" scheme="https://totoro.ink/tags/love/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Hello World</title>
+    <link href="https://totoro.ink/hello-world.html"/>
+    <id>https://totoro.ink/hello-world.html</id>
+    <published>2020-02-11T12:20:00.000Z</published>
+    <updated>2021-01-18T10:12:51.590Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;Welcome to &lt;a href=&quot;https://hexo.io/&quot;&gt;Hexo&lt;/a&gt;! This is your very first post. Check &lt;a href=&quot;https://hexo.io/docs/&quot;&gt;documentation&lt;/a&gt; for more info. If you get any problems when using Hexo, you can find the answer in &lt;a href=&quot;https://hexo.io/docs/troubleshooting.html&quot;&gt;troubleshooting&lt;/a&gt; or you can ask me on &lt;a href=&quot;https://github.com/hexojs/hexo/issues&quot;&gt;GitHub&lt;/a&gt;.&lt;/p&gt;</summary>
+    
+    
+    
+    
+  </entry>
+  
+  <entry>
+    <title>YubiKey 与 BitLocker</title>
+    <link href="https://totoro.ink/yubikey-more.html"/>
+    <id>https://totoro.ink/yubikey-more.html</id>
+    <published>2020-02-09T02:07:00.000Z</published>
+    <updated>2021-01-18T10:12:51.590Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;前年的这个时候&lt;a href=&quot;https://totoro.ink/yubikey.html&quot;&gt;买了一个 YubiKey&lt;/a&gt; ，具体的应用实际上就是并没有什么，除了给我输入一下超长的主密码。&lt;/p&gt;
+&lt;p&gt;日常逛 V站看到一个&lt;a href=&quot;https://www.v2ex.com/t/376472&quot;&gt;三年前的坟帖子&lt;/a&gt; 更新了，有人回复了配置 YubiKey 以支持 BitLocker 的方法。&lt;/p&gt;
+&lt;p&gt;微软的官方教程中就有用智能卡加密硬盘的方法&lt;/p&gt;
+&lt;p&gt;WIN10 可用的3种方法</summary>
+    
+    
+    
+    <category term="bash" scheme="https://totoro.ink/categories/bash/"/>
+    
+    
+    <category term="安全" scheme="https://totoro.ink/tags/%E5%AE%89%E5%85%A8/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>2020年，我在如何备份我的数据</title>
+    <link href="https://totoro.ink/life/backup2020.html"/>
+    <id>https://totoro.ink/life/backup2020.html</id>
+    <published>2020-01-06T01:10:10.000Z</published>
+    <updated>2021-01-18T10:12:51.590Z</updated>
+    
+    
+    <summary type="html">&lt;h1 id=&quot;2020-年，数据为什么重要&quot;&gt;&lt;a href=&quot;#2020-年，数据为什么重要&quot; class=&quot;headerlink&quot; title=&quot;2020 年，数据为什么重要&quot;&gt;&lt;/a&gt;2020 年，数据为什么重要&lt;/h1&gt;&lt;p&gt;随着电子信息技术的不断发展，值得保存的东西不再仅仅是两三张老照片，一件件物件，一份份文件，更多地是一段段电子数据&lt;/p&gt;
+&lt;p&gt;看到年仅34岁的中国工程师因为笔记本被抢，在与歹徒争夺中不幸遇难，我的内心非常难受&lt;/p&gt;
+&lt;p&gt;站在事后键盘侠的角度来说，为了笔记本与其内部的资料受伤乃至丢掉性命是一件很不值当的事情&lt;/p&gt;
+&lt;p&gt;当然，你也可以说“不是每个人在危急情况下都可以做出最理性的选择，你东西被抢了，第一反应肯定是抢回来，后面发生的事，谁知道会咋样”&lt;/p&gt;
+&lt;p&gt;但是，不管怎么说，笔记本对他而言价值巨大，他丢掉需要承受非常大的损失，这才值得他为自己的笔记本和歹徒争斗&lt;/p&gt;
+&lt;p&gt;对于我这种小怂包来说，被抢了肯定是抱头蹲下啊。大部分都是有个团伙的，人家本来可能只想劫财，我要是追上去，再被劫人就不好了。&lt;/p&gt;
+&lt;p&gt;据说非洲黑矿还缺人呢&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="life" scheme="https://totoro.ink/categories/life/"/>
+    
+    
+    <category term="生活" scheme="https://totoro.ink/tags/%E7%94%9F%E6%B4%BB/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>站在2019，面向2020</title>
+    <link href="https://totoro.ink/life/bye2019.html"/>
+    <id>https://totoro.ink/life/bye2019.html</id>
+    <published>2019-12-31T12:26:10.000Z</published>
+    <updated>2021-01-18T10:12:51.590Z</updated>
+    
+    
+    <summary type="html">&lt;h1 id=&quot;9102-年就这样过去&quot;&gt;&lt;a href=&quot;#9102-年就这样过去&quot; class=&quot;headerlink&quot; title=&quot;9102 年就这样过去&quot;&gt;&lt;/a&gt;9102 年就这样过去&lt;/h1&gt;&lt;p&gt;9102年过去的很快，至少对我而言是这样的&lt;/p&gt;
+&lt;p&gt;作为一只社畜，每天都在按部就班的 上班、下班 中度过，出于保密性的要求这里就不多赘述上班内容&lt;/p&gt;
+&lt;p&gt;那么故事应该从何说起呢？&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="life" scheme="https://totoro.ink/categories/life/"/>
+    
+    
+    <category term="生活" scheme="https://totoro.ink/tags/%E7%94%9F%E6%B4%BB/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>梦想是什么</title>
+    <link href="https://totoro.ink/life/dream2019.html"/>
+    <id>https://totoro.ink/life/dream2019.html</id>
+    <published>2019-11-02T00:48:00.000Z</published>
+    <updated>2021-01-18T10:12:51.590Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h2 id=&quot;梦想是什么&quot;&gt;&lt;a href=&quot;#梦想是什么&quot; class=&quot;headerlink&quot;</summary>
+        
+      
+    
+    
+    
+    <category term="life" scheme="https://totoro.ink/categories/life/"/>
+    
+    
+    <category term="生活" scheme="https://totoro.ink/tags/%E7%94%9F%E6%B4%BB/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Airpods Pro 好吃么</title>
+    <link href="https://totoro.ink/life/airpods-pro.html"/>
+    <id>https://totoro.ink/life/airpods-pro.html</id>
+    <published>2019-10-31T00:48:00.000Z</published>
+    <updated>2021-01-18T10:12:51.590Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;起因&quot;&gt;&lt;a href=&quot;#起因&quot; class=&quot;headerlink&quot; title=&quot;起因&quot;&gt;&lt;/a&gt;起因&lt;/h2&gt;&lt;p&gt;可能是我的耳廓偏小的原因，导致我在&lt;a href=&quot;https://totoro.ink/life/jbl-ua-flash.html&quot;&gt;用JBL UA FLASH的过程中耳朵不是很舒服&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;再加上我睡觉的时候喜欢戴着耳机睡觉，侧睡时体积过于庞大，并在睡觉的时候顶着耳朵很难受，我就萌生出了换一个耳机的想法。&lt;/p&gt;
+&lt;p&gt;正好最近换了 iPhone ，就想着正好体验一下 AirPods 。&lt;/p&gt;
+&lt;p&gt;原本是打算双十一购买 Airpods 2 的，谁知道10月29日早上刚睡醒就看到推送消息说苹果发布了 AirPods Pro ，30日正式开售&lt;/p&gt;
+&lt;p&gt;买的早不如买的巧，早买早享受，晚买出新款。&lt;/p&gt;
+&lt;p&gt;蹬蹬蹬的爬起来，用信用卡24期免息下单了。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="life" scheme="https://totoro.ink/categories/life/"/>
+    
+    
+    <category term="生活" scheme="https://totoro.ink/tags/%E7%94%9F%E6%B4%BB/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>JBL UA FLASH 使用初体验</title>
+    <link href="https://totoro.ink/life/jbl-ua-flash.html"/>
+    <id>https://totoro.ink/life/jbl-ua-flash.html</id>
+    <published>2019-02-19T00:48:00.000Z</published>
+    <updated>2021-01-18T10:12:51.590Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;祖传的 JBL T280A+ 线缆破损后又被我『不小心弄丢了』，于是乎就迸生出够买一个耳机的想法。&lt;/p&gt;
+&lt;p&gt;没有耳机的期间一直在用小米的蓝牙耳机在凑合着用，突然就感觉蓝牙耳机也是个不错的选择。&lt;/p&gt;
+&lt;p&gt;在使用小米蓝牙耳机的期间也遇到了很多的问题，首先是硅胶耳塞在口袋中很容易蹭掉，导致送的3个耳塞最终我只剩下一个可用；其次就是续航时间了，虽说充满电可用4小时左右，但是在高频率的实用下，频繁的拔插 Micro-USB 实在不是一个很好的体验。&lt;/p&gt;
+&lt;p&gt;随意的逛了逛 B 站，发现现在有不少蓝牙耳机都有一个配套的小盒子，可以放在盒子里面进行充电，不用的时候也可以存放在小盒子里，感觉这个功能设计一下子解决了我的全部痛点。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="life" scheme="https://totoro.ink/categories/life/"/>
+    
+    
+    <category term="生活" scheme="https://totoro.ink/tags/%E7%94%9F%E6%B4%BB/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>我的 ITX 主机 | ZS-A4</title>
+    <link href="https://totoro.ink/life/zs-a4.html"/>
+    <id>https://totoro.ink/life/zs-a4.html</id>
+    <published>2018-08-31T12:10:00.000Z</published>
+    <updated>2021-01-18T10:12:51.590Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;起因&quot;&gt;&lt;a href=&quot;#起因&quot; class=&quot;headerlink&quot; title=&quot;起因&quot;&gt;&lt;/a&gt;起因&lt;/h2&gt;&lt;p&gt;难以忍受破旧笔记本（ACER V5-472G i5-3337u）懦弱的CPU性能，正值工作之际，计划更换一台新的电脑。&lt;/p&gt;
+&lt;p&gt;心水水的 i7-8550u 性能由于散热原因达不到应有的水平，更不要说 i7-8750h 的散热能力了，根本压不住。&lt;/p&gt;
+&lt;p&gt;想到以后对于CPU的需求越来越多，索性上了台式机。不过为了以后能够经常性的搬运、携带，便上了 ITX 的贼船。（工作原因）&lt;/p&gt;
+&lt;p&gt;Inter 的挤牙膏功夫太强，甚至还往回缩了一大口（ CPU 漏洞频发）。正值散片价格上涨之宜，干脆的上了 AMD 平台。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="life" scheme="https://totoro.ink/categories/life/"/>
+    
+    
+    <category term="computer" scheme="https://totoro.ink/tags/computer/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Ingress 镇江地区任务拼图介绍</title>
+    <link href="https://totoro.ink/ingress/missions-zhenjiang.html"/>
+    <id>https://totoro.ink/ingress/missions-zhenjiang.html</id>
+    <published>2018-04-25T03:19:00.000Z</published>
+    <updated>2021-01-18T10:12:51.590Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;Ingress 镇江地区任务拼图介绍&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="ingress" scheme="https://totoro.ink/categories/ingress/"/>
+    
+    
+    <category term="ingress" scheme="https://totoro.ink/tags/ingress/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>写在 ingress 游戏入坑一周年</title>
+    <link href="https://totoro.ink/ingress/ingress-for-one-year.html"/>
+    <id>https://totoro.ink/ingress/ingress-for-one-year.html</id>
+    <published>2018-04-05T05:54:00.000Z</published>
+    <updated>2021-01-18T10:12:51.590Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;不知不觉，入坑 ingress 这个游戏也一年整了。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="ingress" scheme="https://totoro.ink/categories/ingress/"/>
+    
+    
+    <category term="ingress" scheme="https://totoro.ink/tags/ingress/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>met 16级玩家</title>
+    <link href="https://totoro.ink/ingress/42met-16.html"/>
+    <id>https://totoro.ink/ingress/42met-16.html</id>
+    <published>2018-04-04T17:29:00.000Z</published>
+    <updated>2021-01-18T10:12:51.590Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;日常观看 iitc 发现附近出没两只16级玩家，于是 telegram 上戳了一下询问能否抓捕。&lt;/p&gt;
+&lt;p&gt;得到回复后开心的跑过去玩儿。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="ingress" scheme="https://totoro.ink/categories/ingress/"/>
+    
+    
+    <category term="ingress" scheme="https://totoro.ink/tags/ingress/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>无锡 MISSION DAY</title>
+    <link href="https://totoro.ink/ingress/331wuxi-missionday.html"/>
+    <id>https://totoro.ink/ingress/331wuxi-missionday.html</id>
+    <published>2018-04-04T16:15:00.000Z</published>
+    <updated>2021-01-18T10:12:51.590Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;去过了&lt;a href=&quot;https://totoro.ink/ingress/610suzhou.html&quot;&gt;苏州 mission day&lt;/a&gt; 之后再去参加无锡 mission day  的感觉就是截然不同的了，不同于第一次参加 mission day  的无知懵懂，再一次前往 mission day 的我也是更加的老练了。&lt;/p&gt;
+&lt;h2 id=&quot;准备&quot;&gt;&lt;a href=&quot;#准备&quot; class=&quot;headerlink&quot; title=&quot;准备&quot;&gt;&lt;/a&gt;准备&lt;/h2&gt;&lt;p&gt;回想起苏州 mission day 上恐怖的玩家数量，我不禁想起结束后库存中的脚 （Resonator）一个不剩的恐惧，于是乎我提前两个月就做好了长期摸4级脚的准备，因为4级脚在一个 po 上可以插上4个，而且等级也不会太低从而太容易被打掉。我大概准备了800的四级脚以及少量的其他高级脚共计大约1400多脚（事后表明800的四级脚最后还是不够用的）。&lt;/p&gt;
+&lt;h2 id=&quot;别人拍的照片&quot;&gt;&lt;a href=&quot;#别人拍的照片&quot; class=&quot;headerlink&quot; title=&quot;别人拍的照片&quot;&gt;&lt;/a&gt;别人拍的照片&lt;/h2&gt;&lt;p&gt;出发之前就有群友在群内发出他们拍摄的无锡的照片，可以说是美不胜收了。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;em&gt;（点击图片可以查看原图）&lt;/em&gt;&lt;/strong&gt;&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="ingress" scheme="https://totoro.ink/categories/ingress/"/>
+    
+    
+    <category term="ingress" scheme="https://totoro.ink/tags/ingress/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>yubikey使用初体验</title>
+    <link href="https://totoro.ink/yubikey.html"/>
+    <id>https://totoro.ink/yubikey.html</id>
+    <published>2018-03-14T05:07:00.000Z</published>
+    <updated>2021-01-18T10:12:51.590Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;觊觎 &lt;a href=&quot;https://www.yubico.com/&quot;&gt;yubico&lt;/a&gt; 公司的 &lt;a href=&quot;https://www.yubico.com/products/yubikey-hardware/&quot;&gt;yubikey&lt;/a&gt; 很久了，最近又由于 lastpass 主密钥过长不方便的原因，索性买了一个回来研究。&lt;/p&gt;
+&lt;p&gt;我在购买前有了解到这是一个略微高端的玩具，国内外的教程都很少，而且新老教程都有些不尽准确的地方。yubikey 在设计使用上对于 MAC OS 以及 Linux 系统比较友好，而在 Windows 上的使用范围就相对小了很多，不过如果是仅仅用做固定密码输入器的话，也是够用的。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="bash" scheme="https://totoro.ink/categories/bash/"/>
+    
+    
+    <category term="安全" scheme="https://totoro.ink/tags/%E5%AE%89%E5%85%A8/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>adb命令模拟按键事件 KeyCode</title>
+    <link href="https://totoro.ink/bash/android-adb.html"/>
+    <id>https://totoro.ink/bash/android-adb.html</id>
+    <published>2018-02-12T18:18:00.000Z</published>
+    <updated>2021-01-18T10:12:51.586Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;p&gt;随手重启手机之后，由于输入法未自启动无法输入锁屏密码&lt;/p&gt;
+&lt;p&gt;半夜两点多爬起来想办法&lt;/p&gt;
+&lt;p&gt;依据&lt;a</summary>
+        
+      
+    
+    
+    
+    <category term="bash" scheme="https://totoro.ink/categories/bash/"/>
+    
+    
+    <category term="android" scheme="https://totoro.ink/tags/android/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>raspberry 搭建plex服务器</title>
+    <link href="https://totoro.ink/bash/raspberry-pi-plex-service.html"/>
+    <id>https://totoro.ink/bash/raspberry-pi-plex-service.html</id>
+    <published>2018-01-30T16:21:10.000Z</published>
+    <updated>2021-01-18T10:12:51.586Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;raspberry安装plex的速度实在是太慢了，网上教程很少，错误很多，故写一篇教程。&lt;/p&gt;
+&lt;p&gt;由于树莓派是armhf架构，而plex官方并没有提供相应的软件包，我又不会自己编译，只能上网找教程/编译好的包&lt;/p&gt;
+&lt;p&gt;我在网上东找西找，最后找到一篇这样的文章-&lt;a href=&quot;https://www.zybuluo.com/jocker---/note/840749#5-plex-media-server&quot;&gt;使用树莓派搭建私人媒体云&lt;/a&gt; 最后根据自己的经验成功的在raspberry上安装了plex&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="bash" scheme="https://totoro.ink/categories/bash/"/>
+    
+    
+    <category term="raspberry" scheme="https://totoro.ink/tags/raspberry/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>一个普通北大人的命运与冒险——怎样避免家庭和学校对人造成的长期伤害重演？</title>
+    <link href="https://totoro.ink/129parents.html"/>
+    <id>https://totoro.ink/129parents.html</id>
+    <published>2018-01-29T12:04:00.000Z</published>
+    <updated>2021-01-18T10:12:51.586Z</updated>
+    
+    
+    <summary type="html">&lt;h1 id=&quot;简介&quot;&gt;&lt;a href=&quot;#简介&quot; class=&quot;headerlink&quot; title=&quot;简介&quot;&gt;&lt;/a&gt;简介&lt;/h1&gt;&lt;p&gt;起因是在知乎看到这样一个问题-&lt;a href=&quot;https://www.zhihu.com/question/266320691&quot;&gt;如何看待「北大留美学生写万字长文数落父母‘过度关爱’，12年春节不归」？&lt;/a&gt; 里面贴出了澎湃的一篇报道-&lt;a href=&quot;http://www.thepaper.cn/newsDetail_forward_1972716&quot;&gt;留美学生写万字长文数落父母“过度关爱”，12年春节不归&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;同时我在知乎的这个问题-&lt;a href=&quot;https://www.zhihu.com/question/265024635&quot;&gt;一个普通北大人的命运与冒险——怎样避免家庭和学校对人造成的长期伤害重演？&lt;/a&gt; 中找到了&lt;a href=&quot;https://www.zhihu.com/question/265024635/answer/288304477&quot;&gt;作者的回答（正文内容）&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;以下为文章具体内容：&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="pen" scheme="https://totoro.ink/categories/pen/"/>
+    
+    
+    <category term="思考" scheme="https://totoro.ink/tags/%E6%80%9D%E8%80%83/"/>
+    
+    <category term="教育" scheme="https://totoro.ink/tags/%E6%95%99%E8%82%B2/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>ServerStatus支持多台服务器监控的探针</title>
+    <link href="https://totoro.ink/serverstatus.html"/>
+    <id>https://totoro.ink/serverstatus.html</id>
+    <published>2018-01-23T09:18:00.000Z</published>
+    <updated>2021-01-18T10:12:51.590Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;&lt;em&gt;服务器多了就总是想着监控—-这大概是病，得治&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;ServerStatus是一款python探针，&lt;a href=&quot;https://github.com/BotoX/ServerStatus&quot;&gt;英文原版项目&lt;/a&gt; | &lt;a href=&quot;https://github.com/cppla/ServerStatus&quot;&gt;中文版项目&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;另外也有Go 语言编写的&lt;a href=&quot;https://github.com/likexian/stathub-go/blob/master/README-ZH.md&quot;&gt;stathub-go&lt;/a&gt; 可供选择&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="bash" scheme="https://totoro.ink/categories/bash/"/>
+    
+    
+    <category term="status" scheme="https://totoro.ink/tags/status/"/>
+    
+    <category term="服务器" scheme="https://totoro.ink/tags/%E6%9C%8D%E5%8A%A1%E5%99%A8/"/>
+    
+  </entry>
+  
+</feed>

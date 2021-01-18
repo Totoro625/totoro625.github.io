@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/avatar.jpg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/avatar.jpg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/avatar.jpg">
+  <link rel="mask-icon" href="/avatar.jpg" color="#222">
+  <meta name="google-site-verification" content="1p0EsRqqrxXK9MKusHQddZLU3uRKR39HAJc0nv9cCPY">
+  <meta name="baidu-site-verification" content="p98fiVOwSW">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('https://totoro.ink').hostname,
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.7.1',
+    exturl: false,
+    sidebar: {"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":"flat"},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":true,"nav":{"disqus":{"text":"Load Disqus","order":-1}}},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="进行环境配置yum -y install screen git htop nano vim 更好的上网配置wget -N --no-check-certificate https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;91yun&#x2F;shadowsocks_install&#x2F;master&#x2F;ssr-install.sh &amp;&amp; bash ssr-install.sh">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一个新的服务器到手后(kvm)">
+<meta property="og:url" content="https://totoro.ink/bash/new-kvm-docker.html">
+<meta property="og:site_name" content="TOTORO625">
+<meta property="og:description" content="进行环境配置yum -y install screen git htop nano vim 更好的上网配置wget -N --no-check-certificate https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;91yun&#x2F;shadowsocks_install&#x2F;master&#x2F;ssr-install.sh &amp;&amp; bash ssr-install.sh">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2017-07-14T17:58:10.000Z">
+<meta property="article:modified_time" content="2021-01-18T10:12:51.586Z">
+<meta property="article:author" content="totoro625">
+<meta property="article:tag" content="docker">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://totoro.ink/bash/new-kvm-docker.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>一个新的服务器到手后(kvm) | TOTORO625</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="TOTORO625" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">TOTORO625</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-友链">
+
+    <a href="/link.html" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about.html" rel="section"><i class="fa fa-fw fa-user-circle-o"></i>关于</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://totoro.ink/bash/new-kvm-docker.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/avatar.jpg">
+      <meta itemprop="name" content="totoro625">
+      <meta itemprop="description" content="龙猫不在家">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="TOTORO625">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          一个新的服务器到手后(kvm)
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2017-07-15 01:58:10" itemprop="dateCreated datePublished" datetime="2017-07-15T01:58:10+08:00">2017-07-15</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-01-18 18:12:51" itemprop="dateModified" datetime="2021-01-18T18:12:51+08:00">2021-01-18</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/bash/" itemprop="url" rel="index">
+                    <span itemprop="name">bash</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="进行环境配置"><a href="#进行环境配置" class="headerlink" title="进行环境配置"></a>进行环境配置</h2><p><code>yum -y install screen git htop nano vim</code></p>
+<h2 id="更好的上网配置"><a href="#更好的上网配置" class="headerlink" title="更好的上网配置"></a>更好的上网配置</h2><p><code>wget -N --no-check-certificate https://raw.githubusercontent.com/91yun/shadowsocks_install/master/ssr-install.sh &amp;&amp; bash ssr-install.sh</code>     来自 <a target="_blank" rel="noopener" href="https://www.91yun.co/archives/14321">91yun</a></p>
+<p><code>vi /home/ssr/mudb.json</code></p>
+<p>修改<code>chacha20</code>为<code>chacha20-ietf</code> 以更适合移动设备等运算能力低或者有省电需求的设备</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">添加用户： ssr adduser</span><br><span class="line">删除用户： ssr deluser</span><br><span class="line">启动 SSR ： ssr start</span><br><span class="line">停止 SSR ： ssr stop</span><br><span class="line">重启 SSR ： ssr restart</span><br><span class="line">卸载 SSR ： ssr uninstall</span><br><span class="line">更新 SSR ： ssr update</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+
+<h2 id="开启BBR"><a href="#开启BBR" class="headerlink" title="开启BBR"></a>开启BBR</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">wget --no-check-certificate https:&#x2F;&#x2F;github.com&#x2F;teddysun&#x2F;across&#x2F;raw&#x2F;master&#x2F;bbr.sh</span><br><span class="line">chmod +x bbr.sh</span><br><span class="line">.&#x2F;bbr.sh</span><br></pre></td></tr></table></figure>
+<p>来自<a target="_blank" rel="noopener" href="https://teddysun.com/489.html">秋水逸冰</a></p>
+<h3 id="开启成功验证方法（可省略"><a href="#开启成功验证方法（可省略" class="headerlink" title="开启成功验证方法（可省略"></a>开启成功验证方法（可省略</h3><p>重启完成后，进入 VPS，验证一下是否成功安装最新内核并开启 TCP BBR，输入以下命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">uname -r</span><br></pre></td></tr></table></figure>
+<p>查看内核版本，含有 4.11 就表示 OK 了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sysctl net.ipv4.tcp_available_congestion_control</span><br></pre></td></tr></table></figure>
+<p>返回值一般为：<br>net.ipv4.tcp_available_congestion_control = bbr cubic reno</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sysctl net.ipv4.tcp_congestion_control</span><br></pre></td></tr></table></figure>
+<p>返回值一般为：<br>net.ipv4.tcp_congestion_control = bbr</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sysctl net.core.default_qdisc</span><br></pre></td></tr></table></figure>
+<p>返回值一般为：<br>net.core.default_qdisc = fq</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lsmod | grep bbr</span><br></pre></td></tr></table></figure>
+<p>返回值有 tcp_bbr 模块即说明bbr已启动</p>
+<h2 id="Resilio-Sync搭建"><a href="#Resilio-Sync搭建" class="headerlink" title="Resilio Sync搭建"></a>Resilio Sync搭建</h2><p>新建一个<code>/etc/yum.repos.d/resilio-sync.repo</code></p>
+<p>写入</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[resilio-sync]</span><br><span class="line">name&#x3D;Resilio Sync $basearch</span><br><span class="line">baseurl&#x3D;http:&#x2F;&#x2F;linux-packages.resilio.com&#x2F;resilio-sync&#x2F;rpm&#x2F;$basearch</span><br><span class="line">enabled&#x3D;1</span><br><span class="line">gpgcheck&#x3D;1</span><br></pre></td></tr></table></figure>
+<p>再导入密钥<code>rpm --import https://linux-packages.resilio.com/resilio-sync/key.asc</code></p>
+<p><code>yum -y update</code></p>
+<p><code>yum -y install resilio-sync</code></p>
+<p>就算安装成功了</p>
+<p><code>rslsync --webui.listen 0.0.0.0:8888 </code>    开启网页访问</p>
+<p>树莓派参考<a target="_blank" rel="noopener" href="https://totoro.pub/bash/raspberry-resilio-sync.html">这个方法</a></p>
+<p>或者使用</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">wget https:&#x2F;&#x2F;download-cdn.resilio.com&#x2F;stable&#x2F;linux-x64&#x2F;resilio-sync_x64.tar.gz</span><br><span class="line">tar -zxvf  resilio-sync_x64.tar.gz</span><br><span class="line">.&#x2F;rslsync --webui.listen 0.0.0.0:8888</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">管理命令：</span><br><span class="line">sudo service resilio-sync start</span><br><span class="line">sudo service resilio-sync stop</span><br><span class="line">sudo service resilio-sync restart</span><br><span class="line">卸载：</span><br><span class="line">sudo yum remove btsync</span><br></pre></td></tr></table></figure>
+<p>更多请参照<a target="_blank" rel="noopener" href="https://help.resilio.com/hc/en-us/articles/206178924">官方说明文档</a></p>
+<h3 id="导入Resilio-Sync密钥并等待同步"><a href="#导入Resilio-Sync密钥并等待同步" class="headerlink" title="导入Resilio Sync密钥并等待同步"></a>导入Resilio Sync密钥并等待同步</h3><p>需要注意的是：</p>
+<ul>
+<li>网站数据文件同步</li>
+<li>数据库导出导入</li>
+<li>Nginx文件导出导入</li>
+<li>旧域名301</li>
+</ul>
+<h2 id="lnmp的安装"><a href="#lnmp的安装" class="headerlink" title="lnmp的安装"></a>lnmp的安装</h2><p><code>screen -S lnmp</code></p>
+<p><code>wget -c http://soft.vpser.net/lnmp/lnmp1.4.tar.gz &amp;&amp; tar zxf lnmp1.4.tar.gz &amp;&amp; cd lnmp1.4 &amp;&amp; ./install.sh lnmp</code></p>
+<p>根据需要来就行，建议使用<strong>MySQL 5.5</strong>  我比较喜欢<strong>PHP7</strong></p>
+<p>参考<a target="_blank" rel="noopener" href="https://lnmp.org/install.html">lnmp一键包</a></p>
+<h2 id="用daocloud进行docker集群管理"><a href="#用daocloud进行docker集群管理" class="headerlink" title="用daocloud进行docker集群管理"></a>用daocloud进行docker集群管理</h2><p>进入 <a target="_blank" rel="noopener" href="https://www.daocloud.io/">daocloud</a> 之后，我们在控制台进行<a target="_blank" rel="noopener" href="http://dashboard.daocloud.io/cluster">集群管理</a> </p>
+<p>不用怕，就算我们只有一台服务器也是可以j进行集群管理的</p>
+<p>点击可爱的添加主机键</p>
+<p>咦，等一下，我的docker是不是还没有安装？</p>
+<p>对于网络好的国外服务器可以使用 <code>curl -sSL https://get.docker.com/ | sh</code> 进行安装</p>
+<p>对于其他服务器大可使用<a target="_blank" rel="noopener" href="http://get.daocloud.io/#install-docker">DaoCloud提供的镜像</a> <code>curl -sSL https://get.daocloud.io/docker | sh</code> 进行安装</p>
+<p>当然他们还提供了<a target="_blank" rel="noopener" href="http://get.daocloud.io/">各种加速服务</a>给国内的服务器</p>
+<p>之后进行安装主机监控程序</p>
+<p>执行DaoCloud给的命令将你的服务器与DaoCloud相连接</p>
+<h2 id="部署docker"><a href="#部署docker" class="headerlink" title="部署docker"></a>部署docker</h2><h3 id="简要说明"><a href="#简要说明" class="headerlink" title="简要说明"></a>简要说明</h3><p>h5ai是一个精致的文件目录浏览程序，但是配置复杂</p>
+<p>owncloud是一个网盘程序，但是在Nginx环境下各种坑</p>
+<p>Resilio Sync是一个bt同步程序</p>
+<p>但是我为什么不用docker来部署Resilio Sync呢？因为docker部署的Resilio Sync需要额外的权限配置，不利于全局的文件同步</p>
+<p>在发现镜像中找到<a target="_blank" rel="noopener" href="http://dashboard.daocloud.io/packages/d6c0f231-d83d-44f9-89fa-f1c237fd4dfd">corfr/h5ai</a> 和<a target="_blank" rel="noopener" href="http://dashboard.daocloud.io/packages/7d1b2f49-c52a-4a8d-b678-b917f6c0ccd2">library/owncloud</a> 即可选择部署</p>
+<p>在容器端口选项中将动态端口改为好记的固定端口</p>
+<h3 id="对于Volumes"><a href="#对于Volumes" class="headerlink" title="对于Volumes"></a>对于Volumes</h3><p>h5ai为</p>
+<table>
+<thead>
+<tr>
+<th>容器路径</th>
+<th>主机路径</th>
+<th>是否可写</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>/var/www</td>
+<td>/home/sync/h5ai</td>
+<td>是</td>
+</tr>
+</tbody></table>
+<p>这样你在/home/sync/h5ai添加的文件将会直接展示出来</p>
+<p>owncloud为</p>
+<table>
+<thead>
+<tr>
+<th>容器路径</th>
+<th>主机路径</th>
+<th>是否可写</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>/var/www/html/apps</td>
+<td>/home/sync/owncloud/apps</td>
+<td>是</td>
+</tr>
+<tr>
+<td>/var/www/html/config</td>
+<td>/home/sync/owncloud/config</td>
+<td>是</td>
+</tr>
+<tr>
+<td>/var/www/html/data</td>
+<td>/home/sync/owncloud/data</td>
+<td>是</td>
+</tr>
+</tbody></table>
+<p>这样你的owncloud数据处理数据库都在这里了</p>
+<p>进入yourip/phpmyadmin/ 进行数据库管理，导入备份过的数据库再去owncloud配置即可正常使用了</p>
+<h2 id="开启nginx反向代理实现SSL以及HSTS"><a href="#开启nginx反向代理实现SSL以及HSTS" class="headerlink" title="开启nginx反向代理实现SSL以及HSTS"></a>开启nginx反向代理实现SSL以及HSTS</h2><p><code>lnmp vhost add</code> 先添加虚拟主机，按照流程并选择添加Letsencrypt的证书</p>
+<p>成功后在<code>/usr/local/nginx/conf/vhost</code> 修改配置信息</p>
+<p>示例：<a target="_blank" rel="noopener" href="https://pan.totoro.pub/">https://pan.totoro.pub</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">server</span><br><span class="line">    &#123;</span><br><span class="line">        listen 80;</span><br><span class="line">        #listen [::]:80;</span><br><span class="line">        server_name pan.totot.net ;</span><br><span class="line">		return	  301 https:&#x2F;&#x2F;pan.totot.net$request_uri;		&#x2F;&#x2F;重定向http到https</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">server</span><br><span class="line">    &#123;</span><br><span class="line">        listen 443 ssl http2;</span><br><span class="line">        #listen [::]:443 ssl http2;</span><br><span class="line">        server_name pan.totoro.pub ;</span><br><span class="line">        index index.html index.htm index.php default.html default.htm default.php;</span><br><span class="line">        root  html;			&#x2F;&#x2F;修改为html</span><br><span class="line">		add_header Strict-Transport-Security &quot;max-age&#x3D;18036000; includeSubdomains; preload&quot;;	&#x2F;&#x2F;HSTS 180天</span><br><span class="line">        ssl on;</span><br><span class="line">        ssl_certificate &#x2F;etc&#x2F;letsencrypt&#x2F;live&#x2F;pan.totoro.pub&#x2F;fullchain.pem;</span><br><span class="line">        ssl_certificate_key &#x2F;etc&#x2F;letsencrypt&#x2F;live&#x2F;pan.totoro.pub&#x2F;privkey.pem;</span><br><span class="line">        ssl_session_timeout 5m;</span><br><span class="line">        ssl_protocols TLSv1 TLSv1.1 TLSv1.2;</span><br><span class="line">        ssl_prefer_server_ciphers on;</span><br><span class="line">        ssl_ciphers &quot;EECDH+CHACHA20:EECDH+CHACHA20-draft:EECDH+AES128:RSA+AES128:EECDH+AES256:RSA+AES256:EECDH+3DES:RSA+3DES:!MD5&quot;;</span><br><span class="line">        ssl_session_cache builtin:1000 shared:SSL:10m;</span><br><span class="line">        # openssl dhparam -out &#x2F;usr&#x2F;local&#x2F;nginx&#x2F;conf&#x2F;ssl&#x2F;dhparam.pem 2048</span><br><span class="line">        ssl_dhparam &#x2F;usr&#x2F;local&#x2F;nginx&#x2F;conf&#x2F;ssl&#x2F;dhparam.pem;</span><br><span class="line"></span><br><span class="line">        #error_page   404   &#x2F;404.html;</span><br><span class="line"></span><br><span class="line">		location &#x2F; &#123;</span><br><span class="line">        proxy_pass http:&#x2F;&#x2F;127.0.0.1:你的端口;  &#x2F;&#x2F;本地的端口</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">        access_log off;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>对于3个需要使用端口访问的服务使用反向代理并添加SSL加密使得数据的传输更加安全</p>
+<h2 id="博客程序的部署"><a href="#博客程序的部署" class="headerlink" title="博客程序的部署"></a>博客程序的部署</h2><h3 id="hexo"><a href="#hexo" class="headerlink" title="hexo"></a>hexo</h3><p>我所使用的是hexo是在本地计算机创建的静态页面直接用sync同步过去即可，更多hexo的使用请参照你所使用的主题说明文档或者本博客其他文章</p>
+<h3 id="chevereto图床"><a href="#chevereto图床" class="headerlink" title="chevereto图床"></a>chevereto图床</h3><p>参考<a target="_blank" rel="noopener" href="https://chevereto.com/">官网</a> ，我是用的是<a target="_blank" rel="noopener" href="https://github.com/Chevereto/Chevereto-Free">chevereto free</a> 版本</p>
+<p>同样这里可以使用<a target="_blank" rel="noopener" href="http://dashboard.daocloud.io/packages/e9b826c3-3184-440c-a3f3-17c80ed3a8e2">furiousgeorge/chevereto</a> docker，但是我的数据积累较多暂时没迁移</p>
+<p>主要是懒得看说明不想配置Volumes啦</p>
+<p>使用sync同步所有数据之后，导入数据库</p>
+<p>Nginx的conf需要增加一段</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">location &#x2F; &#123;</span><br><span class="line">if (-f $request_filename&#x2F;index.html)&#123;</span><br><span class="line">rewrite (.*) $1&#x2F;index.html break;</span><br><span class="line">&#125;</span><br><span class="line">if (-f $request_filename&#x2F;index.php)&#123;</span><br><span class="line">rewrite (.*) $1&#x2F;index.php;</span><br><span class="line">&#125;</span><br><span class="line">if (!-f $request_filename)&#123;</span><br><span class="line">rewrite (.*) &#x2F;index.php;</span><br><span class="line">&#125;</span><br><span class="line">try_files $uri $uri&#x2F; &#x2F;api.php;</span><br><span class="line">&#125;</span><br><span class="line">location &#x2F;admin &#123;</span><br><span class="line">try_files $uri &#x2F;admin&#x2F;index.php?$args;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">#location &#x2F; &#123;</span><br><span class="line">#try_files $uri $uri&#x2F; &#x2F;index.php?$query_string;</span><br><span class="line">#&#125;</span><br></pre></td></tr></table></figure>
+<p>当然使用docker不用这么麻烦，直接使用上文的方法即可</p>
+<h2 id="reboot之后需要做的"><a href="#reboot之后需要做的" class="headerlink" title="reboot之后需要做的"></a>reboot之后需要做的</h2><p><code>rslsync --webui.listen 0.0.0.0:8888</code>  开启Resilio Sync</p>
+<p><code>service docker start</code> 开启docker使用</p>
+<p><strong>（加入开机启动偶尔会不执行，手动输入一下吧</strong></p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>totoro625
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://totoro.ink/bash/new-kvm-docker.html" title="一个新的服务器到手后(kvm)">https://totoro.ink/bash/new-kvm-docker.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/docker/" rel="tag"><i class="fa fa-tag"></i> docker</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/ingress/629zhenjiang-met.html" rel="prev" title="ingress6月29日镇江蓝绿聚会">
+      <i class="fa fa-chevron-left"></i> ingress6月29日镇江蓝绿聚会
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/kms.html" rel="next" title="未闻花名KMS服务器">
+      未闻花名KMS服务器 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9B%E8%A1%8C%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE"><span class="nav-number">1.</span> <span class="nav-text">进行环境配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9B%B4%E5%A5%BD%E7%9A%84%E4%B8%8A%E7%BD%91%E9%85%8D%E7%BD%AE"><span class="nav-number">2.</span> <span class="nav-text">更好的上网配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%80%E5%90%AFBBR"><span class="nav-number">3.</span> <span class="nav-text">开启BBR</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%80%E5%90%AF%E6%88%90%E5%8A%9F%E9%AA%8C%E8%AF%81%E6%96%B9%E6%B3%95%EF%BC%88%E5%8F%AF%E7%9C%81%E7%95%A5"><span class="nav-number">3.1.</span> <span class="nav-text">开启成功验证方法（可省略</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Resilio-Sync%E6%90%AD%E5%BB%BA"><span class="nav-number">4.</span> <span class="nav-text">Resilio Sync搭建</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%BC%E5%85%A5Resilio-Sync%E5%AF%86%E9%92%A5%E5%B9%B6%E7%AD%89%E5%BE%85%E5%90%8C%E6%AD%A5"><span class="nav-number">4.1.</span> <span class="nav-text">导入Resilio Sync密钥并等待同步</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#lnmp%E7%9A%84%E5%AE%89%E8%A3%85"><span class="nav-number">5.</span> <span class="nav-text">lnmp的安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%A8daocloud%E8%BF%9B%E8%A1%8Cdocker%E9%9B%86%E7%BE%A4%E7%AE%A1%E7%90%86"><span class="nav-number">6.</span> <span class="nav-text">用daocloud进行docker集群管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%83%A8%E7%BD%B2docker"><span class="nav-number">7.</span> <span class="nav-text">部署docker</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%80%E8%A6%81%E8%AF%B4%E6%98%8E"><span class="nav-number">7.1.</span> <span class="nav-text">简要说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%B9%E4%BA%8EVolumes"><span class="nav-number">7.2.</span> <span class="nav-text">对于Volumes</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%80%E5%90%AFnginx%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86%E5%AE%9E%E7%8E%B0SSL%E4%BB%A5%E5%8F%8AHSTS"><span class="nav-number">8.</span> <span class="nav-text">开启nginx反向代理实现SSL以及HSTS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%9A%E5%AE%A2%E7%A8%8B%E5%BA%8F%E7%9A%84%E9%83%A8%E7%BD%B2"><span class="nav-number">9.</span> <span class="nav-text">博客程序的部署</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#hexo"><span class="nav-number">9.1.</span> <span class="nav-text">hexo</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#chevereto%E5%9B%BE%E5%BA%8A"><span class="nav-number">9.2.</span> <span class="nav-text">chevereto图床</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#reboot%E4%B9%8B%E5%90%8E%E9%9C%80%E8%A6%81%E5%81%9A%E7%9A%84"><span class="nav-number">10.</span> <span class="nav-text">reboot之后需要做的</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="totoro625"
+      src="/avatar.jpg">
+  <p class="site-author-name" itemprop="name">totoro625</p>
+  <div class="site-description" itemprop="description">龙猫不在家</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">67</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Totoro625" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Totoro625" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:hc625@qq.com" title="E-Mail → mailto:hc625@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://t.me/totoro625" title="Telegram → http:&#x2F;&#x2F;t.me&#x2F;totoro625" rel="noopener" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/hc625" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;hc625" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS订阅 → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS订阅</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/sitemap.xml" title="SiteMap → &#x2F;sitemap.xml"><i class="fa fa-fw fa-sitemap"></i>SiteMap</a>
+      </span>
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 2015 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">totoro625 | 龙猫不在家</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://totoro.ink/bash/new-kvm-docker.html";
+    this.page.identifier = "bash/new-kvm-docker.html";
+    this.page.title = "一个新的服务器到手后(kvm)";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://totoro625.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>

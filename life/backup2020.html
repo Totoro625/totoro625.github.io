@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/avatar.jpg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/avatar.jpg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/avatar.jpg">
+  <link rel="mask-icon" href="/avatar.jpg" color="#222">
+  <meta name="google-site-verification" content="1p0EsRqqrxXK9MKusHQddZLU3uRKR39HAJc0nv9cCPY">
+  <meta name="baidu-site-verification" content="p98fiVOwSW">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('https://totoro.ink').hostname,
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.7.1',
+    exturl: false,
+    sidebar: {"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":"flat"},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":true,"nav":{"disqus":{"text":"Load Disqus","order":-1}}},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="2020 年，数据为什么重要随着电子信息技术的不断发展，值得保存的东西不再仅仅是两三张老照片，一件件物件，一份份文件，更多地是一段段电子数据 看到年仅34岁的中国工程师因为笔记本被抢，在与歹徒争夺中不幸遇难，我的内心非常难受 站在事后键盘侠的角度来说，为了笔记本与其内部的资料受伤乃至丢掉性命是一件很不值当的事情 当然，你也可以说“不是每个人在危急情况下都可以做出最理性的选择，你东西被抢了，第一反应">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2020年，我在如何备份我的数据">
+<meta property="og:url" content="https://totoro.ink/life/backup2020.html">
+<meta property="og:site_name" content="TOTORO625">
+<meta property="og:description" content="2020 年，数据为什么重要随着电子信息技术的不断发展，值得保存的东西不再仅仅是两三张老照片，一件件物件，一份份文件，更多地是一段段电子数据 看到年仅34岁的中国工程师因为笔记本被抢，在与歹徒争夺中不幸遇难，我的内心非常难受 站在事后键盘侠的角度来说，为了笔记本与其内部的资料受伤乃至丢掉性命是一件很不值当的事情 当然，你也可以说“不是每个人在危急情况下都可以做出最理性的选择，你东西被抢了，第一反应">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://totoro.ink/img/backup2020.png">
+<meta property="article:published_time" content="2020-01-06T01:10:10.000Z">
+<meta property="article:modified_time" content="2021-01-18T10:12:51.590Z">
+<meta property="article:author" content="totoro625">
+<meta property="article:tag" content="生活">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://totoro.ink/img/backup2020.png">
+
+<link rel="canonical" href="https://totoro.ink/life/backup2020.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>2020年，我在如何备份我的数据 | TOTORO625</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="TOTORO625" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">TOTORO625</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-友链">
+
+    <a href="/link.html" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about.html" rel="section"><i class="fa fa-fw fa-user-circle-o"></i>关于</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://totoro.ink/life/backup2020.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/avatar.jpg">
+      <meta itemprop="name" content="totoro625">
+      <meta itemprop="description" content="龙猫不在家">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="TOTORO625">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          2020年，我在如何备份我的数据
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-01-06 09:10:10" itemprop="dateCreated datePublished" datetime="2020-01-06T09:10:10+08:00">2020-01-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-01-18 18:12:51" itemprop="dateModified" datetime="2021-01-18T18:12:51+08:00">2021-01-18</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/life/" itemprop="url" rel="index">
+                    <span itemprop="name">life</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="2020-年，数据为什么重要"><a href="#2020-年，数据为什么重要" class="headerlink" title="2020 年，数据为什么重要"></a>2020 年，数据为什么重要</h1><p>随着电子信息技术的不断发展，值得保存的东西不再仅仅是两三张老照片，一件件物件，一份份文件，更多地是一段段电子数据</p>
+<p>看到年仅34岁的中国工程师因为笔记本被抢，在与歹徒争夺中不幸遇难，我的内心非常难受</p>
+<p>站在事后键盘侠的角度来说，为了笔记本与其内部的资料受伤乃至丢掉性命是一件很不值当的事情</p>
+<p>当然，你也可以说“不是每个人在危急情况下都可以做出最理性的选择，你东西被抢了，第一反应肯定是抢回来，后面发生的事，谁知道会咋样”</p>
+<p>但是，不管怎么说，笔记本对他而言价值巨大，他丢掉需要承受非常大的损失，这才值得他为自己的笔记本和歹徒争斗</p>
+<p>对于我这种小怂包来说，被抢了肯定是抱头蹲下啊。大部分都是有个团伙的，人家本来可能只想劫财，我要是追上去，再被劫人就不好了。</p>
+<p>据说非洲黑矿还缺人呢</p>
+<a id="more"></a>
+
+<p><img src="https://totoro.ink/img/backup2020.png" alt="backup2020"></p>
+<h1 id="存储"><a href="#存储" class="headerlink" title="存储"></a>存储</h1><p>先来一段总结</p>
+<ul>
+<li>U盘最容易丢失损坏</li>
+<li>CD成本高</li>
+<li>机械硬盘不摔不震也有几率坏，但是最适合普通人存数据</li>
+<li>固态硬盘不适合长期存储，不插电会丢数据</li>
+<li>云存储会和谐</li>
+<li>NAS成本高</li>
+</ul>
+<h3 id="1、U盘不是个好的存储设备"><a href="#1、U盘不是个好的存储设备" class="headerlink" title="1、U盘不是个好的存储设备"></a>1、U盘不是个好的存储设备</h3><p>首先，我要警告所有还在把U盘当做主要数据存储设备的人</p>
+<p>如果你的全部工作文件都在U盘上，修改新建各种操作全部放在U盘上</p>
+<p>那么当U盘遗失或者损坏时，那将是一件灾难性的损失</p>
+<p>U盘，由于市场的参差不齐，携带环境的恶劣，直接裸露在外，受到的干扰也是巨大，很大几率出现物理损害，即不可恢复的丢数据</p>
+<blockquote>
+<p>U盘或者移动硬盘的出现让我们比过去方便很多，但一般 U 盘都是有擦写寿命的，寿命往往比 HDD/SSD 更短，同时容易携带也就意味着容易损坏，物理损坏，或者因为太小了，放在哪里就忘记了，“丢U盘”想必大家都试过。</p>
+<p>除去物理损坏外，各种使用不小心（比如频繁插拔，忘记安全弹出），也容易造成 U 盘/移动硬盘的损害。尽管你很小心的用你的u盘，结果拿给家人搞点啥，几下可能就用坏了。</p>
+</blockquote>
+<h3 id="2、CD光盘存储"><a href="#2、CD光盘存储" class="headerlink" title="2、CD光盘存储"></a>2、CD光盘存储</h3><blockquote>
+<p>光碟是最廉价最受欢迎的介质，他们本来设计寿命是 10-20 年的，而一般情况你不要指望你光盘上的东西五年后还能正常读出来。即便一些号称长期保存百年以上的光盘，寿命也会由于我们各种不当行为大大降低，比如，没法按要求的条件保存（放桌面上被阳光暴晒变形），不小心刮花光盘，在盘面上留下指纹或者手上的油脂，这些都会促进光盘表面化学成分变质，最终导致你的数据损坏。</p>
+</blockquote>
+<p>刻录CD无疑是最麻烦的</p>
+<p>真的</p>
+<p>除非是必要的仪式</p>
+<p>我真的不会去刻录</p>
+<h3 id="3、机械硬盘是最适合普通人的存储设备"><a href="#3、机械硬盘是最适合普通人的存储设备" class="headerlink" title="3、机械硬盘是最适合普通人的存储设备"></a>3、机械硬盘是最适合普通人的存储设备</h3><p>随着时代的发展，新款机械硬盘已经从技术上解决了磁盘损坏的情况出现</p>
+<p>但这仅仅是技术上解决，实际上，任何一次读写过程中的移动，震动，摇晃都可能给你的硬盘致命的一刀</p>
+<p>任何一次摔倒地面都可能是永别</p>
+<p>当这一切都不影响他作为最适合普通人的存储设备</p>
+<p>一块移动硬盘，只要你好好保存下去，需要存储的时候找一个抗震盒子，基本不会有很大的问题</p>
+<p>但是在日常使用中，拿来拿去真不是一个硬盘该做的事情</p>
+<h3 id="4、固态硬盘请不要存储重要数据"><a href="#4、固态硬盘请不要存储重要数据" class="headerlink" title="4、固态硬盘请不要存储重要数据"></a>4、固态硬盘请不要存储重要数据</h3><p>固态硬盘从本质上讲是高端的U盘</p>
+<p>由于固态芯片产量严重不足，基本上能买到的都是大牌厂商的高端货</p>
+<p>固态的水很深，但是价格贵啊，买贵的准没错</p>
+<p>但是简单来讲就按芯片来区分就可以了</p>
+<p>简单而言 1 SLC=2 MLC=4 TLC=8 QLC</p>
+<p>SLC为企业级；MLC为高端消费级；TLC为主流消费级；QLC就是大号U盘</p>
+<p>一般正常TLC就很不错了</p>
+<p>但是由于电子芯片的原因，长时间不通电会导致丢数据，所以固态硬盘不适合长期存储数据</p>
+<h3 id="5、云存储的隐私问题"><a href="#5、云存储的隐私问题" class="headerlink" title="5、云存储的隐私问题"></a>5、云存储的隐私问题</h3><p>我清楚的记得我的一个正常的表情包被百度云给和谐掉了</p>
+<p>云端存储方便但是有隐私问题</p>
+<p>国外网盘好点，但是404</p>
+<h3 id="6、NAS真费钱"><a href="#6、NAS真费钱" class="headerlink" title="6、NAS真费钱"></a>6、NAS真费钱</h3><p>都说机械硬盘是最适合普通人的存储方式</p>
+<p>但是他也会坏</p>
+<p>这个时候组成 raid 放入 NAS 可以降低损坏的风险，就是太贵了</p>
+<h1 id="怎么备份"><a href="#怎么备份" class="headerlink" title="怎么备份"></a>怎么备份</h1><p>不论如何存储都有丢失的风险，但是数据又非常的重要，那么为什么我们不加以备份呢？</p>
+<p>U盘、硬盘、网盘</p>
+<p>所有普通人能够想到的备份无一例外都需要手动操作</p>
+<p>手动备份最为安全保险</p>
+<p>但是也最麻烦最容易被偷懒遗忘</p>
+<p>想想看你上一次备份又是何年何月呢</p>
+<p>这里我要推荐几个自动备份软件</p>
+<h3 id="1、Windows自带文件历史记录"><a href="#1、Windows自带文件历史记录" class="headerlink" title="1、Windows自带文件历史记录"></a>1、Windows自带文件历史记录</h3><p>系统自带的可能不是最好用的，功能最全的，但一定是最方便的</p>
+<p>不需要额外的 安装程序，镶嵌在系统内部，便于使用</p>
+<p>打开设置==》更新与安全==》备份，你就可以看到使用文件历史记录进行备份</p>
+<p>你可以选择任何的移动硬盘或者U盘进行备份</p>
+<p>或者在，控制面板\系统和安全\文件历史记录中选择网络驱动器，这样就可以备份到局域网的其他设备中了</p>
+<p>如果你安装软件全部使用默认设置的话，这里建议不备份我的文档，或者使用排除设置将其排除出去，这样可以不备份QQ的聊天数据库。若果你不想一个1-5GB的聊天数据库文件每隔一小时备份一个的话。</p>
+<p>推荐备份的目录有你的工作文件目录以及QQ微信接收的文件目录</p>
+<h3 id="2、filegee免费版"><a href="#2、filegee免费版" class="headerlink" title="2、filegee免费版"></a>2、filegee免费版</h3><p>免费版本支持8个任务，对于一般人是够用的</p>
+<p>不建议购买</p>
+<p>因为更换设备时</p>
+<blockquote>
+<p>1、如果以联网方式在线激活软件的，则收取换机时FileGee市场价格30%的新机注册费用。</p>
+<p>2、如果以不联网方式离线激活软件的，则收取换机时FileGee市场价格60%的新机注册费用。</p>
+</blockquote>
+<p>支持加密并上传到百度网盘，这就是一个值得推荐的理由了</p>
+<h3 id="3、GoodSync"><a href="#3、GoodSync" class="headerlink" title="3、GoodSync"></a>3、GoodSync</h3><p>这是我找到的第二个好用的自动同步软件了</p>
+<p>主要是付费版支持和设备解绑</p>
+<p>此处强烈谴责filegee费用高昂换机收费</p>
+<p>另外安卓苹果均有手机APP，很好用</p>
+<h2 id="安全"><a href="#安全" class="headerlink" title="安全"></a>安全</h2><p>有人说，备份的 东西要是丢了会更加危险，所以干脆宁可丢了也不备份</p>
+<p>但是备份软件的出现打破了这一局面，我们大可以加密后再进行备份</p>
+<p>另外一个问题忘记备份，通过备份软件可以定时的/随时的为你备份全部修改内容，让你的数据没有任何安全隐患</p>
+<h1 id="备份到哪里"><a href="#备份到哪里" class="headerlink" title="备份到哪里"></a>备份到哪里</h1><blockquote>
+<p>数据备份的321原则就是</p>
+<p>3份备份数据</p>
+<p>1种不同媒介储存</p>
+<p>1个备份存于异地</p>
+<p>还有，不是所有数据都需要备份，首先把自己的数据分类</p>
+<p>1、核心自有数据，自己的照片，表格，视频等，具有唯一性，无法从其他地方获取的。这类数据是备份的重点。</p>
+<p>2、较难获取但是费点儿力气还是可以得到的，比如公司的资料，自己没有可以从同事处获取，虽然费时但是并非无法获取。此类数据可以根据情况备份，如果空间足够可以备份，否则根据情况选择。</p>
+<p>3、普通容易获得的资源和数据。下载的软件，电影，书籍资源，网络上很多资源，不需要多次备份，需要的时候重新下载就好了。</p>
+</blockquote>
+<p>我的备份就是：</p>
+<p>固定设备：</p>
+<ol>
+<li>电脑工作文件一份（原始文件）随身携带</li>
+<li>电脑加密中转目录一个（不加密名称只加密文件）电脑磁盘</li>
+<li>电脑加密中转目录一个（名称、文件双加密）电脑磁盘</li>
+<li>电脑文件历史记录一份（原始文件带UTC时间编码）固定在家的移动硬盘</li>
+</ol>
+<p>移动设备：</p>
+<ol>
+<li>加密备份到移动硬盘一份（不加密名称只加密文件）可能需要携带的移动硬盘</li>
+<li>加密备份到U盘一份（不加密名称只加密文件）需要随身携带的U盘</li>
+</ol>
+<p>云端设备：</p>
+<ol>
+<li>加密备份到Google云盘一份（名称、文件双加密）</li>
+<li>加密到百度云盘一份（名称、文件双加密）</li>
+</ol>
+<p>计划添加的设备：</p>
+<ol>
+<li>群辉NAS，进行raid的备份，进而把备份任务转移到NAS上</li>
+<li>一个软路由，进而把网络软件转移到专业设备上</li>
+<li>一个服务器，更好的管理（骗人的</li>
+</ol>
+<p>加油</p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>totoro625
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://totoro.ink/life/backup2020.html" title="2020年，我在如何备份我的数据">https://totoro.ink/life/backup2020.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/%E7%94%9F%E6%B4%BB/" rel="tag"><i class="fa fa-tag"></i> 生活</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/life/bye2019.html" rel="prev" title="站在2019，面向2020">
+      <i class="fa fa-chevron-left"></i> 站在2019，面向2020
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/yubikey-more.html" rel="next" title="YubiKey 与 BitLocker">
+      YubiKey 与 BitLocker <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#2020-%E5%B9%B4%EF%BC%8C%E6%95%B0%E6%8D%AE%E4%B8%BA%E4%BB%80%E4%B9%88%E9%87%8D%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">2020 年，数据为什么重要</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AD%98%E5%82%A8"><span class="nav-number">2.</span> <span class="nav-text">存储</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%E3%80%81U%E7%9B%98%E4%B8%8D%E6%98%AF%E4%B8%AA%E5%A5%BD%E7%9A%84%E5%AD%98%E5%82%A8%E8%AE%BE%E5%A4%87"><span class="nav-number">2.0.1.</span> <span class="nav-text">1、U盘不是个好的存储设备</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%E3%80%81CD%E5%85%89%E7%9B%98%E5%AD%98%E5%82%A8"><span class="nav-number">2.0.2.</span> <span class="nav-text">2、CD光盘存储</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3%E3%80%81%E6%9C%BA%E6%A2%B0%E7%A1%AC%E7%9B%98%E6%98%AF%E6%9C%80%E9%80%82%E5%90%88%E6%99%AE%E9%80%9A%E4%BA%BA%E7%9A%84%E5%AD%98%E5%82%A8%E8%AE%BE%E5%A4%87"><span class="nav-number">2.0.3.</span> <span class="nav-text">3、机械硬盘是最适合普通人的存储设备</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4%E3%80%81%E5%9B%BA%E6%80%81%E7%A1%AC%E7%9B%98%E8%AF%B7%E4%B8%8D%E8%A6%81%E5%AD%98%E5%82%A8%E9%87%8D%E8%A6%81%E6%95%B0%E6%8D%AE"><span class="nav-number">2.0.4.</span> <span class="nav-text">4、固态硬盘请不要存储重要数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5%E3%80%81%E4%BA%91%E5%AD%98%E5%82%A8%E7%9A%84%E9%9A%90%E7%A7%81%E9%97%AE%E9%A2%98"><span class="nav-number">2.0.5.</span> <span class="nav-text">5、云存储的隐私问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6%E3%80%81NAS%E7%9C%9F%E8%B4%B9%E9%92%B1"><span class="nav-number">2.0.6.</span> <span class="nav-text">6、NAS真费钱</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%8E%E4%B9%88%E5%A4%87%E4%BB%BD"><span class="nav-number">3.</span> <span class="nav-text">怎么备份</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%E3%80%81Windows%E8%87%AA%E5%B8%A6%E6%96%87%E4%BB%B6%E5%8E%86%E5%8F%B2%E8%AE%B0%E5%BD%95"><span class="nav-number">3.0.1.</span> <span class="nav-text">1、Windows自带文件历史记录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%E3%80%81filegee%E5%85%8D%E8%B4%B9%E7%89%88"><span class="nav-number">3.0.2.</span> <span class="nav-text">2、filegee免费版</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3%E3%80%81GoodSync"><span class="nav-number">3.0.3.</span> <span class="nav-text">3、GoodSync</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E5%85%A8"><span class="nav-number">3.1.</span> <span class="nav-text">安全</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A4%87%E4%BB%BD%E5%88%B0%E5%93%AA%E9%87%8C"><span class="nav-number">4.</span> <span class="nav-text">备份到哪里</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="totoro625"
+      src="/avatar.jpg">
+  <p class="site-author-name" itemprop="name">totoro625</p>
+  <div class="site-description" itemprop="description">龙猫不在家</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">67</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Totoro625" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Totoro625" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:hc625@qq.com" title="E-Mail → mailto:hc625@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://t.me/totoro625" title="Telegram → http:&#x2F;&#x2F;t.me&#x2F;totoro625" rel="noopener" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/hc625" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;hc625" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS订阅 → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS订阅</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/sitemap.xml" title="SiteMap → &#x2F;sitemap.xml"><i class="fa fa-fw fa-sitemap"></i>SiteMap</a>
+      </span>
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 2015 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">totoro625 | 龙猫不在家</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://totoro.ink/life/backup2020.html";
+    this.page.identifier = "life/backup2020.html";
+    this.page.title = "2020年，我在如何备份我的数据";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://totoro625.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>

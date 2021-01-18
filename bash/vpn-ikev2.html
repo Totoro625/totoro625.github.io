@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/avatar.jpg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/avatar.jpg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/avatar.jpg">
+  <link rel="mask-icon" href="/avatar.jpg" color="#222">
+  <meta name="google-site-verification" content="1p0EsRqqrxXK9MKusHQddZLU3uRKR39HAJc0nv9cCPY">
+  <meta name="baidu-site-verification" content="p98fiVOwSW">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('https://totoro.ink').hostname,
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.7.1',
+    exturl: false,
+    sidebar: {"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":"flat"},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":true,"nav":{"disqus":{"text":"Load Disqus","order":-1}}},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="安装部分使用 一键包 先下载 12wget --no-check-certificate https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;quericy&#x2F;one-key-ikev2-vpn&#x2F;master&#x2F;one-key-ikev2.shchmod +x one-key-ikev2.sh 准备好 SSL 证书（单域名的，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="VPN服务器一键搭建教程(ipsec,ikev2)">
+<meta property="og:url" content="https://totoro.ink/bash/vpn-ikev2.html">
+<meta property="og:site_name" content="TOTORO625">
+<meta property="og:description" content="安装部分使用 一键包 先下载 12wget --no-check-certificate https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;quericy&#x2F;one-key-ikev2-vpn&#x2F;master&#x2F;one-key-ikev2.shchmod +x one-key-ikev2.sh 准备好 SSL 证书（单域名的，">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2017-06-01T16:56:10.000Z">
+<meta property="article:modified_time" content="2021-01-18T10:12:51.586Z">
+<meta property="article:author" content="totoro625">
+<meta property="article:tag" content="network">
+<meta property="article:tag" content="vpn">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://totoro.ink/bash/vpn-ikev2.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>VPN服务器一键搭建教程(ipsec,ikev2) | TOTORO625</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="TOTORO625" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">TOTORO625</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-友链">
+
+    <a href="/link.html" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about.html" rel="section"><i class="fa fa-fw fa-user-circle-o"></i>关于</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://totoro.ink/bash/vpn-ikev2.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/avatar.jpg">
+      <meta itemprop="name" content="totoro625">
+      <meta itemprop="description" content="龙猫不在家">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="TOTORO625">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          VPN服务器一键搭建教程(ipsec,ikev2)
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2017-06-02 00:56:10" itemprop="dateCreated datePublished" datetime="2017-06-02T00:56:10+08:00">2017-06-02</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-01-18 18:12:51" itemprop="dateModified" datetime="2021-01-18T18:12:51+08:00">2021-01-18</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/bash/" itemprop="url" rel="index">
+                    <span itemprop="name">bash</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="安装部分"><a href="#安装部分" class="headerlink" title="安装部分"></a>安装部分</h1><p>使用 <a target="_blank" rel="noopener" href="https://github.com/quericy/one-key-ikev2-vpn">一键包</a></p>
+<p>先下载</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">wget --no-check-certificate https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;quericy&#x2F;one-key-ikev2-vpn&#x2F;master&#x2F;one-key-ikev2.sh</span><br><span class="line">chmod +x one-key-ikev2.sh</span><br></pre></td></tr></table></figure>
+<p>准备好 SSL 证书（单域名的，那么多免费的，随意撸一个一年的呗）</p>
+<a id="more"></a>
+<p>在脚本所在的目录新建 3 个文件</p>
+<ol>
+<li><strong>ca.cert.pem</strong> 证书颁发机构的 CA；</li>
+<li><strong>server.cert.pem</strong> 签发的域名证书；（注意检查两个证书不要颠倒）</li>
+<li><strong>server.pem</strong> 签发域名证书时用的私钥；</li>
+</ol>
+<p>决定以后都不改 ip 之后就把 SNAT 规则打开</p>
+<p>看到 install Complete 字样即表示安装完成。默认用户名密码将以黄字显示，可根据提示自行修改配置文件中的用户名密码, 多用户则在配置文件中按格式一行一个 (多用户时用户名不能使用%any), 保存并重启服务生效。</p>
+<p>最终跑完之后 连接信息是：</p>
+<p>服务器地址：域名 ip</p>
+<p>账户：myUserName</p>
+<p>密码：myUserPass</p>
+<p>这么愚蠢的默认连接方式怎么能用？</p>
+<p><code>vi /usr/local/etc/ipsec.secrets</code></p>
+<p>修改 myUserName %any : EAP “myUserPass” 为对应的用户名与密码</p>
+<p>可以添加多用户（封锁这么严重了，顶多给你家妹子用就行了）</p>
+<p>把： /usr/local/sbin/ipsec 加入到：/etc/rc.local 来实现需要开机自启</p>
+<p>不怕麻烦的可以（当然有些奇怪的问题的时候也可以用）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ipsec start   #启动服务</span><br><span class="line">ipsec stop    #关闭服务</span><br><span class="line">ipsec restart #重启服务</span><br><span class="line">ipsec reload  #重新读取</span><br><span class="line">ipsec status  #查看状态</span><br><span class="line">ipsec --help  #查看帮助</span><br></pre></td></tr></table></figure>
+<p>或者用 /etc/init.d/ipsec_vpn start|stop|restart 来彰显高端</p>
+<p>更多问题请去 <a target="_blank" rel="noopener" href="https://github.com/quericy/one-key-ikev2-vpn/issues">gtihub</a></p>
+<h1 id="IOS-配置"><a href="#IOS-配置" class="headerlink" title="IOS 配置"></a>IOS 配置</h1><p>找到设置=》VPN=》添加配置，</p>
+<p>默认类型都是 IKEv2 了吧，描述随便写，服务器与远程 ID 填写上面说到的 域名 ，用户鉴定为 用户名 ，分别填写你 设置的用户名与密码或者默认的 myUserName   myUserPass</p>
+<p>然后就可以愉快的玩耍啦</p>
+<p>打游戏什么的还是 VPN 靠谱</p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>totoro625
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://totoro.ink/bash/vpn-ikev2.html" title="VPN服务器一键搭建教程(ipsec,ikev2)">https://totoro.ink/bash/vpn-ikev2.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/network/" rel="tag"><i class="fa fa-tag"></i> network</a>
+              <a href="/tags/vpn/" rel="tag"><i class="fa fa-tag"></i> vpn</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/player.html" rel="prev" title="APlayer and DPlayer">
+      <i class="fa fa-chevron-left"></i> APlayer and DPlayer
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/ingress/610suzhou.html" rel="next" title="ingress610在苏州参加mission day">
+      ingress610在苏州参加mission day <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%89%E8%A3%85%E9%83%A8%E5%88%86"><span class="nav-number">1.</span> <span class="nav-text">安装部分</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#IOS-%E9%85%8D%E7%BD%AE"><span class="nav-number">2.</span> <span class="nav-text">IOS 配置</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="totoro625"
+      src="/avatar.jpg">
+  <p class="site-author-name" itemprop="name">totoro625</p>
+  <div class="site-description" itemprop="description">龙猫不在家</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">67</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Totoro625" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Totoro625" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:hc625@qq.com" title="E-Mail → mailto:hc625@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://t.me/totoro625" title="Telegram → http:&#x2F;&#x2F;t.me&#x2F;totoro625" rel="noopener" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/hc625" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;hc625" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS订阅 → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS订阅</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/sitemap.xml" title="SiteMap → &#x2F;sitemap.xml"><i class="fa fa-fw fa-sitemap"></i>SiteMap</a>
+      </span>
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 2015 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">totoro625 | 龙猫不在家</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://totoro.ink/bash/vpn-ikev2.html";
+    this.page.identifier = "bash/vpn-ikev2.html";
+    this.page.title = "VPN服务器一键搭建教程(ipsec,ikev2)";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://totoro625.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>
