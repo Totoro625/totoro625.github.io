@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico">
+  <link rel="mask-icon" href="/favicon.svg" color="#222">
+  <meta name="google-site-verification" content="1p0EsRqqrxXK9MKusHQddZLU3uRKR39HAJc0nv9cCPY">
+  <meta name="baidu-site-verification" content="p98fiVOwSW">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('https://totoro.ink').hostname,
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.7.1',
+    exturl: false,
+    sidebar: {"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":"flat"},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":true,"nav":{"disqus":{"text":"Load Disqus","order":-1}}},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="iptables端口转发经常会出现一些问题，导致无法使用，而haproxy又不支持转发udp。所以如果你要转发一个或几个端口的话就推荐这个工具：socat 。 socat不支持端口段转发，只适用于单端口或者少量端口，如果需要大量端口请看下面这两个教程。    利用HaProxy实现中继（中转）加速   利用iptables实现中继（中转）加速">
+<meta property="og:type" content="article">
+<meta property="og:title" content="利用Socat实现单端口中继（中转）加速">
+<meta property="og:url" content="https://totoro.ink/bash/socat.html">
+<meta property="og:site_name" content="TOTORO625">
+<meta property="og:description" content="iptables端口转发经常会出现一些问题，导致无法使用，而haproxy又不支持转发udp。所以如果你要转发一个或几个端口的话就推荐这个工具：socat 。 socat不支持端口段转发，只适用于单端口或者少量端口，如果需要大量端口请看下面这两个教程。    利用HaProxy实现中继（中转）加速   利用iptables实现中继（中转）加速">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2016-12-19T11:37:10.000Z">
+<meta property="article:modified_time" content="2021-03-24T03:01:07.659Z">
+<meta property="article:author" content="totoro625">
+<meta property="article:tag" content="network">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://totoro.ink/bash/socat.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>利用Socat实现单端口中继（中转）加速 | TOTORO625</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="TOTORO625" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">TOTORO625</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-友链">
+
+    <a href="/link.html" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about.html" rel="section"><i class="fa fa-fw fa-user-circle-o"></i>关于</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://totoro.ink/bash/socat.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/avatar.jpg">
+      <meta itemprop="name" content="totoro625">
+      <meta itemprop="description" content="龙猫不在家">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="TOTORO625">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          利用Socat实现单端口中继（中转）加速
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2016-12-19 19:37:10" itemprop="dateCreated datePublished" datetime="2016-12-19T19:37:10+08:00">2016-12-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-03-24 11:01:07" itemprop="dateModified" datetime="2021-03-24T11:01:07+08:00">2021-03-24</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/bash/" itemprop="url" rel="index">
+                    <span itemprop="name">bash</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>iptables端口转发经常会出现一些问题，导致无法使用，而haproxy又不支持转发udp。所以如果你要转发一个或几个端口的话就推荐这个工具：<strong>socat</strong> 。</p>
+<p>socat不支持端口段转发，只适用于<strong>单端口或者少量端口</strong>，如果需要大量端口请看下面这两个教程。</p>
+<ul>
+<li>  <a target="_blank" rel="noopener" href="https://www.dou-bi.co/ss-jc29/">利用HaProxy实现中继（中转）加速</a></li>
+<li>  <a target="_blank" rel="noopener" href="https://www.dou-bi.co/ss-jc34/">利用iptables实现中继（中转）加速</a><a id="more"></a>
+
+</li>
+</ul>
+<h2 id="Socat安装"><a href="#Socat安装" class="headerlink" title="Socat安装"></a>Socat安装</h2><p><strong>Centos 系统：</strong><br><code>yum install -y socat</code><br><strong>Debian/Ubuntu 系统：</strong><br><code>apt-get update</code><br><code>apt-get install -y socat</code></p>
+<h2 id="Socat使用"><a href="#Socat使用" class="headerlink" title="Socat使用"></a>Socat使用</h2><h3 id="转发TCP"><a href="#转发TCP" class="headerlink" title="转发TCP"></a>转发TCP</h3><p><code>nohup socat TCP4-LISTEN:2333,reuseaddr,fork TCP4:233.233.233.233:6666  &gt;&gt; /root/socat.log </code></p>
+<p><strong><em>nohup</em></strong></p>
+<p>指的是 后台运行。</p>
+<h4 id="TCP4-LISTEN-2333"><a href="#TCP4-LISTEN-2333" class="headerlink" title="TCP4-LISTEN:2333"></a>TCP4-LISTEN:2333</h4><p>指的是 监听<strong>ipv4的端口</strong>，也就是 <strong>转发的端口</strong>，后面Shadowsocks链接中继时填写的 <strong>端口</strong>。</p>
+<h4 id="fork-TCP4-233-233-233-233-6666"><a href="#fork-TCP4-233-233-233-233-6666" class="headerlink" title="fork TCP4:233.233.233.233:6666"></a><code>fork TCP4:233.233.233.233:6666</code></h4><p>指的是 <strong>被转发的 IP 和 端口</strong>，也就是你要中继的服务器的 <strong>IP</strong> 和 <strong>端口</strong>。<br><code>注意：这里的 **中继端口(2333)** 和 **被中继端口(6666)** 是可以一样的，我区分开只是为了让你们更好地理解。</code></p>
+<h4 id="root-socat-log-2-gt-amp-1-amp"><a href="#root-socat-log-2-gt-amp-1-amp" class="headerlink" title="/root/socat.log 2&gt;&amp;1 &amp;"></a>/root/socat.log 2&gt;&amp;1 &amp;</h4><p>指的是 <strong>转发日志记录</strong>。</p>
+<h3 id="转发UDP"><a href="#转发UDP" class="headerlink" title="转发UDP"></a>转发UDP</h3><p><code>nohup socat UDP4-LISTEN:2333,reuseaddr,fork UDP4:233.233.233.233:6666 &amp;gt;&amp;gt; /root/socat.log 2&amp;gt;</code><br>转发UDP很简单，只要把<code>TCP4</code>改成<code>UDP4</code>就行了！</p>
+<h3 id="停止转发"><a href="#停止转发" class="headerlink" title="停止转发"></a>停止转发</h3><p><code>ps -ef | grep socat</code><br>#输入上面的命令找到socat程序的PID，然后用下面的命令KILL掉这个PID进程（PID是个数字，自己替换下面的”pid”）。<br><code>kill -9 pid</code></p>
+<h2 id="Socat卸载"><a href="#Socat卸载" class="headerlink" title="Socat卸载"></a>Socat卸载</h2><p>Centos系统：<br><code>yum remove socat</code><br>Debian/Ubuntu系统：<br><code>sudo apt-get remove socat</code><br><code>sudo apt-get autoremove</code></p>
+<h3 id="简单解释"><a href="#简单解释" class="headerlink" title="简单解释"></a>简单解释</h3><p>注意：假设你的<strong>中继服务器</strong>也就是现在在操作的服务器 IP 是<code>1.1.1.1</code>，那么你的 <strong>中继端口</strong> 就是<code>2333</code>。你的 <strong>被中继服务器</strong>的 IP 是 <code>233.233.233.233 </code>，端口是<code>6666</code>。</p>
+<p>这时候你的 <strong>Shadowsocks客户端</strong> 填写信息的时候 <strong>IP **就是<code>1.1.1.1</code>，</strong>端口** 就是<code>2333</code>。</p>
+<p><strong>所以原理就是：</strong></p>
+<p>Shadowsocks客户端通过<code>1.1.1.1:2333</code>链接<strong>中继服务器</strong><code>1.1.1.1</code>，然后<strong>中继服务器</strong>把端口<code>2333</code>的流量转发到 <strong>被中继服务器</strong><code>233.233.233.233</code>的端口<code>6666</code>上面。然后 <strong>被中继服务器</strong> 也就是上面的 <strong>Shadowsocks服务端</strong>，就会去访问你要的数据，然后依次返回 <strong>中继服务器 -&gt; Shadowsocks客户端</strong>。</p>
+<h2 id="防火墙设置"><a href="#防火墙设置" class="headerlink" title="防火墙设置"></a>防火墙设置</h2><p>如果你设置后无法链接，那么多半是防火墙 阻拦了，只要开放端口 就行了。以上面的 示例的中继端口<code>2333</code>为例。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">iptables -I INPUT -p tcp -m tcp --dport 你的端口 -j ACCEPT  &#x2F;&#x2F;单端口</span><br><span class="line">iptables -I INPUT -p tcp -m tcp --dport 12450: -j ACCEPT  &#x2F;&#x2F;多端口</span><br></pre></td></tr></table></figure>
+
+
+<h1 id="注意是半角冒号，意为允许-12450-及以上的端口"><a href="#注意是半角冒号，意为允许-12450-及以上的端口" class="headerlink" title="注意是半角冒号，意为允许 12450 及以上的端口"></a>注意是半角冒号，意为允许 12450 及以上的端口</h1><h1 id="也可以指定-12450-15550-这样的范围"><a href="#也可以指定-12450-15550-这样的范围" class="headerlink" title="也可以指定 12450:15550 这样的范围"></a>也可以指定 12450:15550 这样的范围</h1><p><code>iptables -I INPUT -p tcp --dport 2333 -j ACCEPT</code><br><code>iptables -I INPUT -p udp --dport 2333 -j ACCEPT</code><br><code>service iptables save</code></p>
+<h1 id="保存防火墙"><a href="#保存防火墙" class="headerlink" title="保存防火墙"></a>保存防火墙</h1><p><code>service iptables restart</code></p>
+<h1 id="重启防火墙"><a href="#重启防火墙" class="headerlink" title="重启防火墙"></a>重启防火墙</h1><p>如果上面的命令提示没有这个 服务，那么加上sudo(<code>sudo service iptables save</code>/<code>sudo service iptables restart </code>)试试或者下面这个。<br><code>/etc/init.d/iptables save</code><br><code>/etc/init.d/iptables restart</code></p>
+<h2 id="开机启动"><a href="#开机启动" class="headerlink" title="开机启动"></a>开机启动</h2><p>因为这个工具并没有开机启动的设定，所以需要设置系统的开机启动。</p>
+<p><strong>Centos系统：</strong><br><code>chmod +x /etc/rc.d/rc.local</code><br><code>vi /etc/rc.d/rc.local</code><br><strong>Ubuntu/Debian系统：</strong><br><code>chmod +x /etc/rc.local</code><br><code>vi /etc/rc.local</code><br>输入<code>I 键</code>进入编辑模式（如果没反应请看上面的教程安装 vim），然后在打开的文件中的<code>exit 0</code>代码前面<strong>插入你的 socat 命令代码（就是上面 nohup socat…的代码）。</strong></p>
+<p>然后再 按<code>ESC 键</code>退出编辑模式，然后输入<code>:wq</code>退出并保存。<br><strong>转载注明：</strong> <a target="_blank" rel="noopener" href="https://www.dou-bi.co/ss-jc40/">Shadowsocks利用 Socat 实现单端口 中继（中转）加速</a></p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>totoro625
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://totoro.ink/bash/socat.html" title="利用Socat实现单端口中继（中转）加速">https://totoro.ink/bash/socat.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/network/" rel="tag"><i class="fa fa-tag"></i> network</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/bash/simple-http-server.html" rel="prev" title="Simple HTTP Server 快速搭建http web服务+一键脚本">
+      <i class="fa fa-chevron-left"></i> Simple HTTP Server 快速搭建http web服务+一键脚本
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/bash/raspberry-pi-root.html" rel="next" title="树莓派 Raspberry Pi 启用 root 登陆账户">
+      树莓派 Raspberry Pi 启用 root 登陆账户 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Socat%E5%AE%89%E8%A3%85"><span class="nav-number">1.</span> <span class="nav-text">Socat安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Socat%E4%BD%BF%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">Socat使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BD%AC%E5%8F%91TCP"><span class="nav-number">2.1.</span> <span class="nav-text">转发TCP</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#TCP4-LISTEN-2333"><span class="nav-number">2.1.1.</span> <span class="nav-text">TCP4-LISTEN:2333</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#fork-TCP4-233-233-233-233-6666"><span class="nav-number">2.1.2.</span> <span class="nav-text">fork TCP4:233.233.233.233:6666</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#root-socat-log-2-gt-amp-1-amp"><span class="nav-number">2.1.3.</span> <span class="nav-text">&#x2F;root&#x2F;socat.log 2&gt;&amp;1 &amp;</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BD%AC%E5%8F%91UDP"><span class="nav-number">2.2.</span> <span class="nav-text">转发UDP</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%81%9C%E6%AD%A2%E8%BD%AC%E5%8F%91"><span class="nav-number">2.3.</span> <span class="nav-text">停止转发</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Socat%E5%8D%B8%E8%BD%BD"><span class="nav-number">3.</span> <span class="nav-text">Socat卸载</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%80%E5%8D%95%E8%A7%A3%E9%87%8A"><span class="nav-number">3.1.</span> <span class="nav-text">简单解释</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%98%B2%E7%81%AB%E5%A2%99%E8%AE%BE%E7%BD%AE"><span class="nav-number">4.</span> <span class="nav-text">防火墙设置</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E6%98%AF%E5%8D%8A%E8%A7%92%E5%86%92%E5%8F%B7%EF%BC%8C%E6%84%8F%E4%B8%BA%E5%85%81%E8%AE%B8-12450-%E5%8F%8A%E4%BB%A5%E4%B8%8A%E7%9A%84%E7%AB%AF%E5%8F%A3"><span class="nav-number"></span> <span class="nav-text">注意是半角冒号，意为允许 12450 及以上的端口</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B9%9F%E5%8F%AF%E4%BB%A5%E6%8C%87%E5%AE%9A-12450-15550-%E8%BF%99%E6%A0%B7%E7%9A%84%E8%8C%83%E5%9B%B4"><span class="nav-number"></span> <span class="nav-text">也可以指定 12450:15550 这样的范围</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BF%9D%E5%AD%98%E9%98%B2%E7%81%AB%E5%A2%99"><span class="nav-number"></span> <span class="nav-text">保存防火墙</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%87%8D%E5%90%AF%E9%98%B2%E7%81%AB%E5%A2%99"><span class="nav-number"></span> <span class="nav-text">重启防火墙</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%80%E6%9C%BA%E5%90%AF%E5%8A%A8"><span class="nav-number">1.</span> <span class="nav-text">开机启动</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="totoro625"
+      src="/avatar.jpg">
+  <p class="site-author-name" itemprop="name">totoro625</p>
+  <div class="site-description" itemprop="description">龙猫不在家</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">68</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">27</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Totoro625" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Totoro625" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:hc625@qq.com" title="E-Mail → mailto:hc625@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://t.me/totoro625" title="Telegram → http:&#x2F;&#x2F;t.me&#x2F;totoro625" rel="noopener" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/hc625" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;hc625" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS订阅 → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS订阅</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/sitemap.xml" title="SiteMap → &#x2F;sitemap.xml"><i class="fa fa-fw fa-sitemap"></i>SiteMap</a>
+      </span>
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 2015 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">totoro625 | 龙猫不在家</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://totoro.ink/bash/socat.html";
+    this.page.identifier = "bash/socat.html";
+    this.page.title = "利用Socat实现单端口中继（中转）加速";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://totoro625.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico">
+  <link rel="mask-icon" href="/favicon.svg" color="#222">
+  <meta name="google-site-verification" content="1p0EsRqqrxXK9MKusHQddZLU3uRKR39HAJc0nv9cCPY">
+  <meta name="baidu-site-verification" content="p98fiVOwSW">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('https://totoro.ink').hostname,
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.7.1',
+    exturl: false,
+    sidebar: {"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":"flat"},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":true,"nav":{"disqus":{"text":"Load Disqus","order":-1}}},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="一、前言 对于从来没接触过linux的人来说，HyperApp绝对不是你选择尝试Linux的理由，请相信我。不然你可能连服务器都登不上上面是一个FLAG，不管你信不信，反正我是信的  对于一个新手小白来说，Linux的困难甚至是ssh登录层面的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="IOS 服务器管理软件 HyperApp 推荐，Linux 上自动化部署 Docker，附上 EFB 教程">
+<meta property="og:url" content="https://totoro.ink/bash/ios-hyperapp-docker-efb.html">
+<meta property="og:site_name" content="TOTORO625">
+<meta property="og:description" content="一、前言 对于从来没接触过linux的人来说，HyperApp绝对不是你选择尝试Linux的理由，请相信我。不然你可能连服务器都登不上上面是一个FLAG，不管你信不信，反正我是信的  对于一个新手小白来说，Linux的困难甚至是ssh登录层面的">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://totoro.ink/img/hyperapp01.png">
+<meta property="og:image" content="https://totoro.ink/img/hyperapp02.jpg">
+<meta property="og:image" content="https://totoro.ink/img/hyperapp03.jpg">
+<meta property="og:image" content="https://totoro.ink/img/hyperapp04.png">
+<meta property="og:image" content="https://totoro.ink/img/hyperapp05.jpg">
+<meta property="article:published_time" content="2017-06-19T23:30:10.000Z">
+<meta property="article:modified_time" content="2021-03-24T03:01:07.659Z">
+<meta property="article:author" content="totoro625">
+<meta property="article:tag" content="docker">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://totoro.ink/img/hyperapp01.png">
+
+<link rel="canonical" href="https://totoro.ink/bash/ios-hyperapp-docker-efb.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>IOS 服务器管理软件 HyperApp 推荐，Linux 上自动化部署 Docker，附上 EFB 教程 | TOTORO625</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="TOTORO625" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">TOTORO625</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-友链">
+
+    <a href="/link.html" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about.html" rel="section"><i class="fa fa-fw fa-user-circle-o"></i>关于</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://totoro.ink/bash/ios-hyperapp-docker-efb.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/avatar.jpg">
+      <meta itemprop="name" content="totoro625">
+      <meta itemprop="description" content="龙猫不在家">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="TOTORO625">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          IOS 服务器管理软件 HyperApp 推荐，Linux 上自动化部署 Docker，附上 EFB 教程
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2017-06-20 07:30:10" itemprop="dateCreated datePublished" datetime="2017-06-20T07:30:10+08:00">2017-06-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-03-24 11:01:07" itemprop="dateModified" datetime="2021-03-24T11:01:07+08:00">2021-03-24</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/bash/" itemprop="url" rel="index">
+                    <span itemprop="name">bash</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="一、前言"><a href="#一、前言" class="headerlink" title="一、前言"></a>一、前言</h1><blockquote>
+<p>对于从来没接触过linux的人来说，HyperApp绝对不是你选择尝试Linux的理由，请相信我。不然你可能连服务器都登不上<br>上面是一个FLAG，不管你信不信，反正我是信的</p>
+</blockquote>
+<p>对于一个新手小白来说，Linux的困难甚至是ssh登录层面的</p>
+<a id="more"></a>
+
+<p>在这里我的建议是找一家可以按量付费的IDC，先开一台，认真读读几篇说明文档，弄懂如何使用ssh，还有进阶的ssh key的使用。这里我推荐的是<a target="_blank" rel="noopener" href="https://www.qcloud.com/">国内的腾讯云</a>，原因是阿里云的按量付费要预充值￥100+</p>
+<p>腾讯云对于学生用户更加友好，虽然服务不及阿里云，但是感觉态度上是友好的（<a target="_blank" rel="noopener" href="https://www.qcloud.com/act/campus">学生优惠政策</a>，1元学生机，可选HK）</p>
+<p>能够一键生成SSH KEY这一点感觉挺好用，不放心的可以下载puttygen.exe（<a target="_blank" rel="noopener" href="https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html">下载地址</a>）自行生成密钥对</p>
+<p><img src="https://totoro.ink/img/hyperapp01.png" alt="enter description here"></p>
+<p>这是我的KEY ，选择一个点击进去就可以看到公钥（也是腾讯云带我走进密钥登录这个坑的，这里表扬一下）</p>
+<p>公钥差不多ssh-rsa AAAXXXX……..这种形式，记住这个应该不会用错了吧（当然是我曾经搞错过）</p>
+<p>多用ssh登录几次服务器，再换成密钥登陆几次差不多就粗略熟悉了Linux的最最最基本的登录操作了，就相当于你会给Windows开机了</p>
+<p>&nbsp;</p>
+<h1 id="二、HyperAPP"><a href="#二、HyperAPP" class="headerlink" title="二、HyperAPP"></a>二、HyperAPP</h1><p>本文是介绍HyperAPP这个软件的，在APP STORE搜索HyperAPP，中国售价￥25，<a target="_blank" rel="noopener" href="https://itunes.apple.com/us/app/hyperapp/id1179750280">美区$3.99</a></p>
+<p><img src="https://totoro.ink/img/hyperapp02.jpg" alt="enter description here"></p>
+<p>一杯咖啡不是么？毕竟是独立开发首个docker管理APP，界面挺简洁，支持不支持？（不支持我也没办法：淘宝美区兑换码，封号几率30%）</p>
+<p>唯一比较遗憾的是并不支持openvz架构（因为依赖docker）</p>
+<p><img src="https://totoro.ink/img/hyperapp03.jpg" alt="enter description here"></p>
+<p>这是我在用的界面</p>
+<p><img src="https://totoro.ink/img/hyperapp04.png" alt="enter description here"></p>
+<p>当然是可以简单管理SS的，适合少量端口的私人机场</p>
+<p>为什么我要推荐这个APP呢？</p>
+<p>原因是<del>他的widget简直太好看了</del></p>
+<p><img src="https://totoro.ink/img/hyperapp05.jpg" alt="enter description here"></p>
+<p>不，可以使用EFB</p>
+<h1 id="三、EFB食用说明"><a href="#三、EFB食用说明" class="headerlink" title="三、EFB食用说明"></a>三、EFB食用说明</h1><blockquote>
+<p>EH Forwarder Bot（简称 EFB）是一个可扩展的聊天平台隧道框架，基于 Python 3。目前已内置了 Telegram 主端 (Master Channel) 和微信从端 (Slave Channel)，用来在 Telegram 收发微信消息。<br>也就是说，有了EFB我们现在就可以使用telegram来收发WeChat的全部消息啦</p>
+</blockquote>
+<p>这种好事一定要支持</p>
+<p>奈何目前EFB的教程非常少，我作为一个资深蠢货手动安装总是失败，偶然拾得HyperApp的一键docker简直不要太爽（懒人专属）</p>
+<h2 id="3-1创建-Telegram-Bot"><a href="#3-1创建-Telegram-Bot" class="headerlink" title="3.1创建 Telegram Bot"></a>3.1创建 Telegram Bot</h2><p>使用 <a target="_blank" rel="noopener" href="https://telegram.me/botfather">@BotBrother</a> 创建一个新的机器人（点击<a target="_blank" rel="noopener" href="https://telegram.me/botfather">链接</a>即可，不要像我一样蠢到在搜索栏里面搜索）</p>
+<p>发送指令 <code>/newbot</code>，根据提示完成创建，之后得到一个 <code>token</code></p>
+<p>（此处图片丢失）</p>
+<p>接下来还要对刚刚启用的 Bot 进行进一步的配置：允许 Bot 读取非指令信息、允许将 Bot 添加进群组、以及提供指令列表：</p>
+<ul>
+<li><p>  发送 <code>/setprivacy</code> 到 @BotFather，选择刚刚创建好的 Bot 用户名，然后选择 Disable；</p>
+</li>
+<li><p>  发送 <code>/setjoingroups</code> 到 @BotFather，选择刚刚创建好的 Bot 用户名，然后选择 Enable；</p>
+</li>
+<li><p>发送 <code>/setcommands</code> 到 @BotFather，选择刚刚创建好的 Bot 用户名，然后发送如下内容：</p>
+<p>  link - 将会话绑定到 Telegram 群组<br>  chat - 生成会话头<br>  recog - 回复语音消息以进行识别<br>  extra - 获取更多功能    `</pre><br>  这里先告一段落，我们然后还需要获取你自己的 Telegram ID，向 <a target="_blank" rel="noopener" href="https://t.me/get_id_bot">@get_id_bot</a> （点这个<a target="_blank" rel="noopener" href="https://t.me/get_id_bot">链接</a>）发起会话便可。</p>
+<p>  Your Chat ID :后面的一串数字就是你的ID啦</p>
+<p>  此时我们拥有两个东西</p>
+</li>
+</ul>
+<ol>
+<li><p> 机器人的token</p>
+</li>
+<li><p>自己的chat id<br> 接下来我们配置服务器上的EFB</p>
+<h2 id="3-2服务端EFB配置（HyperApp）"><a href="#3-2服务端EFB配置（HyperApp）" class="headerlink" title="3.2服务端EFB配置（HyperApp）"></a>3.2服务端EFB配置（HyperApp）</h2><p> 在HyperApp的docker商店找到EFB并安装，配置文件填入之前获得的token及chat id等待安装好即可使用</p>
+<p>（此处图片丢失）</p>
+</li>
+<li><p> 安装完毕后点击“查看日志” -&gt; 点击右上角的 “Term” 在终端中打开，然后点击右上角的”A-“ 缩小字体直到能看见二维码。</p>
+</li>
+<li><p>使用微信扫描该二维码。注意不能截图保存到相册中然后选择图片扫描，只能扫描屏幕。但你可以截图后发到另外一台设备（比如通过QQ/微信发到PC版上）然后用微信扫描。</p>
+<h2 id="3-3服务端EFB配置（手动）"><a href="#3-3服务端EFB配置（手动）" class="headerlink" title="3.3服务端EFB配置（手动）"></a>3.3服务端EFB配置（手动）</h2><p> <a target="_blank" rel="noopener" href="https://alanoy.com/post/send-and-receive-wechat-message-with-telegram/">教程1</a>    <a target="_blank" rel="noopener" href="https://blog.1a23.com/2017/01/09/EFB-How-to-Send-and-Receive-Messages-from-WeChat-on-Telegram-zh-CN/">教程2</a></p>
+<p> 大致上是</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">git clone https:&#x2F;&#x2F;github.com&#x2F;blueset&#x2F;ehForwarderBot.git</span><br><span class="line">cd ehForwarderBot</span><br><span class="line">pip3 install -r requirements.txt</span><br><span class="line">mkdir storage chmod 777 storage</span><br><span class="line">cp config.sample.py config.py</span><br><span class="line">editor config.py</span><br></pre></td></tr></table></figure>
+<p>手动出问题的都是python3的安装上出现的问题（没错我就是）</p>
+</li>
+</ol>
+<p>更多docker应用教程见<a target="_blank" rel="noopener" href="https://github.com/waylybaye/HyperApp-Guide">GITHUB</a></p>
+<h2 id="3-4-EFB的使用"><a href="#3-4-EFB的使用" class="headerlink" title="3.4 EFB的使用"></a>3.4 EFB的使用</h2><p>刚刚得到EFB的我也是不太会用</p>
+<p>对你的机器人说</p>
+<p>“/chat ”可以选择一个新的对话</p>
+<p>“ /chat 乌龟” 就可以查找通讯录里名字带乌龟的人</p>
+<p>你可以通过长按新会话选择回复来跟那个人聊天</p>
+<p>人太多会显得混乱？</p>
+<p>在电脑上新建一个群组把你和你的机器人拉进去</p>
+<p>然后对你的机器人说“/link”选择联系人或者群组“/link 乌龟”选择带乌龟的联系人或者群组到一个群，这样你直接在哪个群组里面说话而不需要长按回复了，不建议在群组里拉入第三人除非你要被人查岗</p>
+<p>“/group”可以将公众号拉入群组</p>
+<p>这样你可以给他们设置不同的通知提醒</p>
+<p>建议吧公众号拉倒一个群组，因为你也不需要给公众号发消息</p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>totoro625
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://totoro.ink/bash/ios-hyperapp-docker-efb.html" title="IOS 服务器管理软件 HyperApp 推荐，Linux 上自动化部署 Docker，附上 EFB 教程">https://totoro.ink/bash/ios-hyperapp-docker-efb.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/docker/" rel="tag"><i class="fa fa-tag"></i> docker</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/how-to-use.html" rel="prev" title="如何使用hexo">
+      <i class="fa fa-chevron-left"></i> 如何使用hexo
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/bash/hexo-blog.html" rel="next" title="hexo安装">
+      hexo安装 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">一、前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%8C%E3%80%81HyperAPP"><span class="nav-number">2.</span> <span class="nav-text">二、HyperAPP</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%89%E3%80%81EFB%E9%A3%9F%E7%94%A8%E8%AF%B4%E6%98%8E"><span class="nav-number">3.</span> <span class="nav-text">三、EFB食用说明</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1%E5%88%9B%E5%BB%BA-Telegram-Bot"><span class="nav-number">3.1.</span> <span class="nav-text">3.1创建 Telegram Bot</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2%E6%9C%8D%E5%8A%A1%E7%AB%AFEFB%E9%85%8D%E7%BD%AE%EF%BC%88HyperApp%EF%BC%89"><span class="nav-number">3.2.</span> <span class="nav-text">3.2服务端EFB配置（HyperApp）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-3%E6%9C%8D%E5%8A%A1%E7%AB%AFEFB%E9%85%8D%E7%BD%AE%EF%BC%88%E6%89%8B%E5%8A%A8%EF%BC%89"><span class="nav-number">3.3.</span> <span class="nav-text">3.3服务端EFB配置（手动）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-4-EFB%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="nav-number">3.4.</span> <span class="nav-text">3.4 EFB的使用</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="totoro625"
+      src="/avatar.jpg">
+  <p class="site-author-name" itemprop="name">totoro625</p>
+  <div class="site-description" itemprop="description">龙猫不在家</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">68</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">27</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Totoro625" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Totoro625" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:hc625@qq.com" title="E-Mail → mailto:hc625@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://t.me/totoro625" title="Telegram → http:&#x2F;&#x2F;t.me&#x2F;totoro625" rel="noopener" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/hc625" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;hc625" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS订阅 → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS订阅</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/sitemap.xml" title="SiteMap → &#x2F;sitemap.xml"><i class="fa fa-fw fa-sitemap"></i>SiteMap</a>
+      </span>
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 2015 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">totoro625 | 龙猫不在家</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://totoro.ink/bash/ios-hyperapp-docker-efb.html";
+    this.page.identifier = "bash/ios-hyperapp-docker-efb.html";
+    this.page.title = "IOS 服务器管理软件 HyperApp 推荐，Linux 上自动化部署 Docker，附上 EFB 教程";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://totoro625.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>

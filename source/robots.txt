@@ -1,0 +1,15 @@
+# robots.txt 
+User-agent: Baiduspider
+Disallow: /bash/vpn-ikev2.html
+Disallow: /bash/socat.html
+Disallow: /kms.html
+Disallow: /vps-russia.html
+User-agent: *
+Disallow: /source/
+Disallow: /to/
+Disallow: /dcraft/
+Sitemap: https://totoro.ink/sitemap.xml
+Sitemap: https://totoro.ink/post-sitemap.xml
+Sitemap: https://totoro.ink/page-sitemap.xml
+Sitemap: https://totoro.ink/category-sitemap.xml
+Sitemap: https://totoro.ink/tag-sitemap.xml

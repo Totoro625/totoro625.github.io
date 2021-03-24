@@ -1,0 +1,556 @@
+<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type="text/xsl" href="sitemap.xsl"?>
+<urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+    <url>
+        <loc>https://totoro.ink/</loc>
+        <changefreq>daily</changefreq>
+        <priority>1</priority>
+    </url>
+
+
+    <url>
+        <loc>https://totoro.ink/519fire.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/My-New-Post.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/chevereto-svg-logo.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/hello-world.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/hi2018.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/how-to-use.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/kms.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/player.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/random-pic.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/serverstatus.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/systemctl.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/toothache.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/vps-russia.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/yubikey-more.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/yubikey.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/bash/android-adb.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/bash/chevereto.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/bash/hexo-blog.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/bash/how-to-use-git.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/bash/ios-hyperapp-docker-efb.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/bash/linux-minecraft-autorun.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/bash/mirrors.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/bash/new-kvm-docker.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/bash/raspberry-pi-new.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/bash/raspberry-pi-plex-service.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/bash/raspberry-pi-rebuild.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/bash/raspberry-pi-root.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/bash/raspberry-pi.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/bash/raspberry-resilio-sync.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/bash/simple-http-server.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/bash/socat.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/bash/vpn-ikev2.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/bim/about-mad.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/bim/glodon-competition.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/ingress/113field-mu-first.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/ingress/331wuxi-missionday.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/ingress/420dalao.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/ingress/424field.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/ingress/427nanjing-plan.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/ingress/427nanjing.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/ingress/429enlightened-girl.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/ingress/42met-16.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/ingress/513wuhu-3113.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/ingress/519zhenjiang-missions.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/ingress/52link.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/ingress/53hackfull.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/ingress/610suzhou.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/ingress/629zhenjiang-met.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/ingress/ingress-biocard.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/ingress/ingress-for-one-year.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/ingress/missions-zhenjiang.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/ingress/my-biocard.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/life/airpods-pro.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/life/backup2020.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/life/bye2019.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/life/dream2019.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/life/jbl-ua-flash.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/life/love2020.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/life/xiaomi.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/life/zs-a4.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/memory/in-memory-of-my-friend.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/pen/boy-friend-of-beautifully-girls.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/pen/nothing-impossible.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/pen/totoro625-font.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/pen/how-to-write.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/bash/worldedit.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/bim/bim-archicad-vs-revit.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://totoro.ink/129parents.html</loc>
+        <lastmod>2021-03-24T03:01:07.659Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+</urlset>
+<!-- XML Sitemap generated by Hexo SEO Friendly Sitemap Generator -->

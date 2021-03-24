@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico">
+  <link rel="mask-icon" href="/favicon.svg" color="#222">
+  <meta name="google-site-verification" content="1p0EsRqqrxXK9MKusHQddZLU3uRKR39HAJc0nv9cCPY">
+  <meta name="baidu-site-verification" content="p98fiVOwSW">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('https://totoro.ink').hostname,
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.7.1',
+    exturl: false,
+    sidebar: {"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":"flat"},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":true,"nav":{"disqus":{"text":"Load Disqus","order":-1}}},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="起因难以忍受破旧笔记本（ACER V5-472G i5-3337u）懦弱的CPU性能，正值工作之际，计划更换一台新的电脑。 心水水的 i7-8550u 性能由于散热原因达不到应有的水平，更不要说 i7-8750h 的散热能力了，根本压不住。 想到以后对于CPU的需求越来越多，索性上了台式机。不过为了以后能够经常性的搬运、携带，便上了 ITX 的贼船。（工作原因） Inter 的挤牙膏功夫太强，甚至">
+<meta property="og:type" content="article">
+<meta property="og:title" content="我的 ITX 主机 | ZS-A4">
+<meta property="og:url" content="https://totoro.ink/life/zs-a4.html">
+<meta property="og:site_name" content="TOTORO625">
+<meta property="og:description" content="起因难以忍受破旧笔记本（ACER V5-472G i5-3337u）懦弱的CPU性能，正值工作之际，计划更换一台新的电脑。 心水水的 i7-8550u 性能由于散热原因达不到应有的水平，更不要说 i7-8750h 的散热能力了，根本压不住。 想到以后对于CPU的需求越来越多，索性上了台式机。不过为了以后能够经常性的搬运、携带，便上了 ITX 的贼船。（工作原因） Inter 的挤牙膏功夫太强，甚至">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://totoro.ink/img/itx01.jpg">
+<meta property="og:image" content="https://totoro.ink/img/itx02.jpg">
+<meta property="og:image" content="https://totoro.ink/img/itx03.jpg">
+<meta property="og:image" content="https://totoro.ink/img/itx04.jpg">
+<meta property="og:image" content="https://totoro.ink/img/itx05.jpg">
+<meta property="og:image" content="https://totoro.ink/img/itx06.jpg">
+<meta property="og:image" content="https://totoro.ink/img/itx07.jpg">
+<meta property="og:image" content="https://totoro.ink/img/itx08.jpg">
+<meta property="og:image" content="https://totoro.ink/img/itx09.jpg">
+<meta property="og:image" content="https://totoro.ink/img/itx10.jpg">
+<meta property="og:image" content="https://totoro.ink/img/itx11.jpg">
+<meta property="og:image" content="https://totoro.ink/img/itx12.jpg">
+<meta property="og:image" content="https://totoro.ink/img/itx13.jpg">
+<meta property="og:image" content="https://totoro.ink/img/itx14.jpg">
+<meta property="og:image" content="https://totoro.ink/img/itx01.jpg">
+<meta property="og:image" content="https://totoro.ink/img/itx15.jpg">
+<meta property="article:published_time" content="2018-08-31T12:10:00.000Z">
+<meta property="article:modified_time" content="2021-03-24T03:01:07.659Z">
+<meta property="article:author" content="totoro625">
+<meta property="article:tag" content="computer">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://totoro.ink/img/itx01.jpg">
+
+<link rel="canonical" href="https://totoro.ink/life/zs-a4.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>我的 ITX 主机 | ZS-A4 | TOTORO625</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="TOTORO625" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">TOTORO625</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-友链">
+
+    <a href="/link.html" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about.html" rel="section"><i class="fa fa-fw fa-user-circle-o"></i>关于</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://totoro.ink/life/zs-a4.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/avatar.jpg">
+      <meta itemprop="name" content="totoro625">
+      <meta itemprop="description" content="龙猫不在家">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="TOTORO625">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          我的 ITX 主机 | ZS-A4
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-08-31 20:10:00" itemprop="dateCreated datePublished" datetime="2018-08-31T20:10:00+08:00">2018-08-31</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-03-24 11:01:07" itemprop="dateModified" datetime="2021-03-24T11:01:07+08:00">2021-03-24</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/life/" itemprop="url" rel="index">
+                    <span itemprop="name">life</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h2><p>难以忍受破旧笔记本（ACER V5-472G i5-3337u）懦弱的CPU性能，正值工作之际，计划更换一台新的电脑。</p>
+<p>心水水的 i7-8550u 性能由于散热原因达不到应有的水平，更不要说 i7-8750h 的散热能力了，根本压不住。</p>
+<p>想到以后对于CPU的需求越来越多，索性上了台式机。不过为了以后能够经常性的搬运、携带，便上了 ITX 的贼船。（工作原因）</p>
+<p>Inter 的挤牙膏功夫太强，甚至还往回缩了一大口（ CPU 漏洞频发）。正值散片价格上涨之宜，干脆的上了 AMD 平台。</p>
+<a id="more"></a>
+
+<p><img src="https://totoro.ink/img/itx01.jpg" alt="主机"></p>
+<h2 id="我的配置"><a href="#我的配置" class="headerlink" title="我的配置"></a>我的配置</h2><table>
+<thead>
+<tr>
+<th align="center">配件</th>
+<th align="left">型号</th>
+<th align="left">备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">CPU</td>
+<td align="left">AMD ryzen 2600X</td>
+<td align="left">AMD YES !</td>
+</tr>
+<tr>
+<td align="center">主板</td>
+<td align="left">ASRock/华擎 Fatal1ty B450 Gaming-ITX/ac</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="center">内存</td>
+<td align="left">Team/十铨 ddr4-2400 8G + 16G</td>
+<td align="left">32G没钱上</td>
+</tr>
+<tr>
+<td align="center">CPU散热</td>
+<td align="left">Cryorig/快睿 C7</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="center">机箱散热</td>
+<td align="left">Noctua/猫头鹰 NF-A9X14-PWM x2</td>
+<td align="left">猫扇信仰</td>
+</tr>
+<tr>
+<td align="center">机箱</td>
+<td align="left">ZS-A4</td>
+<td align="left">类似于 DAN cases A4-SFX 的国产版</td>
+</tr>
+<tr>
+<td align="center">SSD 1</td>
+<td align="left">Samsung/三星 PM981 256G</td>
+<td align="left">970evo 的 OEM 版</td>
+</tr>
+<tr>
+<td align="center">SSD 2</td>
+<td align="left">CRUCIAL/镁光/英睿达 MX500 500G</td>
+<td align="left">性价比不错</td>
+</tr>
+<tr>
+<td align="center">HDD 1</td>
+<td align="left">Seagate/希捷 ST500 500G</td>
+<td align="left">旧笔记本拆机当存储</td>
+</tr>
+<tr>
+<td align="center">电源</td>
+<td align="left">USCorsair/海盗船 SF450</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="center">显卡</td>
+<td align="left">COLORFUL/七彩虹 GTX750ti</td>
+<td align="left">亮机卡</td>
+</tr>
+<tr>
+<td align="center">显示器</td>
+<td align="left">AOC LV243XIP 23.8寸</td>
+<td align="left"></td>
+</tr>
+</tbody></table>
+<p>花自己的钱贼心疼</p>
+<p>等到9102年3月份老黄的2060发布，我也是不会买的，亮机卡够用了</p>
+<h2 id="一些照片"><a href="#一些照片" class="headerlink" title="一些照片"></a>一些照片</h2><h3 id="开箱"><a href="#开箱" class="headerlink" title="开箱"></a>开箱</h3><p><img src="https://totoro.ink/img/itx02.jpg"></p>
+<p><img src="https://totoro.ink/img/itx03.jpg"></p>
+<p>最后到的PM981</p>
+<p><img src="https://totoro.ink/img/itx04.jpg"></p>
+<p>AMD yes！</p>
+<h3 id="细节"><a href="#细节" class="headerlink" title="细节"></a>细节</h3><p><img src="https://totoro.ink/img/itx05.jpg"></p>
+<p><img src="https://totoro.ink/img/itx06.jpg"></p>
+<p><img src="https://totoro.ink/img/itx07.jpg"></p>
+<p><img src="https://totoro.ink/img/itx08.jpg"></p>
+<h3 id="整机照片"><a href="#整机照片" class="headerlink" title="整机照片"></a>整机照片</h3><p><img src="https://totoro.ink/img/itx09.jpg"></p>
+<h3 id="对比照片"><a href="#对比照片" class="headerlink" title="对比照片"></a>对比照片</h3><p><img src="https://totoro.ink/img/itx10.jpg"></p>
+<p>对比破旧的笔记本，居然还要小一圈</p>
+<p><img src="https://totoro.ink/img/itx11.jpg"></p>
+<p><img src="https://totoro.ink/img/itx12.jpg"></p>
+<p>对比一下移动硬盘</p>
+<h3 id="临时工作地点"><a href="#临时工作地点" class="headerlink" title="临时工作地点"></a>临时工作地点</h3><p><img src="https://totoro.ink/img/itx13.jpg"></p>
+<p><img src="https://totoro.ink/img/itx14.jpg"></p>
+<h3 id="临时工作地点2"><a href="#临时工作地点2" class="headerlink" title="临时工作地点2"></a>临时工作地点2</h3><p><img src="https://totoro.ink/img/itx01.jpg"></p>
+<p><img src="https://totoro.ink/img/itx15.jpg"></p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>totoro625
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://totoro.ink/life/zs-a4.html" title="我的 ITX 主机 | ZS-A4">https://totoro.ink/life/zs-a4.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/computer/" rel="tag"><i class="fa fa-tag"></i> computer</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/ingress/missions-zhenjiang.html" rel="prev" title="Ingress 镇江地区任务拼图介绍">
+      <i class="fa fa-chevron-left"></i> Ingress 镇江地区任务拼图介绍
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/life/jbl-ua-flash.html" rel="next" title="JBL UA FLASH 使用初体验">
+      JBL UA FLASH 使用初体验 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B5%B7%E5%9B%A0"><span class="nav-number">1.</span> <span class="nav-text">起因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%88%91%E7%9A%84%E9%85%8D%E7%BD%AE"><span class="nav-number">2.</span> <span class="nav-text">我的配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E4%BA%9B%E7%85%A7%E7%89%87"><span class="nav-number">3.</span> <span class="nav-text">一些照片</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%80%E7%AE%B1"><span class="nav-number">3.1.</span> <span class="nav-text">开箱</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%86%E8%8A%82"><span class="nav-number">3.2.</span> <span class="nav-text">细节</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B4%E6%9C%BA%E7%85%A7%E7%89%87"><span class="nav-number">3.3.</span> <span class="nav-text">整机照片</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%B9%E6%AF%94%E7%85%A7%E7%89%87"><span class="nav-number">3.4.</span> <span class="nav-text">对比照片</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%B4%E6%97%B6%E5%B7%A5%E4%BD%9C%E5%9C%B0%E7%82%B9"><span class="nav-number">3.5.</span> <span class="nav-text">临时工作地点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%B4%E6%97%B6%E5%B7%A5%E4%BD%9C%E5%9C%B0%E7%82%B92"><span class="nav-number">3.6.</span> <span class="nav-text">临时工作地点2</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="totoro625"
+      src="/avatar.jpg">
+  <p class="site-author-name" itemprop="name">totoro625</p>
+  <div class="site-description" itemprop="description">龙猫不在家</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">68</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">27</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Totoro625" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Totoro625" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:hc625@qq.com" title="E-Mail → mailto:hc625@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://t.me/totoro625" title="Telegram → http:&#x2F;&#x2F;t.me&#x2F;totoro625" rel="noopener" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/hc625" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;hc625" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS订阅 → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS订阅</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/sitemap.xml" title="SiteMap → &#x2F;sitemap.xml"><i class="fa fa-fw fa-sitemap"></i>SiteMap</a>
+      </span>
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 2015 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">totoro625 | 龙猫不在家</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://totoro.ink/life/zs-a4.html";
+    this.page.identifier = "life/zs-a4.html";
+    this.page.title = "我的 ITX 主机 | ZS-A4";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://totoro625.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>

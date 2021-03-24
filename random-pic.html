@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico">
+  <link rel="mask-icon" href="/favicon.svg" color="#222">
+  <meta name="google-site-verification" content="1p0EsRqqrxXK9MKusHQddZLU3uRKR39HAJc0nv9cCPY">
+  <meta name="baidu-site-verification" content="p98fiVOwSW">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('https://totoro.ink').hostname,
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.7.1',
+    exturl: false,
+    sidebar: {"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":true,"style":"flat"},
+    back2top: {"enable":true,"sidebar":true,"scrollpercent":true},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":true,"nav":{"disqus":{"text":"Load Disqus","order":-1}}},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="想法来源日常逛博客看到未闻花名的博客 头部图片一直在变换，F12看到用了一个PHP来加载随机图片。 不得不感慨一句和泉沙雾最可爱了，你们不要跟我抢">
+<meta property="og:type" content="article">
+<meta property="og:title" content="随机图片api与一言(hitokoto)api">
+<meta property="og:url" content="https://totoro.ink/random-pic.html">
+<meta property="og:site_name" content="TOTORO625">
+<meta property="og:description" content="想法来源日常逛博客看到未闻花名的博客 头部图片一直在变换，F12看到用了一个PHP来加载随机图片。 不得不感慨一句和泉沙雾最可爱了，你们不要跟我抢">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2018-01-15T15:27:00.000Z">
+<meta property="article:modified_time" content="2021-03-24T03:01:07.659Z">
+<meta property="article:author" content="totoro625">
+<meta property="article:tag" content="api">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://totoro.ink/random-pic.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>随机图片api与一言(hitokoto)api | TOTORO625</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="TOTORO625" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">TOTORO625</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-友链">
+
+    <a href="/link.html" rel="section"><i class="fa fa-fw fa-link"></i>友链</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about.html" rel="section"><i class="fa fa-fw fa-user-circle-o"></i>关于</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://totoro.ink/random-pic.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/avatar.jpg">
+      <meta itemprop="name" content="totoro625">
+      <meta itemprop="description" content="龙猫不在家">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="TOTORO625">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          随机图片api与一言(hitokoto)api
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-01-15 23:27:00" itemprop="dateCreated datePublished" datetime="2018-01-15T23:27:00+08:00">2018-01-15</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-03-24 11:01:07" itemprop="dateModified" datetime="2021-03-24T11:01:07+08:00">2021-03-24</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/bash/" itemprop="url" rel="index">
+                    <span itemprop="name">bash</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="想法来源"><a href="#想法来源" class="headerlink" title="想法来源"></a>想法来源</h2><p>日常逛博客看到<a target="_blank" rel="noopener" href="https://snrat.com/">未闻花名的博客</a> 头部图片一直在变换，F12看到用了一个<a target="_blank" rel="noopener" href="https://api.ikmoe.com/shawu-rand-background.php">PHP</a>来加载随机图片。</p>
+<p><del>不得不感慨一句和泉沙雾最可爱了，你们不要跟我抢</del></p>
+<a id="more"></a>
+<p>顺着链接爬到了<a target="_blank" rel="noopener" href="https://ikmoe.com/">月宅酱</a>的<a target="_blank" rel="noopener" href="https://random.ikmoe.com/">漫月api</a> ，看到他每个月<a target="_blank" rel="noopener" href="https://ikmoe.com/5722.html">维护所需的花费</a>那么巨大，我还是撸一个自己用吧</p>
+<p>（其实主要是可用的接口过少）目前有一个<a target="_blank" rel="noopener" href="https://api.ikmoe.com/moeu-rand-background.php">公开接口</a> 以及一个博文内<a target="_blank" rel="noopener" href="https://api.ikmoe.com/xiao-ren-api.php">隐藏接口-小忍壁纸</a> 还有我爬取到的<a target="_blank" rel="noopener" href="https://api.ikmoe.com/shawu-rand-background.php">和泉沙雾</a> 。<del>和泉沙雾最可爱</del></p>
+<p>顺手爬了一下月宅酱的和泉沙雾api接口内的全部图片，<a target="_blank" rel="noopener" href="https://img.totoro.ink/album/m7n">一共50张(相册)</a></p>
+<p>由于很久没有写PHP的原因，月宅酱的漫月api也没有公开源码我打算照抄一下一言(hitokoto)api的源码来写这个随机图片的api</p>
+<h2 id="寻找一言API"><a href="#寻找一言API" class="headerlink" title="寻找一言API"></a>寻找一言API</h2><p>lwl12的 <a target="_blank" rel="noopener" href="https://blog.lwl12.com/read/hitokoto-api.html">LWL-Hitokoto API（一言-纯净API）</a> 未开源</p>
+<p>狂放的 <a target="_blank" rel="noopener" href="https://www.iknet.top/568.html">[开源]一言纯净API</a>  <a target="_blank" rel="noopener" href="https://github.com/kfangf/hitokoto">开源</a> 也很好用</p>
+<p>在狂放的评论区找到了后宫学长的超简洁版api <a target="_blank" rel="noopener" href="https://haremu.com/p/94">使用“一言”为博客增加文雅气息</a> 差不多7行代码就搞定</p>
+<ul>
+<li>新建一个文件夹，名为：hitokoto</li>
+<li>复制以下代码，保存为 index.php 文件，并放置上面的文件夹中</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">&#x2F;&#x2F;获取句子文件的绝对路径</span><br><span class="line">$path &#x3D; dirname(__FILE__);</span><br><span class="line">$file &#x3D; file($path.&quot;&#x2F;hitokoto.txt&quot;);</span><br><span class="line">&#x2F;&#x2F;随机读取一行</span><br><span class="line">$arr  &#x3D; mt_rand( 0, count( $file ) - 1 );</span><br><span class="line">$hitokoto  &#x3D; trim($file[$arr]);</span><br><span class="line">&#x2F;&#x2F;输出内容</span><br><span class="line">echo $hitokoto;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>把你的一言名言写进 hitokoto.txt 文件中，一句话一行，并放置上面的文件夹中</li>
+</ul>
+<p><strong>示例：</strong></p>
+<blockquote>
+<p>有你在的日子才是我的日常。<br>夹在我女友与前女友与青梅竹马间的果然是修罗场！<br>既然如此，就再努力一次吧。别在这里愁眉不展，也不要再自欺欺人，重新来过！<br>比自己,比梦想更重要的东西永远都存在着…<br>嘛，那又怎么样呢？</p>
+</blockquote>
+<p>就这样就可以了</p>
+<h2 id="改造成随机图片API"><a href="#改造成随机图片API" class="headerlink" title="改造成随机图片API"></a>改造成随机图片API</h2><p>那么一言api有了之后，我们该如何改造他变成一个随机图片api呢？</p>
+<p>http的303跳转的作用是：对于POST请求，它表示请求已经被处理，客户端可以接着使用GET方法去请求Location里的URI</p>
+<p>这样我们可以用</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">if (isset($url)) </span><br><span class="line">&#123; </span><br><span class="line">Header(&quot;HTTP&#x2F;1.1 303 See Other&quot;); </span><br><span class="line">Header(&quot;Location: $url&quot;); </span><br><span class="line">exit; </span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
+<p>来进行跳转</p>
+<p>在原有的API基础上修改一下就是</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">&#x2F;&#x2F;获取句子文件的绝对路径</span><br><span class="line">$path &#x3D; dirname(__FILE__);</span><br><span class="line">$file &#x3D; file($path.&quot;&#x2F;pics.txt&quot;);</span><br><span class="line">&#x2F;&#x2F;随机读取一行</span><br><span class="line">$arr  &#x3D; mt_rand( 0, count( $file ) - 1 );</span><br><span class="line">$url  &#x3D; trim($file[$arr]);</span><br><span class="line">&#x2F;&#x2F;输出内容</span><br><span class="line">#echo $url;</span><br><span class="line">&#x2F;&#x2F;303跳转</span><br><span class="line">if (isset($url)) </span><br><span class="line">&#123; </span><br><span class="line">Header(&quot;HTTP&#x2F;1.1 303 See Other&quot;); </span><br><span class="line">Header(&quot;Location: $url&quot;); </span><br><span class="line">exit; </span><br><span class="line">&#125; </span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>新建一个pics.txt写入你所需要的随机展示的图片即可食用</p>
+<p>我的和泉沙雾是</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;mVKl.png</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;muqM.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;mj3d.png</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;mqJ9.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;mHNR.png</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;miMI.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;m291.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;m4Ca.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;mnng.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;mZEP.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;mfzT.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;mXTU.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;mW33.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;mMFV.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;msNJ.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;mDMs.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;mAek.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;m3C7.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;monX.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;mhBy.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;mPzp.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;mGTn.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;mEoS.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;mBFE.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;mr8i.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;mpwK.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;mmeh.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;meyj.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;m7n0.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;mxBA.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;mLg8.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;mJTl.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;mFoM.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;m00d.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;9U89.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;9OwR.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;9K7I.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;9gy1.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;9cZa.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;9S1g.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;9IgP.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;9CHT.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;9yhU.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;9t03.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;95bV.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;9kwJ.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;9N7s.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;9btk.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;9VZ7.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;9u1X.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;9qcy.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;9THp.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;9Hhn.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;92vS.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;9abE.jpg</span><br><span class="line">https:&#x2F;&#x2F;img.totoro.ink&#x2F;images&#x2F;2018&#x2F;01&#x2F;15&#x2F;94si.jpg</span><br></pre></td></tr></table></figure>
+<p>就这样，一份随机图片api就写好了，不用受到别人的约束，自己写的才是最好用的。</p>
+<h2 id="用法"><a href="#用法" class="headerlink" title="用法"></a>用法</h2><p>我在<a target="_blank" rel="noopener" href="https://img.totoro.ink/">我的图床</a>上展示了几个<a target="_blank" rel="noopener" href="https://img.totoro.ink/page/api">api的用法</a> ，由于写的不是很直观，我在这里就直接贴出</p>
+<h3 id="和泉沙雾50张"><a href="#和泉沙雾50张" class="headerlink" title="和泉沙雾50张"></a>和泉沙雾50张</h3><p>来源于相册<a target="_blank" rel="noopener" href="https://img.totoro.ink/album/m7n">和泉沙雾</a>，可以使用<a target="_blank" rel="noopener" href="https://pan.totoro.ink/code/php/random-pics/shawu.php">https://pan.totoro.ink/code/php/random-pics/shawu.php</a>这个链接调用随机图片</p>
+<p>调用地址：<a target="_blank" rel="noopener" href="https://pan.totoro.ink/code/php/random-pics/shawu.php">https://pan.totoro.ink/code/php/random-pics/shawu.php</a></p>
+<h3 id="和泉沙雾193张"><a href="#和泉沙雾193张" class="headerlink" title="和泉沙雾193张"></a>和泉沙雾193张</h3><p>图片来源<a target="_blank" rel="noopener" href="https://random.ikmoe.com/">漫月API</a>，我把它们另存于相册<a target="_blank" rel="noopener" href="https://img.totoro.ink/album/rby">和泉沙雾2</a></p>
+<p>调用地址：<a target="_blank" rel="noopener" href="https://pan.totoro.ink/code/php/random-pics/shawu2.php">https://pan.totoro.ink/code/php/random-pics/shawu2.php</a></p>
+<h3 id="博客daily-pic"><a href="#博客daily-pic" class="headerlink" title="博客daily_pic"></a>博客daily_pic</h3><p><a href="https://totoro.ink/">我的博客</a>首页随机图片</p>
+<p>调用地址：<a target="_blank" rel="noopener" href="https://pan.totoro.ink/code/php/random-pics/daily_pic.php">https://pan.totoro.ink/code/php/random-pics/daily_pic.php</a></p>
+<p>复制上面的地址到你需要显示图片的地方</p>
+<p>例如：background:url(<a target="_blank" rel="noopener" href="https://pan.totoro.ink/code/php/random-pics/daily_pic.php">https://pan.totoro.ink/code/php/random-pics/daily_pic.php</a>);</p>
+<p>其他：随时跑路，食用请自建，搭建方式<a href="https://totoro.ink/random-pic.html">随机图片api与一言api</a> </p>
+<h2 id="使用到的图片"><a href="#使用到的图片" class="headerlink" title="使用到的图片"></a>使用到的图片</h2><p>具体使用图片明细请在<a target="_blank" rel="noopener" href="https://img.totoro.ink/page/api">随机图片api</a>查看</p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>totoro625
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://totoro.ink/random-pic.html" title="随机图片api与一言(hitokoto)api">https://totoro.ink/random-pic.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/api/" rel="tag"><i class="fa fa-tag"></i> api</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/hi2018.html" rel="prev" title="2018 元旦快乐">
+      <i class="fa fa-chevron-left"></i> 2018 元旦快乐
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/ingress/113field-mu-first.html" rel="next" title="ingress113随手两个Field就能上区域排行榜第一？">
+      ingress113随手两个Field就能上区域排行榜第一？ <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%83%B3%E6%B3%95%E6%9D%A5%E6%BA%90"><span class="nav-number">1.</span> <span class="nav-text">想法来源</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%BB%E6%89%BE%E4%B8%80%E8%A8%80API"><span class="nav-number">2.</span> <span class="nav-text">寻找一言API</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%94%B9%E9%80%A0%E6%88%90%E9%9A%8F%E6%9C%BA%E5%9B%BE%E7%89%87API"><span class="nav-number">3.</span> <span class="nav-text">改造成随机图片API</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%A8%E6%B3%95"><span class="nav-number">4.</span> <span class="nav-text">用法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%92%8C%E6%B3%89%E6%B2%99%E9%9B%BE50%E5%BC%A0"><span class="nav-number">4.1.</span> <span class="nav-text">和泉沙雾50张</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%92%8C%E6%B3%89%E6%B2%99%E9%9B%BE193%E5%BC%A0"><span class="nav-number">4.2.</span> <span class="nav-text">和泉沙雾193张</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8D%9A%E5%AE%A2daily-pic"><span class="nav-number">4.3.</span> <span class="nav-text">博客daily_pic</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%88%B0%E7%9A%84%E5%9B%BE%E7%89%87"><span class="nav-number">5.</span> <span class="nav-text">使用到的图片</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="totoro625"
+      src="/avatar.jpg">
+  <p class="site-author-name" itemprop="name">totoro625</p>
+  <div class="site-description" itemprop="description">龙猫不在家</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">68</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">27</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Totoro625" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Totoro625" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:hc625@qq.com" title="E-Mail → mailto:hc625@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="http://t.me/totoro625" title="Telegram → http:&#x2F;&#x2F;t.me&#x2F;totoro625" rel="noopener" target="_blank"><i class="fa fa-fw fa-telegram"></i>Telegram</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/hc625" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;hc625" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS订阅 → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i>RSS订阅</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/sitemap.xml" title="SiteMap → &#x2F;sitemap.xml"><i class="fa fa-fw fa-sitemap"></i>SiteMap</a>
+      </span>
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 2015 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">totoro625 | 龙猫不在家</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://totoro.ink/random-pic.html";
+    this.page.identifier = "random-pic.html";
+    this.page.title = "随机图片api与一言(hitokoto)api";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://totoro625.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>
