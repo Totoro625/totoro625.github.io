@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh_cn"><head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>分享 AIO 服务器兼 NAS 存储</title><!-- Begin Jekyll SEO tag v2.7.1 -->
+<meta name="generator" content="Jekyll v3.9.3" />
+<meta property="og:title" content="分享 AIO 服务器兼 NAS 存储" />
+<meta name="author" content="totoro625" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="正在运行的配置 配件 型号 CPU Intel i5-11400 显卡 核显 主板 华硕ROG STRIX B560-I GAMING WIFI 内存 英睿达DDR4 3200 16Gx2 电源 海盗船RM750e 机箱 机械大师C28 CPU散热 利民 FS140 机箱散热（进） 猫头鹰 A9x14 x1 + 玄冰风4010 x2 + 外置USB 9cm x1 机箱散热（出） ID-COOLING 12025 x1 + 利民12015 x1 显示器 显卡欺骗器 键鼠 罗技接收器 拓展卡 绿联pcie转m2 固态1pcie位置 4.0 x16 亿联 am6a1 1T （slog+l2arc+lvm） 固态2主板正面 4.0 x16 三星 Samsung PM9A1 2T （slog+l2arc+PVE swap+ext4目录） 固态3主板背面 3.0 x16 三星 Samsung PM981 256G （PVE系统盘） 数据盘 西数 WD HC550 16T x4（RAIDZ2） UPS APC BK650M2-CH 备用 配件 型号 备注 显示器 树莓派5寸LCD 用于临时调试BIOS 拓展卡 plx8748 NVME 3.0 x16 x4 + 8654 8i x2，不兼容部分老固态，后期淘汰m2再用，暂不需要 新购物品清单： 3块HC550 16T 一台UPS plx8748 功率 powersave 模式，50~120W ，日常使用一般 80~100W 波动" />
+<meta property="og:description" content="正在运行的配置 配件 型号 CPU Intel i5-11400 显卡 核显 主板 华硕ROG STRIX B560-I GAMING WIFI 内存 英睿达DDR4 3200 16Gx2 电源 海盗船RM750e 机箱 机械大师C28 CPU散热 利民 FS140 机箱散热（进） 猫头鹰 A9x14 x1 + 玄冰风4010 x2 + 外置USB 9cm x1 机箱散热（出） ID-COOLING 12025 x1 + 利民12015 x1 显示器 显卡欺骗器 键鼠 罗技接收器 拓展卡 绿联pcie转m2 固态1pcie位置 4.0 x16 亿联 am6a1 1T （slog+l2arc+lvm） 固态2主板正面 4.0 x16 三星 Samsung PM9A1 2T （slog+l2arc+PVE swap+ext4目录） 固态3主板背面 3.0 x16 三星 Samsung PM981 256G （PVE系统盘） 数据盘 西数 WD HC550 16T x4（RAIDZ2） UPS APC BK650M2-CH 备用 配件 型号 备注 显示器 树莓派5寸LCD 用于临时调试BIOS 拓展卡 plx8748 NVME 3.0 x16 x4 + 8654 8i x2，不兼容部分老固态，后期淘汰m2再用，暂不需要 新购物品清单： 3块HC550 16T 一台UPS plx8748 功率 powersave 模式，50~120W ，日常使用一般 80~100W 波动" />
+<link rel="canonical" href="https://totoro.ink/share-my-nas-c28" />
+<meta property="og:url" content="https://totoro.ink/share-my-nas-c28" />
+<meta property="og:site_name" content="TOTORO625" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2023-10-07T00:00:00+08:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="分享 AIO 服务器兼 NAS 存储" />
+<script type="application/ld+json">
+{"headline":"分享 AIO 服务器兼 NAS 存储","dateModified":"2023-10-07T00:00:00+08:00","datePublished":"2023-10-07T00:00:00+08:00","@type":"BlogPosting","url":"https://totoro.ink/share-my-nas-c28","author":{"@type":"Person","name":"totoro625"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://totoro.ink/share-my-nas-c28"},"description":"正在运行的配置 配件 型号 CPU Intel i5-11400 显卡 核显 主板 华硕ROG STRIX B560-I GAMING WIFI 内存 英睿达DDR4 3200 16Gx2 电源 海盗船RM750e 机箱 机械大师C28 CPU散热 利民 FS140 机箱散热（进） 猫头鹰 A9x14 x1 + 玄冰风4010 x2 + 外置USB 9cm x1 机箱散热（出） ID-COOLING 12025 x1 + 利民12015 x1 显示器 显卡欺骗器 键鼠 罗技接收器 拓展卡 绿联pcie转m2 固态1pcie位置 4.0 x16 亿联 am6a1 1T （slog+l2arc+lvm） 固态2主板正面 4.0 x16 三星 Samsung PM9A1 2T （slog+l2arc+PVE swap+ext4目录） 固态3主板背面 3.0 x16 三星 Samsung PM981 256G （PVE系统盘） 数据盘 西数 WD HC550 16T x4（RAIDZ2） UPS APC BK650M2-CH 备用 配件 型号 备注 显示器 树莓派5寸LCD 用于临时调试BIOS 拓展卡 plx8748 NVME 3.0 x16 x4 + 8654 8i x2，不兼容部分老固态，后期淘汰m2再用，暂不需要 新购物品清单： 3块HC550 16T 一台UPS plx8748 功率 powersave 模式，50~120W ，日常使用一般 80~100W 波动","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link type="application/atom+xml" rel="alternate" href="https://totoro.ink/feed.xml" title="TOTORO625" /><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="/assets/css/main.css" />
+</head><body a="light">
+    <main class="page-content" aria-label="Content">
+      <div class="w">
+        <a href="/">『返回』首页</a>
+
+<p class="post-meta">
+<a href="/archive">归档</a> | <a href="/link">大佬们</a> | <a href="/about">关于我</a>
+</p>
+<article>
+  <p class="post-meta">
+    <time datetime="2023-10-07 00:00:00 +0800">『时间』2023年10月07日</time>
+  </p>
+  
+  <h1>分享 AIO 服务器兼 NAS 存储</h1>
+
+  <h2 id="正在运行的配置">正在运行的配置</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">配件</th>
+      <th style="text-align: left">型号</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center">CPU</td>
+      <td style="text-align: left">Intel i5-11400</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">显卡</td>
+      <td style="text-align: left">核显</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">主板</td>
+      <td style="text-align: left">华硕ROG STRIX B560-I GAMING WIFI</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">内存</td>
+      <td style="text-align: left">英睿达DDR4 3200 16Gx2</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">电源</td>
+      <td style="text-align: left">海盗船RM750e</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">机箱</td>
+      <td style="text-align: left">机械大师C28</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">CPU散热</td>
+      <td style="text-align: left">利民 FS140</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">机箱散热（进）</td>
+      <td style="text-align: left">猫头鹰 A9x14 x1 + 玄冰风4010 x2 + 外置USB 9cm x1</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">机箱散热（出）</td>
+      <td style="text-align: left">ID-COOLING 12025 x1 + 利民12015 x1</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">显示器</td>
+      <td style="text-align: left">显卡欺骗器</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">键鼠</td>
+      <td style="text-align: left">罗技接收器</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">拓展卡</td>
+      <td style="text-align: left">绿联pcie转m2</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">固态1pcie位置 4.0 x16</td>
+      <td style="text-align: left">亿联 am6a1 1T （slog+l2arc+lvm）</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">固态2主板正面 4.0 x16</td>
+      <td style="text-align: left">三星 Samsung PM9A1 2T （slog+l2arc+PVE swap+ext4目录）</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">固态3主板背面 3.0 x16</td>
+      <td style="text-align: left">三星 Samsung PM981 256G （PVE系统盘）</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">数据盘</td>
+      <td style="text-align: left">西数 WD HC550 16T x4（RAIDZ2）</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">UPS</td>
+      <td style="text-align: left">APC BK650M2-CH</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="备用">备用</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">配件</th>
+      <th style="text-align: left">型号</th>
+      <th>备注</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center">显示器</td>
+      <td style="text-align: left">树莓派5寸LCD</td>
+      <td>用于临时调试BIOS</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">拓展卡</td>
+      <td style="text-align: left">plx8748</td>
+      <td>NVME 3.0 x16 x4 + 8654 8i x2，不兼容部分老固态，后期淘汰m2再用，暂不需要</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>新购物品清单：</strong></p>
+
+<ol>
+  <li>3块HC550 16T</li>
+  <li>一台UPS</li>
+  <li>plx8748</li>
+</ol>
+
+<h2 id="功率">功率</h2>
+
+<p>powersave 模式，50~120W ，日常使用一般 80~100W 波动</p>
+
+<p><img src="https://i.imgur.com/OBxbuad.png" alt="" /></p>
+
+<p><img src="https://i.imgur.com/SKL4Sso.jpg" alt="" /></p>
+
+</article>
+      </div>
+    </main>
+    <div class="cprt">
+© 2015 - 至今 | Powered by <a href="https://jekyllrb.com">Jekyll</a> | Theme - <a href="https://github.com/riggraz/no-style-please">no style, please!</a>
+<br>主站：<a href="https://totoro.ink">TOTORO625</a> | 镜像：<a href="https://www.totoro.pub">橙汁不甜</a> | <a href="/feed.xml">站点地图</a>
+</div>
+<style type="text/css">
+.cprt {
+	max-width: 640px;
+	margin: 0 auto;
+	padding: 4rem 2rem;
+	text-align: center;
+	font-size: 16px;
+	opacity: 0.8;
+	color: #000;
+}
+}
+</style>
+</body>
+</html>

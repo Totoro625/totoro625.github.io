@@ -1,0 +1,1575 @@
+<!DOCTYPE html>
+<html lang="zh_cn"><head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>新的PVE，新的开始</title><!-- Begin Jekyll SEO tag v2.7.1 -->
+<meta name="generator" content="Jekyll v3.9.3" />
+<meta property="og:title" content="新的PVE，新的开始" />
+<meta name="author" content="totoro625" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="旧机器的性能太差了，正好淘汰了一台电脑，改成PVE了 引 - 全新PVE宿主机，写个自己的小Tips Docker不得在宿主机及LXC上安装 vm全部使用cloudimg构建 UFW安装在对外的服务器上 数据盘4块HC550 16T 组建ZFS存储池RaidZ-2 每个VM安装不再安装Tailscale、zerotier、frpc、CFtunnel 独立的swap硬盘用于各VM，及PVE（宿主机64G，UFW 16G，Seafile 16G，Mt-photo 16G） 独立的固态用于PVE安装 参考资料 国光的 PVE 环境搭建教程 N5105 Proxmox VE (PVE) 主页添加温度硬盘等信息 开始安装系统 官方网站下载ISO，用ventoy制作启动工具，插上网线再开机（键盘和显示器是必须的），根据引导走完全部流程 系统盘请使用ext4格式，避免问题 swap设置为0G，后期自行添加专用swap硬盘，减少系统盘的磨损 在tabby添加配置（直连和转发） 特殊情况 DEBUG 网络故障/pcie插拔 键盘、屏幕连接好后 ip a 或者 ip addr 查看一下网卡是什么，例如：enp8s0 nano /etc/network/interfaces 修改网卡 宿主机重启后VM内开机启动程序未启动 PVE开机后重新启动 nano /etc/systemd/system/vmreboot.service [Unit] Description=VM reboot [Service] 待更新 qm stop 202 qm status 202 qm start 202 [Install] WantedBy=multi-user.target systemctl daemon-reload systemctl enable vmreboot.service 硬盘空间不足 unable to initialize physical volume /dev/nvmeon1p3 分区时硬盘总容量选择小几个GB即可 Proxmox VE 8 换源 注1：在前面加#注释掉全部内容，添加以下内容 注2：Ctrl + O 保存，Ctrl + X 退出 nano /etc/apt/sources.list deb https://mirrors.ustc.edu.cn/debian/ bookworm main non-free non-free-firmware contrib deb-src https://mirrors.ustc.edu.cn/debian/ bookworm main non-free non-free-firmware contrib deb https://mirrors.ustc.edu.cn/debian-security/ bookworm-security main deb-src https://mirrors.ustc.edu.cn/debian-security/ bookworm-security main deb https://mirrors.ustc.edu.cn/debian/ bookworm-updates main non-free non-free-firmware contrib deb-src https://mirrors.ustc.edu.cn/debian/ bookworm-updates main non-free non-free-firmware contrib deb https://mirrors.ustc.edu.cn/debian/ bookworm-backports main non-free non-free-firmware contrib deb-src https://mirrors.ustc.edu.cn/debian/ bookworm-backports main non-free non-free-firmware contrib 或者: sed -i &#39;s|http://deb.debian.org/debian|https://mirrors.ustc.edu.cn/debian|g&#39; /etc/apt/sources.list sed -i &#39;s|http://security.debian.org/debian|https://mirrors.ustc.edu.cn/debian|g&#39; /etc/apt/sources.list nano /etc/apt/sources.list.d/pve-enterprise.list deb https://mirrors.ustc.edu.cn/proxmox/debian bookworm pve-no-subscription nano /etc/apt/sources.list.d/ceph.list deb https://mirrors.ustc.edu.cn/proxmox/debian/ceph-quincy bookworm no-subscription apt update 更新 LXC（CT Template）源 sed -i &#39;s|http://download.proxmox.com|https://mirrors.tuna.tsinghua.edu.cn/proxmox|g&#39; /usr/share/perl5/PVE/APLInfo.pm systemctl restart pvedaemon.service 直通 / 开启 IOMMU 和 SR-IOV 默认大家BIOS设置好啦，新机器请看这个教程 nano /etc/default/grub 修改GRUB_CMDLINE_LINUX_DEFAULT字段 Intel GRUB_CMDLINE_LINUX_DEFAULT=&quot;quiet intel_iommu=on iommu=pt textonly nomodeset nofb pci=noaer pcie_acs_override=downstream,multifunction&quot; AMD GRUB_CMDLINE_LINUX_DEFAULT=&quot;quiet amd_iommu=on iommu=pt textonly nomodeset nofb pci=noaer pcie_acs_override=downstream,multifunction&quot; update-grub &amp;&amp; reboot 带显卡直通看这个教程 个性化配置 自定义pveproxy web界面（非必须，just好看） 删除订阅弹窗 sed -Ezi.bak &quot;s/(Ext.Msg.show\(\{\s+title: gettext\(&#39;No valid sub)/void\(\{ \/\/\1/g&quot; /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js systemctl restart pveproxy.service 首页显示 CPU、主板、NVME、硬盘 温度等信息 apt update apt install lm-sensors patch -y sensors-detect 全部回车 chmod +s /usr/sbin/smartctl export LC_ALL=en_US.UTF-8 sensors reboot 懒人一键教程 看一下自己几个NVME smartctl -a -j /dev/nvme? 看一下自己几个硬盘 smartctl -a -j /dev/sd? nano /usr/share/perl5/PVE/API2/Nodes.pm Ctrl + w 搜索shared =&gt; $meminfo-&gt;{memshared} 在该段结束后（；为结束）换行添加（记得tab一下对齐） $res-&gt;{sensinfo} = `sensors`; $res-&gt;{cpusensors} = `lscpu | grep MHz`; $res-&gt;{smartctl_nvme0_json} = `smartctl -a -j /dev/nvme0`; $res-&gt;{smartctl_nvme1_json} = `smartctl -a -j /dev/nvme1`; $res-&gt;{smartctl_nvme2_json} = `smartctl -a -j /dev/nvme2`; $res-&gt;{smartctl_hdd1_json} = `smartctl -a -j /dev/sda`; $res-&gt;{smartctl_hdd2_json} = `smartctl -a -j /dev/sdb`; $res-&gt;{smartctl_hdd3_json} = `smartctl -a -j /dev/sdc`; $res-&gt;{smartctl_hdd4_json} = `smartctl -a -j /dev/sdd`; 注：该示例为3块nvme + 4块硬盘 nano /usr/share/pve-manager/js/pvemanagerlib.js 建议使用winscp打开，notepad++编辑 搜索 PVE Manager Version新版本为Manager Version 旧的配置1 { itemId: &#39;sensinfo&#39;, colspan: 2, printBar: false, title: gettext(&#39;CPU温度&#39;), textField: &#39;sensinfo&#39;, renderer:function(value){ const c0 = value.match(/Core 0.*?\+([\d\.]+)?/)[1]; const c1 = value.match(/Core 1.*?\+([\d\.]+)?/)[1]; const c2 = value.match(/Core 2.*?\+([\d\.]+)?/)[1]; const c3 = value.match(/Core 3.*?\+([\d\.]+)?/)[1]; const c4 = value.match(/Core 4.*?\+([\d\.]+)?/)[1]; const c5 = value.match(/Core 5.*?\+([\d\.]+)?/)[1]; const p0 = value.match(/Package id 0.*?\+([\d\.]+)?/)[1]; const b0 = value.match(/temp1.*?\+([\d\.]+)?/)[1]; return `表面: ${p0} ℃ | 核心: ${c0}|${c1}|${c2}|${c3}|${c4}|${c5} ℃ | 主板: ${b0} ℃` } }, { itemId: &#39;MHz&#39;, colspan: 2, printBar: false, title: gettext(&#39;CPU频率&#39;), textField: &#39;cpusensors&#39;, renderer:function(value){ const f0 = value.match(/CPU.*scaling MHz.*?([\d]+)/)[1]; const f1 = value.match(/CPU min MHz.*?([\d]+)/)[1]; const f2 = value.match(/CPU max MHz.*?([\d]+)/)[1]; const f3 = f0*f2/100; return `实时: ${f3} MHz(${f0}%) | 最小: ${f1} MHz | 最大: ${f2} MHz ` } }, { itemId: &#39;nvme_ssd0&#39;, colspan: 2, printBar: false, title: gettext(&#39;NVME槽0：pcie槽转接&#39;), textField: &#39;smartctl_nvme0_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var percentage_used = &#39; | 使用寿命: &#39; + value[&#39;nvme_smart_health_information_log&#39;][&#39;percentage_used&#39;].toFixed(0) + &#39;% &#39;;} catch(e) {var percentage_used = &#39;&#39;;} try {var data_units_read = value[&#39;nvme_smart_health_information_log&#39;][&#39;data_units_read&#39;]*512/1024/1024;var data_units_read = &#39;(读: &#39; + data_units_read.toFixed(2) + &#39;GB, &#39;;} catch(e) {var data_units_read = &#39;&#39;;} try {var data_units_written = value[&#39;nvme_smart_health_information_log&#39;][&#39;data_units_written&#39;]*512/1024/1024;var data_units_written = &#39;写: &#39; + data_units_written.toFixed(2) + &#39;GB)&#39;;} catch(e) {var data_units_written = &#39;&#39;;} try {var power_on_time = &#39; | 通电: &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | 温度: &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${percentage_used}${data_units_read}${data_units_written}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, { itemId: &#39;nvme_ssd1&#39;, colspan: 2, printBar: false, title: gettext(&#39;NVME槽1：主板正面pcie4.0&#39;), textField: &#39;smartctl_nvme1_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var percentage_used = &#39; | 使用寿命: &#39; + value[&#39;nvme_smart_health_information_log&#39;][&#39;percentage_used&#39;].toFixed(0) + &#39;% &#39;;} catch(e) {var percentage_used = &#39;&#39;;} try {var data_units_read = value[&#39;nvme_smart_health_information_log&#39;][&#39;data_units_read&#39;]*512/1024/1024;var data_units_read = &#39;(读: &#39; + data_units_read.toFixed(2) + &#39;GB, &#39;;} catch(e) {var data_units_read = &#39;&#39;;} try {var data_units_written = value[&#39;nvme_smart_health_information_log&#39;][&#39;data_units_written&#39;]*512/1024/1024;var data_units_written = &#39;写: &#39; + data_units_written.toFixed(2) + &#39;GB)&#39;;} catch(e) {var data_units_written = &#39;&#39;;} try {var power_on_time = &#39; | 通电: &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | 温度: &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${percentage_used}${data_units_read}${data_units_written}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, { itemId: &#39;nvme_ssd2&#39;, colspan: 2, printBar: false, title: gettext(&#39;NVME槽2：主板背面pcie3.0&#39;), textField: &#39;smartctl_nvme2_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var percentage_used = &#39; | 使用寿命: &#39; + value[&#39;nvme_smart_health_information_log&#39;][&#39;percentage_used&#39;].toFixed(0) + &#39;% &#39;;} catch(e) {var percentage_used = &#39;&#39;;} try {var data_units_read = value[&#39;nvme_smart_health_information_log&#39;][&#39;data_units_read&#39;]*512/1024/1024;var data_units_read = &#39;(读: &#39; + data_units_read.toFixed(2) + &#39;GB, &#39;;} catch(e) {var data_units_read = &#39;&#39;;} try {var data_units_written = value[&#39;nvme_smart_health_information_log&#39;][&#39;data_units_written&#39;]*512/1024/1024;var data_units_written = &#39;写: &#39; + data_units_written.toFixed(2) + &#39;GB)&#39;;} catch(e) {var data_units_written = &#39;&#39;;} try {var power_on_time = &#39; | 通电: &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | 温度: &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${percentage_used}${data_units_read}${data_units_written}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, { itemId: &#39;hdd_sda&#39;, colspan: 2, printBar: false, title: gettext(&#39;机械硬盘sda&#39;), textField: &#39;smartctl_hdd1_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var serial_number = &#39; | 序列号: &#39; + value[&#39;serial_number&#39;];} catch(e) {var serial_number = &#39;&#39;;} try {var power_cycle_count = &#39; | 通电: &#39; + value[&#39;power_cycle_count&#39;] + &#39;次&#39;;} catch(e) {var power_cycle_count = &#39;&#39;;} try {var power_on_time = &#39; | 通电: &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | 温度: &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${serial_number}${power_cycle_count}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, { itemId: &#39;hdd_sdb&#39;, colspan: 2, printBar: false, title: gettext(&#39;机械硬盘sdb&#39;), textField: &#39;smartctl_hdd2_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var serial_number = &#39; | 序列号: &#39; + value[&#39;serial_number&#39;];} catch(e) {var serial_number = &#39;&#39;;} try {var power_cycle_count = &#39; | 通电: &#39; + value[&#39;power_cycle_count&#39;] + &#39;次&#39;;} catch(e) {var power_cycle_count = &#39;&#39;;} try {var power_on_time = &#39; | 通电: &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | 温度: &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${serial_number}${power_cycle_count}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, { itemId: &#39;hdd_sdc&#39;, colspan: 2, printBar: false, title: gettext(&#39;机械硬盘sdc&#39;), textField: &#39;smartctl_hdd3_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var serial_number = &#39; | 序列号: &#39; + value[&#39;serial_number&#39;];} catch(e) {var serial_number = &#39;&#39;;} try {var power_cycle_count = &#39; | 通电: &#39; + value[&#39;power_cycle_count&#39;] + &#39;次&#39;;} catch(e) {var power_cycle_count = &#39;&#39;;} try {var power_on_time = &#39; | 通电: &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | 温度: &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${serial_number}${power_cycle_count}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, { itemId: &#39;hdd_sdd&#39;, colspan: 2, printBar: false, title: gettext(&#39;机械硬盘sdd&#39;), textField: &#39;smartctl_hdd4_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var serial_number = &#39; | 序列号: &#39; + value[&#39;serial_number&#39;];} catch(e) {var serial_number = &#39;&#39;;} try {var power_cycle_count = &#39; | 通电: &#39; + value[&#39;power_cycle_count&#39;] + &#39;次&#39;;} catch(e) {var power_cycle_count = &#39;&#39;;} try {var power_on_time = &#39; | 通电: &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | 温度: &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${serial_number}${power_cycle_count}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, 现在使用配置2 { itemId: &#39;sensinfo&#39;, colspan: 2, printBar: false, title: gettext(&#39;CPU温度&#39;), textField: &#39;sensinfo&#39;, renderer:function(value){ const c0 = value.match(/Core 0.*?\+([\d\.]+)?/)[1]; const c1 = value.match(/Core 1.*?\+([\d\.]+)?/)[1]; const c2 = value.match(/Core 2.*?\+([\d\.]+)?/)[1]; const c3 = value.match(/Core 3.*?\+([\d\.]+)?/)[1]; const c4 = value.match(/Core 4.*?\+([\d\.]+)?/)[1]; const c5 = value.match(/Core 5.*?\+([\d\.]+)?/)[1]; const p0 = value.match(/Package id 0.*?\+([\d\.]+)?/)[1]; const b0 = value.match(/temp1.*?\+([\d\.]+)?/)[1]; return `表面: ${p0} ℃ | 核心: ${c0}|${c1}|${c2}|${c3}|${c4}|${c5} ℃ | 主板: ${b0} ℃` } }, { itemId: &#39;MHz&#39;, colspan: 2, printBar: false, title: gettext(&#39;CPU频率&#39;), textField: &#39;cpusensors&#39;, renderer:function(value){ const f0 = value.match(/CPU.*scaling MHz.*?([\d]+)/)[1]; const f1 = value.match(/CPU min MHz.*?([\d]+)/)[1]; const f2 = value.match(/CPU max MHz.*?([\d]+)/)[1]; const f3 = f0*f2/100; return `实时: ${f3} MHz(${f0}%) | 最小: ${f1} MHz | 最大: ${f2} MHz ` } }, { itemId: &#39;nvme_ssd0&#39;, colspan: 2, printBar: false, title: gettext(&#39;/dev/nvme0&#39;), textField: &#39;smartctl_nvme0_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var percentage_used = &#39; | 磨损: &#39; + value[&#39;nvme_smart_health_information_log&#39;][&#39;percentage_used&#39;].toFixed(0) + &#39;% &#39;;} catch(e) {var percentage_used = &#39;&#39;;} try {var data_units_read = value[&#39;nvme_smart_health_information_log&#39;][&#39;data_units_read&#39;]*512/1024/1024/1024;var data_units_read = &#39;(读: &#39; + data_units_read.toFixed(2) + &#39;TB, &#39;;} catch(e) {var data_units_read = &#39;&#39;;} try {var data_units_written = value[&#39;nvme_smart_health_information_log&#39;][&#39;data_units_written&#39;]*512/1024/1024/1024;var data_units_written = &#39;写: &#39; + data_units_written.toFixed(2) + &#39;TB)&#39;;} catch(e) {var data_units_written = &#39;&#39;;} try {var power_on_time = &#39; | &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${percentage_used}${data_units_read}${data_units_written}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, { itemId: &#39;nvme_ssd1&#39;, colspan: 2, printBar: false, title: gettext(&#39;/dev/nvme1&#39;), textField: &#39;smartctl_nvme1_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var percentage_used = &#39; | 磨损: &#39; + value[&#39;nvme_smart_health_information_log&#39;][&#39;percentage_used&#39;].toFixed(0) + &#39;% &#39;;} catch(e) {var percentage_used = &#39;&#39;;} try {var data_units_read = value[&#39;nvme_smart_health_information_log&#39;][&#39;data_units_read&#39;]*512/1024/1024/1024;var data_units_read = &#39;(读: &#39; + data_units_read.toFixed(2) + &#39;TB, &#39;;} catch(e) {var data_units_read = &#39;&#39;;} try {var data_units_written = value[&#39;nvme_smart_health_information_log&#39;][&#39;data_units_written&#39;]*512/1024/1024/1024;var data_units_written = &#39;写: &#39; + data_units_written.toFixed(2) + &#39;TB)&#39;;} catch(e) {var data_units_written = &#39;&#39;;} try {var power_on_time = &#39; | &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${percentage_used}${data_units_read}${data_units_written}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, { itemId: &#39;nvme_ssd2&#39;, colspan: 2, printBar: false, title: gettext(&#39;/dev/nvme2&#39;), textField: &#39;smartctl_nvme2_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var percentage_used = &#39; | 磨损: &#39; + value[&#39;nvme_smart_health_information_log&#39;][&#39;percentage_used&#39;].toFixed(0) + &#39;% &#39;;} catch(e) {var percentage_used = &#39;&#39;;} try {var data_units_read = value[&#39;nvme_smart_health_information_log&#39;][&#39;data_units_read&#39;]*512/1024/1024/1024;var data_units_read = &#39;(读: &#39; + data_units_read.toFixed(2) + &#39;TB, &#39;;} catch(e) {var data_units_read = &#39;&#39;;} try {var data_units_written = value[&#39;nvme_smart_health_information_log&#39;][&#39;data_units_written&#39;]*512/1024/1024/1024;var data_units_written = &#39;写: &#39; + data_units_written.toFixed(2) + &#39;TB)&#39;;} catch(e) {var data_units_written = &#39;&#39;;} try {var power_on_time = &#39; | &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${percentage_used}${data_units_read}${data_units_written}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, { itemId: &#39;hdd_sda&#39;, colspan: 2, printBar: false, title: gettext(&#39;/dev/sda&#39;), textField: &#39;smartctl_hdd1_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var serial_number = &#39; | 序列号: &#39; + value[&#39;serial_number&#39;];} catch(e) {var serial_number = &#39;&#39;;} try {var power_cycle_count = &#39; | &#39; + value[&#39;power_cycle_count&#39;] + &#39;次&#39;;} catch(e) {var power_cycle_count = &#39;&#39;;} try {var power_on_time = &#39; | &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${serial_number}${power_cycle_count}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, { itemId: &#39;hdd_sdb&#39;, colspan: 2, printBar: false, title: gettext(&#39;/dev/sdb&#39;), textField: &#39;smartctl_hdd2_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var serial_number = &#39; | 序列号: &#39; + value[&#39;serial_number&#39;];} catch(e) {var serial_number = &#39;&#39;;} try {var power_cycle_count = &#39; | &#39; + value[&#39;power_cycle_count&#39;] + &#39;次&#39;;} catch(e) {var power_cycle_count = &#39;&#39;;} try {var power_on_time = &#39; | &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${serial_number}${power_cycle_count}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, { itemId: &#39;hdd_sdc&#39;, colspan: 2, printBar: false, title: gettext(&#39;/dev/sdc&#39;), textField: &#39;smartctl_hdd3_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var serial_number = &#39; | 序列号: &#39; + value[&#39;serial_number&#39;];} catch(e) {var serial_number = &#39;&#39;;} try {var power_cycle_count = &#39; | &#39; + value[&#39;power_cycle_count&#39;] + &#39;次&#39;;} catch(e) {var power_cycle_count = &#39;&#39;;} try {var power_on_time = &#39; | &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${serial_number}${power_cycle_count}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, { itemId: &#39;hdd_sdd&#39;, colspan: 2, printBar: false, title: gettext(&#39;/dev/sdd&#39;), textField: &#39;smartctl_hdd4_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var serial_number = &#39; | 序列号: &#39; + value[&#39;serial_number&#39;];} catch(e) {var serial_number = &#39;&#39;;} try {var power_cycle_count = &#39; | &#39; + value[&#39;power_cycle_count&#39;] + &#39;次&#39;;} catch(e) {var power_cycle_count = &#39;&#39;;} try {var power_on_time = &#39; | &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${serial_number}${power_cycle_count}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, 注：该示例为6核心 NUC配置 { itemId: &#39;sensinfo&#39;, colspan: 2, printBar: false, title: gettext(&#39;CPU温度&#39;), textField: &#39;sensinfo&#39;, renderer:function(value){ const c0 = value.match(/Core 0.*?\+([\d\.]+)?/)[1]; const c1 = value.match(/Core 1.*?\+([\d\.]+)?/)[1]; const c2 = value.match(/Core 2.*?\+([\d\.]+)?/)[1]; const c3 = value.match(/Core 3.*?\+([\d\.]+)?/)[1]; const p0 = value.match(/Package id 0.*?\+([\d\.]+)?/)[1]; const b0 = value.match(/temp1.*?\+([\d\.]+)?/)[1]; return `表面: ${p0} ℃ | 核心: ${c0}|${c1}|${c2}|${c3} ℃ | 主板: ${b0} ℃` } }, { itemId: &#39;MHz&#39;, colspan: 2, printBar: false, title: gettext(&#39;CPU频率&#39;), textField: &#39;cpusensors&#39;, renderer:function(value){ const f0 = value.match(/CPU.*scaling MHz.*?([\d]+)/)[1]; const f1 = value.match(/CPU min MHz.*?([\d]+)/)[1]; const f2 = value.match(/CPU max MHz.*?([\d]+)/)[1]; const f3 = f0*f2/100; return `实时: ${f3} MHz(${f0}%) | 最小: ${f1} MHz | 最大: ${f2} MHz ` } }, { itemId: &#39;nvme_ssd0&#39;, colspan: 2, printBar: false, title: gettext(&#39;/dev/nvme0&#39;), textField: &#39;smartctl_nvme0_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var percentage_used = &#39; | 磨损: &#39; + value[&#39;nvme_smart_health_information_log&#39;][&#39;percentage_used&#39;].toFixed(0) + &#39;% &#39;;} catch(e) {var percentage_used = &#39;&#39;;} try {var data_units_read = value[&#39;nvme_smart_health_information_log&#39;][&#39;data_units_read&#39;]*512/1024/1024/1024;var data_units_read = &#39;(读: &#39; + data_units_read.toFixed(2) + &#39;TB, &#39;;} catch(e) {var data_units_read = &#39;&#39;;} try {var data_units_written = value[&#39;nvme_smart_health_information_log&#39;][&#39;data_units_written&#39;]*512/1024/1024/1024;var data_units_written = &#39;写: &#39; + data_units_written.toFixed(2) + &#39;TB)&#39;;} catch(e) {var data_units_written = &#39;&#39;;} try {var power_on_time = &#39; | &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${percentage_used}${data_units_read}${data_units_written}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, { itemId: &#39;ssd_sda&#39;, colspan: 2, printBar: false, title: gettext(&#39;/dev/sda&#39;), textField: &#39;smartctl_hdd1_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var serial_number = &#39; | 序列号: &#39; + value[&#39;serial_number&#39;];} catch(e) {var serial_number = &#39;&#39;;} try {var power_on_time = &#39; | &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${serial_number}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, 搜索widget.pveNodeStatus 将 height: 300 （默认值） 改大为 420，或者更大，然后保存（每多一行大概增大 20~25） systemctl restart pveproxy.service 检查WEB界面是否正常显示 powersave模式 默认使用高性能模式，切换为低性能模式 查看支持的 CPU 电源模式 cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_governors 只有两种结果powersave、performance为intel pstate 受害者 查看当前的 CPU 电源模式 cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor apt install linux-cpupower -y cpupower -c all frequency-info cpupower -c all frequency-set -g powersave 持久化 / cpupower开机启动 nano /etc/systemd/system/cpupower.service [Unit] Description=CPU powersave [Service] Type=oneshot ExecStart=/usr/bin/cpupower frequency-set -g powersave [Install] WantedBy=multi-user.target systemctl daemon-reload systemctl enable cpupower.service APC UPS 连接 apt-get install apcupsd nano /etc/apcupsd/apcupsd.conf 必要的配置： 在 UPSNAME 后面给个易懂的名字 在 UPSCABLE 后指定为 usb 在 UPSTYPE 后更改为 usb 在 DEVICE 后为空，这样系统便会自动检测 USB 连接 UPS 其他的随便找个教程即可，注意：关机触发条件，有剩余电量和剩余时间，默认为5%和3分钟。注意这里只要满足其中任一条件便会触发 nano /etc/default/apcupsd ISCONFIGURED=no 更改为 yes 任何教程都没提，太坑了！来源 /etc/init.d/apcupsd restart systemctl enable apcupsd.service systemctl status apcupsd.service 查看ups运行状态 apcaccess 安装Tailscale curl -fsSL https://tailscale.com/install.sh | sh tailscale up --advertise-exit-node --accept-routes --accept-dns=false 点击/打开终端给的链接，授权登录 不要关闭浏览器，在管理员界面找到这台机器 设置里面关闭登录过期，打开exit node 也可以预设密钥登录 tailscale up --advertise-exit-node --accept-routes --accept-dns=false --authkey=tskey-auth-xxxx NODE01 tailscale up --advertise-routes=192.168.2.32/29 --accept-dns=false --accept-routes --advertise-exit-node NODE02 tailscale up --advertise-exit-node --accept-dns=false --accept-routes --advertise-routes=192.168.1.96/27,192.168.1.128/27,192.168.1.192/27,192.168.1.0/28 ZFS池 参考资料 为新手解释 VDev、zpool、ZIL 和 L2ARC 的幻灯片！ 2023.9 ZFS 能用于数据盘吗？关于 PVE 下 ZFS RAID 等相关 10 个疑问 李守中 Wiki ZFS on Linux 踩坑集 学习笔记 开始 PVE管理界面组ZFS池，选择4块hdd，名称z2pool，RAID级别RAIDZ2，压缩lz4，ashift：12 注，示例池名称为z2pool ZFS 严重依赖内存，因此至少需要 8GB 才能启动 专用缓存和/或日志磁盘，则应使用企业级 SSD。这可以显着提高整体性能。 VM 内安装 Proxmox VE（嵌套虚拟化），请不要对该 VM 的磁盘使用virtio，因为 ZFS 不支持它们。请改用 IDE 或 SCSI（也适用于virtio SCSI 控制器类型） zpool status zfs list zfs get volsize,refreservation,used &lt;pool&gt;/vm-&lt;vmid&gt;-disk-X 阅读手册 man zpool man zfs 限制ZFS内存使用（ARC） 默认情况下， ZFS 将50%的主机内存用于自适应替换缓存(ARC)。为 ARC 分配足够的内存对于 IO 性能至关重要，因此请谨慎减少内存。根据一般经验，至少分配2 GiB Base + 1 GiB/TiB-Storage。例如，如果您有一个具有 8 TiB可用存储空间的池，那么您应该为 ARC使用`10 GiB内存。 您可以通过直接写入zfs_arc_max模块参数来更改当前启动的 ARC 使用限制（重新启动会再次重置此更改）： echo &quot;$[10 * 1024*1024*1024]&quot; &gt;/sys/module/zfs/parameters/zfs_arc_max 要永久更改ARC 限制，请将以下行添加到 /etc/modprobe.d/zfs.conf：（8G) options zfs zfs_arc_max=8589934592 如果您所需的zfs_arc_max值低于或等于 zfs_arc_min（默认为系统内存的 1/32），则zfs_arc_max将被忽略，除非您还将zfs_arc_min设置为最多zfs_arc_max - 1. echo &quot;$[8 * 1024*1024*1024 - 1]&quot; &gt;/sys/module/zfs/parameters/zfs_arc_min echo &quot;$[8 * 1024*1024*1024]&quot; &gt;/sys/module/zfs/parameters/zfs_arc_max 交换分区 SWAP 最好在物理磁盘上创建一个分区并将其用作交换设备，请勿在ZFS上使用swap，BUG 使用fdisk对SSD进行分区 n、1、p、…..w mkswap /dev/nvme1n1p3 swapon /dev/nvme1n1p3 nano /etc/fstab 增加一行 UUID=xxxxx你的UUID swap swap defaults 0 0 修改 swapiness 对于服务器来说，swapiness推荐为 10 临时 sysctl -w vm.swappiness=10 永久 nano /etc/sysctl.conf 增加一行 vm.swappiness = 10 生效 sysctl -p swappiness值 策略 0 内核只会交换以避免内存不足的情况 1 无需完全禁用的最小交换量 10 当系统中有足够的内存时，有时建议使用此值来提高性能 60 默认值 100 内核将积极地交换 举例： 我的笔记本电脑有 16 GB 的内存和 8 GB 的交换空间。如果我在内核参数中使用 60 swappiness，那么在使用大约 6 GB （16G*40% = 6.4G）的内存后，我的机器开始使用交换 ZIL 和 L2ARC 检查nvme状态 适用于转接卡等情况 lspci 获取设备编号，通过编号查询id lspci -n | grep -i 02:00.0 获取硬件id，查看指定PCI设备的带宽 lspci -n -d 144d:a80a -vvv | grep --color Width 例如： Speed 8GT/s, Width x4 Speed 16GT/s, Width x4 使用fdisk对SSD进行分区，请看前文，不再赘述 注：必须使用GPT分区表，不能使用MBR分区表 查看硬盘uuid blkid 或者 lsblk -fl 将 ZIL 镜像添加到池中 ZFS ZIL(SLOG)虽然用起来有写缓存的效果，但 ZIL 不是写缓存 。 ZIL 写入操作全是 4K 写操作，所以 ZFS 搞出了一个 SLOG ( Separate intent LOG ) 组件， SLOG 组件必须是一个独立设备或分区，专门存放 ZIL 数据 。 zpool add z2pool log mirror /dev/disk/by-partuuid/xxxxx你的UUID /dev/disk/by-partuuid/xxxxx你的UUID 将 L2ARC 设备添加到池中 一般建议不超过内存容量*10 zpool add z2pool cache /dev/disk/by-partuuid/xxxxx你的UUID 检查L2ARC持久化 cat /sys/module/zfs/parameters/l2arc_rebuild_enabled 默认值为 1 。 l2arc_rebuild_enabled=1 表示打开 L2ARC 持久化，即重启之后 L2ARC Deivce 中的数据还能用 小技巧 基础 zpool create &lt;pool_name&gt; &lt;pool_type&gt; &lt;device_name&gt; 创建一个存储池。 zpool attach &lt;pool_name&gt; &lt;device_in_pool&gt; &lt;device_name&gt; 向池中添加一个设备使 strip 变成 mirror 。 zpool detach &lt;pool_name&gt; &lt;pool_device_name&gt; 让一个池中的设备脱离池。 zpool remove &lt;pool_name&gt; &lt;pool_device_name&gt; 从一个池中删除一个设备。 zpool offline &lt;pool_name&gt; &lt;device_name&gt; 让一个池中的设备离线。 zpool scrub &lt;pool_name&gt; 同步池中的数据后，检测池中数据的错误并修复。 zpool add &lt;zpool_name&gt; log &lt;device&gt; 给没有 SLOG 设备的池添加一个 SLOG 设备。 zpool attach &lt;zpool_name&gt; &lt;log_device&gt; &lt;device&gt; 向已有一个 SLOG 设备的池添加另一个 SLOG 设备使之互为镜像。 zpool add &lt;zpool_name&gt; log mirror &lt;device_a&gt; &lt;device_b&gt; 直接添加两个互为镜像的 SLOG 设备。 文件系统 请勿直接使用zfs根目录，如/z2pool 创建一个新的文件系统并挂载: zfs create z2pool/docs -o mountpoint=/docs 快照相关 虚拟机快照显示 zfs set snapdev=visible z2pool/vm-303-disk-1 这样可以直接在/dev/zvol/z2pool目录（或/dev/z2pool目录）找到对应的快照，然后方便的通过各种备份工具进行备份，例如restic 创建一个快照 zfs snapshot z2pool/home@tuesday 按日期创建快照 name=`date +&quot;%Y-%m-%d&quot;` zfs snapshot z2pool/home@$name 查看所有快照 zfs list -t snapshot zfs list -t snapshot z2pool/home 回滚到前一个快照 zfs rollback z2pool/home@monday 删除一个快照 zfs destroy -R z2pool/home@monday 重命名快照 zfs rename z2pool/home@version1 z2pool/home@version2 注意: 当一个 dataset 存在快照时，无法直接删除。但可使用 -r 参数强制删除。 zfs destroy -r z2pool/home 克隆 克隆只能从快照中创建，在删除克隆以前，对应的快照无法删除。 zfs clone z2pool/home@monday z2pool/home2 复制 直接复制快照即可 待补充 其他 可通过命令查询文件系统的所有属性 zfs get all z2pool/home 可通过命令查询存储池的所有属性 zpool get all z2pool 查看存储池当前状态和 I/O 状况 zpool status -v zpool iostat 显示存储池所有操作历史记录 zpool history z2pool 开始虚拟机安装 Cloudinit 方式安装 教程贴子：https://gist.github.com/chriswayg/b6421dcc69cb3b7e41f2998f1150e1df 下载镜像：Ubuntu23.04 推荐这个 Debian12 推荐这个 任意地方上传下载的镜像，例如/root/debian-12-genericcloud-amd64.qcow2 除了qm importdisk 其他命令均可用在web界面操作 创建模板 正常方式创建虚拟机 qm create 902 --name debian12-templ --memory 2048 --net0 virtio,bridge=vmbr0 添加cloudinit系统盘 自行确认需要存放虚拟机的位置，示例为local-lvm qm importdisk 902 /root/debian-12-genericcloud-amd64.qcow2 local-lvm 使用cloudinit系统盘 qm set 902 --scsihw virtio-scsi-pci --scsi0 local-lvm:vm-902-disk-0 添加cloudinit设备 qm set 902 --ide2 local-lvm:cloudinit --boot c --bootdisk scsi0 --serial0 socket --vga serial0 增加系统盘空间 qm resize 902 scsi0 +30G 设置网络 qm set 902 --ipconfig0 ip=dhcp qm set 902 --ipconfig0 ip=10.10.10.222/24,gw=10.10.10.1 qm set 902 --ipconfig0 ip=192.168.2.34/24,gw=192.168.2.1,ip6=auto 设置密钥或密码 qm set 902 --sshkey ~/.ssh/id_rsa.pub qm set 902 --cipassword 你的密码 建议直接在web界面设置用户为root或你的用户名 检查设置 qm cloudinit dump 902 user SSH进入VM，按自己的习惯设置 Debian cloudinit换源 nano /etc/apt/mirrors/debian.list nano /etc/apt/mirrors/debian-security.list 分别修改为 https://mirrors.ustc.edu.cn/debian/ https://mirrors.ustc.edu.cn/debian-security/ 换源操作转换为模板后会丢失 阿里源安装docker curl -fsSL https://get.docker.com | bash -s docker --mirror Aliyun 来宾代理 Guest Agent web界面开启QEUM Guest Agent apt install qemu-guest-agent -y 其他 nali q apt install htop cron screen nano -y wget https://conf.totoro.pub/bash/q -O /usr/bin/q wget https://conf.totoro.pub/bash/nali -O /usr/bin/nali chmod +X /usr/bin/q chmod +X /usr/bin/nali chmod 777 /usr/bin/q chmod 777 /usr/bin/nali q www.baidu.com|nali mkdir /data mkdir /data/ssl 特殊的，只在专用服务器设置 curl https://get.acme.sh | sh -s email=my@example.com apt install ufw -y crontab -e 添加我的SSL更新命令 37 7 2 * * wget Update-Url -O xxx.cer 38 7 2 * * wget Update-Url -O xxx.key 47 12 1 * * &quot;/root/.acme.sh&quot;/acme.sh --issue --dns dns_dp --server google --challenge-alias acme.example.com --keylength ec-256 -d example.com -d *.example.com -d *.01.example.com -d *.02.example.com -d *.03.example.com --force 37 13 1 * * &quot;/root/.acme.sh&quot;/acme.sh --install-cert -d example.com --key-file /data/ssl/example.com.key --fullchain-file /data/ssl/example.com.cer poweroff 设置为模板，并通过模板创建虚拟机 qm template 902 qm clone 902 190 --name debian12 qm start 190 调整 VM 磁盘的大小 qm shutdown 190 &amp;&amp; qm wait qm resize 190 scsi0 +8G qm start 190 直接使用ISO安装 Debian ISO 下载 Ubuntu ISO 下载 Windows ISO 下载 第三方精简版： Tiny10 ISO Tiny11 ISO 有用的CDROM GParted Live CD/USB/HD/PXE Bootable Image 分区用 使用IMG安装 OpenWrt 推荐的系统镜像 SuLingGG openwrt-18.06-k5.4 文档 ImmortalWrt OpenWrt官方 在线编译 安装方法 上传你的img，设置好网卡后，正常流程创建虚拟机，导入一下硬盘即可 qm importdisk 100 /var/lib/vz/template/iso/openwrt-xxx.img local-lvm 激活硬盘，即可正常使用 网络配置 正常用户都可以直接web设置这些内容 不正常的用户通过shell修改 修改LAN ipaddr vi /etc/config/network 使用LXC 不推荐使用任何LXC容器 使用Proxmox VE Helper Scripts创建LXC 请先使用软路由保障PVE全局的网络 Plex Media Server bash -c &quot;$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/ct/plex.sh)&quot; Emby Media Server bash -c &quot;$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/ct/emby.sh)&quot; Jellyfin Media Server bash -c &quot;$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/ct/jellyfin.sh)&quot; Nextcloud bash -c &quot;$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/ct/nextcloudpi.sh)&quot; PhotoPrism bash -c &quot;$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/ct/photoprism.sh)&quot; AdGuard Home bash -c &quot;$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/ct/adguard.sh)&quot; Transmission bash -c &quot;$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/ct/transmission.sh)&quot; Vaultwarden bash -c &quot;$(wget -qO - https://github.com/tteck/Proxmox/raw/main/ct/alpine-vaultwarden.sh)&quot; VM使用 数据盘及swap fdisk -l fdisk /dev/sdb n、1、p、…..w mkfs.ext4 /dev/sdb1 mount /dev/sdb1 /data mkswap /dev/sdc swapon /dev/sdc nano /etc/fstab 增加一行 UUID=xxxxx你的UUID swap swap defaults 0 0 UUID=xxxxx你的UUID /data ext4 defaults 0 2 systemctl daemon-reload reboot 检查磁盘挂载情况 df -h 重复一下换源 nano /etc/apt/mirrors/debian.list nano /etc/apt/mirrors/debian-security.list 分别修改为 https://mirrors.ustc.edu.cn/debian/ https://mirrors.ustc.edu.cn/debian-security/ 安装Tailscale curl -fsSL https://tailscale.com/install.sh | sh tailscale up --advertise-exit-node --accept-routes --accept-dns=false 点击/打开终端给的链接，授权登录 不要关闭浏览器，在管理员界面找到这台机器 设置里面关闭登录过期，打开exit node 也可以预设密钥登录 tailscale up --advertise-exit-node --accept-routes --accept-dns=false --authkey=tskey-auth-xxxx 如果是LXC nano /etc/pve/lxc/401.conf 添加 lxc.cgroup2.devices.allow: c 10:200 rwm lxc.mount.entry: /dev/net/tun dev/net/tun none bind,create=file DDNS docker run -d --name ddns-go --restart=always --net=host -v /opt/ddns-go:/root jeessy/ddns-go:latest web访问ip:9876，配置密钥 Plex wget xxx # https://www.plex.tv/media-server-downloads/ dpkg -i plexmediaserver_1.32.6.7557-1cf77d501_amd64.deb systemctl status plexmediaserver.service docker run -d \ --name plex \ --network=host \ -e TZ=&quot;Asia/Shanghai&quot; \ -e PLEX_CLAIM=&quot;claim-xxx&quot; \ -v /data/plexconfig:/config \ -v /data/plextranscode:/transcode \ -v /data/plexmedia:/data \ plexinc/pms-docker 其他 ShellClash Clash.Meta 常用命令 zfs list zpool status zpool iostat -v 1 rsync -aiv --progress /mnt/usb/ /data/xxx/xxx pct set 401 -mp0 /data/archive,mp=/archive SeafilePro Pro版本3用户以内免费，部署方式查看官方中文教程 官方英文教程【推荐】 命令行客户端 wget https://linux-clients.seafile.com/seafile.asc -O /usr/share/keyrings/seafile-keyring.asc echo &quot;deb [arch=amd64 signed-by=/usr/share/keyrings/seafile-keyring.asc] https://linux-clients.seafile.com/seafile-deb/$(lsb_release -cs)/ stable main&quot; | sudo tee /etc/apt/sources.list.d/seafile.list &gt; /dev/null apt update apt install seafile-cli -y mkdir /data/seafile-client seaf-cli init -d /data/seafile-client seaf-cli start seaf-cli sync -l &quot;the id of the library&quot; -s &quot;the url + port of server&quot; -d &quot;the folder which the library will be synced with&quot; -u &quot;username on server&quot; [-p &quot;password&quot;] seaf-cli status seaf-cli list DEBUG docker-compose logs -f --tail 10 BUG示例 seafile-mysql | 2077-77-77 77:77:77 3064 [ERROR] Incorrect definition of table mysql.column_stats: expected column &#39;hist_type&#39; at position 9 to have type enum(&#39;SINGLE_PREC_HB&#39;,&#39;DOUBLE_PREC_HB&#39;,&#39;JSON_HB&#39;), found type enum(&#39;SINGLE_PREC_HB&#39;,&#39;DOUBLE_PREC_HB&#39;). seafile-mysql | 2077-77-77 77:77:77 3064 [ERROR] Incorrect definition of table mysql.column_stats: expected column &#39;histogram&#39; at position 10 to have type longblob, found type varbinary(255). 解决办法 docker exec -it seafile-mysql bash mysql_upgrade --user=root --password=xxxx exit docker-compose down docker-compose up -d BUG示例2 seaf-cli status Traceback (most recent call last): File &quot;/usr/lib/python3/dist-packages/pysearpc/named_pipe.py&quot;, line 85, in _get_transport transport = self._pool.get(False) 解决办法 seaf-cli start 一劳永逸 加入开机启动 nano /etc/systemd/system/seafile.service [Unit] Description=seafile [Service] Type=oneshot ExecStart=/usr/bin/seaf-cli start [Install] WantedBy=multi-user.target systemctl daemon-reload systemctl enable seafile.service" />
+<meta property="og:description" content="旧机器的性能太差了，正好淘汰了一台电脑，改成PVE了 引 - 全新PVE宿主机，写个自己的小Tips Docker不得在宿主机及LXC上安装 vm全部使用cloudimg构建 UFW安装在对外的服务器上 数据盘4块HC550 16T 组建ZFS存储池RaidZ-2 每个VM安装不再安装Tailscale、zerotier、frpc、CFtunnel 独立的swap硬盘用于各VM，及PVE（宿主机64G，UFW 16G，Seafile 16G，Mt-photo 16G） 独立的固态用于PVE安装 参考资料 国光的 PVE 环境搭建教程 N5105 Proxmox VE (PVE) 主页添加温度硬盘等信息 开始安装系统 官方网站下载ISO，用ventoy制作启动工具，插上网线再开机（键盘和显示器是必须的），根据引导走完全部流程 系统盘请使用ext4格式，避免问题 swap设置为0G，后期自行添加专用swap硬盘，减少系统盘的磨损 在tabby添加配置（直连和转发） 特殊情况 DEBUG 网络故障/pcie插拔 键盘、屏幕连接好后 ip a 或者 ip addr 查看一下网卡是什么，例如：enp8s0 nano /etc/network/interfaces 修改网卡 宿主机重启后VM内开机启动程序未启动 PVE开机后重新启动 nano /etc/systemd/system/vmreboot.service [Unit] Description=VM reboot [Service] 待更新 qm stop 202 qm status 202 qm start 202 [Install] WantedBy=multi-user.target systemctl daemon-reload systemctl enable vmreboot.service 硬盘空间不足 unable to initialize physical volume /dev/nvmeon1p3 分区时硬盘总容量选择小几个GB即可 Proxmox VE 8 换源 注1：在前面加#注释掉全部内容，添加以下内容 注2：Ctrl + O 保存，Ctrl + X 退出 nano /etc/apt/sources.list deb https://mirrors.ustc.edu.cn/debian/ bookworm main non-free non-free-firmware contrib deb-src https://mirrors.ustc.edu.cn/debian/ bookworm main non-free non-free-firmware contrib deb https://mirrors.ustc.edu.cn/debian-security/ bookworm-security main deb-src https://mirrors.ustc.edu.cn/debian-security/ bookworm-security main deb https://mirrors.ustc.edu.cn/debian/ bookworm-updates main non-free non-free-firmware contrib deb-src https://mirrors.ustc.edu.cn/debian/ bookworm-updates main non-free non-free-firmware contrib deb https://mirrors.ustc.edu.cn/debian/ bookworm-backports main non-free non-free-firmware contrib deb-src https://mirrors.ustc.edu.cn/debian/ bookworm-backports main non-free non-free-firmware contrib 或者: sed -i &#39;s|http://deb.debian.org/debian|https://mirrors.ustc.edu.cn/debian|g&#39; /etc/apt/sources.list sed -i &#39;s|http://security.debian.org/debian|https://mirrors.ustc.edu.cn/debian|g&#39; /etc/apt/sources.list nano /etc/apt/sources.list.d/pve-enterprise.list deb https://mirrors.ustc.edu.cn/proxmox/debian bookworm pve-no-subscription nano /etc/apt/sources.list.d/ceph.list deb https://mirrors.ustc.edu.cn/proxmox/debian/ceph-quincy bookworm no-subscription apt update 更新 LXC（CT Template）源 sed -i &#39;s|http://download.proxmox.com|https://mirrors.tuna.tsinghua.edu.cn/proxmox|g&#39; /usr/share/perl5/PVE/APLInfo.pm systemctl restart pvedaemon.service 直通 / 开启 IOMMU 和 SR-IOV 默认大家BIOS设置好啦，新机器请看这个教程 nano /etc/default/grub 修改GRUB_CMDLINE_LINUX_DEFAULT字段 Intel GRUB_CMDLINE_LINUX_DEFAULT=&quot;quiet intel_iommu=on iommu=pt textonly nomodeset nofb pci=noaer pcie_acs_override=downstream,multifunction&quot; AMD GRUB_CMDLINE_LINUX_DEFAULT=&quot;quiet amd_iommu=on iommu=pt textonly nomodeset nofb pci=noaer pcie_acs_override=downstream,multifunction&quot; update-grub &amp;&amp; reboot 带显卡直通看这个教程 个性化配置 自定义pveproxy web界面（非必须，just好看） 删除订阅弹窗 sed -Ezi.bak &quot;s/(Ext.Msg.show\(\{\s+title: gettext\(&#39;No valid sub)/void\(\{ \/\/\1/g&quot; /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js systemctl restart pveproxy.service 首页显示 CPU、主板、NVME、硬盘 温度等信息 apt update apt install lm-sensors patch -y sensors-detect 全部回车 chmod +s /usr/sbin/smartctl export LC_ALL=en_US.UTF-8 sensors reboot 懒人一键教程 看一下自己几个NVME smartctl -a -j /dev/nvme? 看一下自己几个硬盘 smartctl -a -j /dev/sd? nano /usr/share/perl5/PVE/API2/Nodes.pm Ctrl + w 搜索shared =&gt; $meminfo-&gt;{memshared} 在该段结束后（；为结束）换行添加（记得tab一下对齐） $res-&gt;{sensinfo} = `sensors`; $res-&gt;{cpusensors} = `lscpu | grep MHz`; $res-&gt;{smartctl_nvme0_json} = `smartctl -a -j /dev/nvme0`; $res-&gt;{smartctl_nvme1_json} = `smartctl -a -j /dev/nvme1`; $res-&gt;{smartctl_nvme2_json} = `smartctl -a -j /dev/nvme2`; $res-&gt;{smartctl_hdd1_json} = `smartctl -a -j /dev/sda`; $res-&gt;{smartctl_hdd2_json} = `smartctl -a -j /dev/sdb`; $res-&gt;{smartctl_hdd3_json} = `smartctl -a -j /dev/sdc`; $res-&gt;{smartctl_hdd4_json} = `smartctl -a -j /dev/sdd`; 注：该示例为3块nvme + 4块硬盘 nano /usr/share/pve-manager/js/pvemanagerlib.js 建议使用winscp打开，notepad++编辑 搜索 PVE Manager Version新版本为Manager Version 旧的配置1 { itemId: &#39;sensinfo&#39;, colspan: 2, printBar: false, title: gettext(&#39;CPU温度&#39;), textField: &#39;sensinfo&#39;, renderer:function(value){ const c0 = value.match(/Core 0.*?\+([\d\.]+)?/)[1]; const c1 = value.match(/Core 1.*?\+([\d\.]+)?/)[1]; const c2 = value.match(/Core 2.*?\+([\d\.]+)?/)[1]; const c3 = value.match(/Core 3.*?\+([\d\.]+)?/)[1]; const c4 = value.match(/Core 4.*?\+([\d\.]+)?/)[1]; const c5 = value.match(/Core 5.*?\+([\d\.]+)?/)[1]; const p0 = value.match(/Package id 0.*?\+([\d\.]+)?/)[1]; const b0 = value.match(/temp1.*?\+([\d\.]+)?/)[1]; return `表面: ${p0} ℃ | 核心: ${c0}|${c1}|${c2}|${c3}|${c4}|${c5} ℃ | 主板: ${b0} ℃` } }, { itemId: &#39;MHz&#39;, colspan: 2, printBar: false, title: gettext(&#39;CPU频率&#39;), textField: &#39;cpusensors&#39;, renderer:function(value){ const f0 = value.match(/CPU.*scaling MHz.*?([\d]+)/)[1]; const f1 = value.match(/CPU min MHz.*?([\d]+)/)[1]; const f2 = value.match(/CPU max MHz.*?([\d]+)/)[1]; const f3 = f0*f2/100; return `实时: ${f3} MHz(${f0}%) | 最小: ${f1} MHz | 最大: ${f2} MHz ` } }, { itemId: &#39;nvme_ssd0&#39;, colspan: 2, printBar: false, title: gettext(&#39;NVME槽0：pcie槽转接&#39;), textField: &#39;smartctl_nvme0_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var percentage_used = &#39; | 使用寿命: &#39; + value[&#39;nvme_smart_health_information_log&#39;][&#39;percentage_used&#39;].toFixed(0) + &#39;% &#39;;} catch(e) {var percentage_used = &#39;&#39;;} try {var data_units_read = value[&#39;nvme_smart_health_information_log&#39;][&#39;data_units_read&#39;]*512/1024/1024;var data_units_read = &#39;(读: &#39; + data_units_read.toFixed(2) + &#39;GB, &#39;;} catch(e) {var data_units_read = &#39;&#39;;} try {var data_units_written = value[&#39;nvme_smart_health_information_log&#39;][&#39;data_units_written&#39;]*512/1024/1024;var data_units_written = &#39;写: &#39; + data_units_written.toFixed(2) + &#39;GB)&#39;;} catch(e) {var data_units_written = &#39;&#39;;} try {var power_on_time = &#39; | 通电: &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | 温度: &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${percentage_used}${data_units_read}${data_units_written}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, { itemId: &#39;nvme_ssd1&#39;, colspan: 2, printBar: false, title: gettext(&#39;NVME槽1：主板正面pcie4.0&#39;), textField: &#39;smartctl_nvme1_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var percentage_used = &#39; | 使用寿命: &#39; + value[&#39;nvme_smart_health_information_log&#39;][&#39;percentage_used&#39;].toFixed(0) + &#39;% &#39;;} catch(e) {var percentage_used = &#39;&#39;;} try {var data_units_read = value[&#39;nvme_smart_health_information_log&#39;][&#39;data_units_read&#39;]*512/1024/1024;var data_units_read = &#39;(读: &#39; + data_units_read.toFixed(2) + &#39;GB, &#39;;} catch(e) {var data_units_read = &#39;&#39;;} try {var data_units_written = value[&#39;nvme_smart_health_information_log&#39;][&#39;data_units_written&#39;]*512/1024/1024;var data_units_written = &#39;写: &#39; + data_units_written.toFixed(2) + &#39;GB)&#39;;} catch(e) {var data_units_written = &#39;&#39;;} try {var power_on_time = &#39; | 通电: &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | 温度: &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${percentage_used}${data_units_read}${data_units_written}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, { itemId: &#39;nvme_ssd2&#39;, colspan: 2, printBar: false, title: gettext(&#39;NVME槽2：主板背面pcie3.0&#39;), textField: &#39;smartctl_nvme2_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var percentage_used = &#39; | 使用寿命: &#39; + value[&#39;nvme_smart_health_information_log&#39;][&#39;percentage_used&#39;].toFixed(0) + &#39;% &#39;;} catch(e) {var percentage_used = &#39;&#39;;} try {var data_units_read = value[&#39;nvme_smart_health_information_log&#39;][&#39;data_units_read&#39;]*512/1024/1024;var data_units_read = &#39;(读: &#39; + data_units_read.toFixed(2) + &#39;GB, &#39;;} catch(e) {var data_units_read = &#39;&#39;;} try {var data_units_written = value[&#39;nvme_smart_health_information_log&#39;][&#39;data_units_written&#39;]*512/1024/1024;var data_units_written = &#39;写: &#39; + data_units_written.toFixed(2) + &#39;GB)&#39;;} catch(e) {var data_units_written = &#39;&#39;;} try {var power_on_time = &#39; | 通电: &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | 温度: &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${percentage_used}${data_units_read}${data_units_written}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, { itemId: &#39;hdd_sda&#39;, colspan: 2, printBar: false, title: gettext(&#39;机械硬盘sda&#39;), textField: &#39;smartctl_hdd1_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var serial_number = &#39; | 序列号: &#39; + value[&#39;serial_number&#39;];} catch(e) {var serial_number = &#39;&#39;;} try {var power_cycle_count = &#39; | 通电: &#39; + value[&#39;power_cycle_count&#39;] + &#39;次&#39;;} catch(e) {var power_cycle_count = &#39;&#39;;} try {var power_on_time = &#39; | 通电: &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | 温度: &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${serial_number}${power_cycle_count}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, { itemId: &#39;hdd_sdb&#39;, colspan: 2, printBar: false, title: gettext(&#39;机械硬盘sdb&#39;), textField: &#39;smartctl_hdd2_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var serial_number = &#39; | 序列号: &#39; + value[&#39;serial_number&#39;];} catch(e) {var serial_number = &#39;&#39;;} try {var power_cycle_count = &#39; | 通电: &#39; + value[&#39;power_cycle_count&#39;] + &#39;次&#39;;} catch(e) {var power_cycle_count = &#39;&#39;;} try {var power_on_time = &#39; | 通电: &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | 温度: &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${serial_number}${power_cycle_count}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, { itemId: &#39;hdd_sdc&#39;, colspan: 2, printBar: false, title: gettext(&#39;机械硬盘sdc&#39;), textField: &#39;smartctl_hdd3_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var serial_number = &#39; | 序列号: &#39; + value[&#39;serial_number&#39;];} catch(e) {var serial_number = &#39;&#39;;} try {var power_cycle_count = &#39; | 通电: &#39; + value[&#39;power_cycle_count&#39;] + &#39;次&#39;;} catch(e) {var power_cycle_count = &#39;&#39;;} try {var power_on_time = &#39; | 通电: &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | 温度: &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${serial_number}${power_cycle_count}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, { itemId: &#39;hdd_sdd&#39;, colspan: 2, printBar: false, title: gettext(&#39;机械硬盘sdd&#39;), textField: &#39;smartctl_hdd4_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var serial_number = &#39; | 序列号: &#39; + value[&#39;serial_number&#39;];} catch(e) {var serial_number = &#39;&#39;;} try {var power_cycle_count = &#39; | 通电: &#39; + value[&#39;power_cycle_count&#39;] + &#39;次&#39;;} catch(e) {var power_cycle_count = &#39;&#39;;} try {var power_on_time = &#39; | 通电: &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | 温度: &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${serial_number}${power_cycle_count}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, 现在使用配置2 { itemId: &#39;sensinfo&#39;, colspan: 2, printBar: false, title: gettext(&#39;CPU温度&#39;), textField: &#39;sensinfo&#39;, renderer:function(value){ const c0 = value.match(/Core 0.*?\+([\d\.]+)?/)[1]; const c1 = value.match(/Core 1.*?\+([\d\.]+)?/)[1]; const c2 = value.match(/Core 2.*?\+([\d\.]+)?/)[1]; const c3 = value.match(/Core 3.*?\+([\d\.]+)?/)[1]; const c4 = value.match(/Core 4.*?\+([\d\.]+)?/)[1]; const c5 = value.match(/Core 5.*?\+([\d\.]+)?/)[1]; const p0 = value.match(/Package id 0.*?\+([\d\.]+)?/)[1]; const b0 = value.match(/temp1.*?\+([\d\.]+)?/)[1]; return `表面: ${p0} ℃ | 核心: ${c0}|${c1}|${c2}|${c3}|${c4}|${c5} ℃ | 主板: ${b0} ℃` } }, { itemId: &#39;MHz&#39;, colspan: 2, printBar: false, title: gettext(&#39;CPU频率&#39;), textField: &#39;cpusensors&#39;, renderer:function(value){ const f0 = value.match(/CPU.*scaling MHz.*?([\d]+)/)[1]; const f1 = value.match(/CPU min MHz.*?([\d]+)/)[1]; const f2 = value.match(/CPU max MHz.*?([\d]+)/)[1]; const f3 = f0*f2/100; return `实时: ${f3} MHz(${f0}%) | 最小: ${f1} MHz | 最大: ${f2} MHz ` } }, { itemId: &#39;nvme_ssd0&#39;, colspan: 2, printBar: false, title: gettext(&#39;/dev/nvme0&#39;), textField: &#39;smartctl_nvme0_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var percentage_used = &#39; | 磨损: &#39; + value[&#39;nvme_smart_health_information_log&#39;][&#39;percentage_used&#39;].toFixed(0) + &#39;% &#39;;} catch(e) {var percentage_used = &#39;&#39;;} try {var data_units_read = value[&#39;nvme_smart_health_information_log&#39;][&#39;data_units_read&#39;]*512/1024/1024/1024;var data_units_read = &#39;(读: &#39; + data_units_read.toFixed(2) + &#39;TB, &#39;;} catch(e) {var data_units_read = &#39;&#39;;} try {var data_units_written = value[&#39;nvme_smart_health_information_log&#39;][&#39;data_units_written&#39;]*512/1024/1024/1024;var data_units_written = &#39;写: &#39; + data_units_written.toFixed(2) + &#39;TB)&#39;;} catch(e) {var data_units_written = &#39;&#39;;} try {var power_on_time = &#39; | &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${percentage_used}${data_units_read}${data_units_written}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, { itemId: &#39;nvme_ssd1&#39;, colspan: 2, printBar: false, title: gettext(&#39;/dev/nvme1&#39;), textField: &#39;smartctl_nvme1_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var percentage_used = &#39; | 磨损: &#39; + value[&#39;nvme_smart_health_information_log&#39;][&#39;percentage_used&#39;].toFixed(0) + &#39;% &#39;;} catch(e) {var percentage_used = &#39;&#39;;} try {var data_units_read = value[&#39;nvme_smart_health_information_log&#39;][&#39;data_units_read&#39;]*512/1024/1024/1024;var data_units_read = &#39;(读: &#39; + data_units_read.toFixed(2) + &#39;TB, &#39;;} catch(e) {var data_units_read = &#39;&#39;;} try {var data_units_written = value[&#39;nvme_smart_health_information_log&#39;][&#39;data_units_written&#39;]*512/1024/1024/1024;var data_units_written = &#39;写: &#39; + data_units_written.toFixed(2) + &#39;TB)&#39;;} catch(e) {var data_units_written = &#39;&#39;;} try {var power_on_time = &#39; | &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${percentage_used}${data_units_read}${data_units_written}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, { itemId: &#39;nvme_ssd2&#39;, colspan: 2, printBar: false, title: gettext(&#39;/dev/nvme2&#39;), textField: &#39;smartctl_nvme2_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var percentage_used = &#39; | 磨损: &#39; + value[&#39;nvme_smart_health_information_log&#39;][&#39;percentage_used&#39;].toFixed(0) + &#39;% &#39;;} catch(e) {var percentage_used = &#39;&#39;;} try {var data_units_read = value[&#39;nvme_smart_health_information_log&#39;][&#39;data_units_read&#39;]*512/1024/1024/1024;var data_units_read = &#39;(读: &#39; + data_units_read.toFixed(2) + &#39;TB, &#39;;} catch(e) {var data_units_read = &#39;&#39;;} try {var data_units_written = value[&#39;nvme_smart_health_information_log&#39;][&#39;data_units_written&#39;]*512/1024/1024/1024;var data_units_written = &#39;写: &#39; + data_units_written.toFixed(2) + &#39;TB)&#39;;} catch(e) {var data_units_written = &#39;&#39;;} try {var power_on_time = &#39; | &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${percentage_used}${data_units_read}${data_units_written}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, { itemId: &#39;hdd_sda&#39;, colspan: 2, printBar: false, title: gettext(&#39;/dev/sda&#39;), textField: &#39;smartctl_hdd1_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var serial_number = &#39; | 序列号: &#39; + value[&#39;serial_number&#39;];} catch(e) {var serial_number = &#39;&#39;;} try {var power_cycle_count = &#39; | &#39; + value[&#39;power_cycle_count&#39;] + &#39;次&#39;;} catch(e) {var power_cycle_count = &#39;&#39;;} try {var power_on_time = &#39; | &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${serial_number}${power_cycle_count}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, { itemId: &#39;hdd_sdb&#39;, colspan: 2, printBar: false, title: gettext(&#39;/dev/sdb&#39;), textField: &#39;smartctl_hdd2_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var serial_number = &#39; | 序列号: &#39; + value[&#39;serial_number&#39;];} catch(e) {var serial_number = &#39;&#39;;} try {var power_cycle_count = &#39; | &#39; + value[&#39;power_cycle_count&#39;] + &#39;次&#39;;} catch(e) {var power_cycle_count = &#39;&#39;;} try {var power_on_time = &#39; | &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${serial_number}${power_cycle_count}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, { itemId: &#39;hdd_sdc&#39;, colspan: 2, printBar: false, title: gettext(&#39;/dev/sdc&#39;), textField: &#39;smartctl_hdd3_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var serial_number = &#39; | 序列号: &#39; + value[&#39;serial_number&#39;];} catch(e) {var serial_number = &#39;&#39;;} try {var power_cycle_count = &#39; | &#39; + value[&#39;power_cycle_count&#39;] + &#39;次&#39;;} catch(e) {var power_cycle_count = &#39;&#39;;} try {var power_on_time = &#39; | &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${serial_number}${power_cycle_count}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, { itemId: &#39;hdd_sdd&#39;, colspan: 2, printBar: false, title: gettext(&#39;/dev/sdd&#39;), textField: &#39;smartctl_hdd4_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var serial_number = &#39; | 序列号: &#39; + value[&#39;serial_number&#39;];} catch(e) {var serial_number = &#39;&#39;;} try {var power_cycle_count = &#39; | &#39; + value[&#39;power_cycle_count&#39;] + &#39;次&#39;;} catch(e) {var power_cycle_count = &#39;&#39;;} try {var power_on_time = &#39; | &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${serial_number}${power_cycle_count}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, 注：该示例为6核心 NUC配置 { itemId: &#39;sensinfo&#39;, colspan: 2, printBar: false, title: gettext(&#39;CPU温度&#39;), textField: &#39;sensinfo&#39;, renderer:function(value){ const c0 = value.match(/Core 0.*?\+([\d\.]+)?/)[1]; const c1 = value.match(/Core 1.*?\+([\d\.]+)?/)[1]; const c2 = value.match(/Core 2.*?\+([\d\.]+)?/)[1]; const c3 = value.match(/Core 3.*?\+([\d\.]+)?/)[1]; const p0 = value.match(/Package id 0.*?\+([\d\.]+)?/)[1]; const b0 = value.match(/temp1.*?\+([\d\.]+)?/)[1]; return `表面: ${p0} ℃ | 核心: ${c0}|${c1}|${c2}|${c3} ℃ | 主板: ${b0} ℃` } }, { itemId: &#39;MHz&#39;, colspan: 2, printBar: false, title: gettext(&#39;CPU频率&#39;), textField: &#39;cpusensors&#39;, renderer:function(value){ const f0 = value.match(/CPU.*scaling MHz.*?([\d]+)/)[1]; const f1 = value.match(/CPU min MHz.*?([\d]+)/)[1]; const f2 = value.match(/CPU max MHz.*?([\d]+)/)[1]; const f3 = f0*f2/100; return `实时: ${f3} MHz(${f0}%) | 最小: ${f1} MHz | 最大: ${f2} MHz ` } }, { itemId: &#39;nvme_ssd0&#39;, colspan: 2, printBar: false, title: gettext(&#39;/dev/nvme0&#39;), textField: &#39;smartctl_nvme0_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var percentage_used = &#39; | 磨损: &#39; + value[&#39;nvme_smart_health_information_log&#39;][&#39;percentage_used&#39;].toFixed(0) + &#39;% &#39;;} catch(e) {var percentage_used = &#39;&#39;;} try {var data_units_read = value[&#39;nvme_smart_health_information_log&#39;][&#39;data_units_read&#39;]*512/1024/1024/1024;var data_units_read = &#39;(读: &#39; + data_units_read.toFixed(2) + &#39;TB, &#39;;} catch(e) {var data_units_read = &#39;&#39;;} try {var data_units_written = value[&#39;nvme_smart_health_information_log&#39;][&#39;data_units_written&#39;]*512/1024/1024/1024;var data_units_written = &#39;写: &#39; + data_units_written.toFixed(2) + &#39;TB)&#39;;} catch(e) {var data_units_written = &#39;&#39;;} try {var power_on_time = &#39; | &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${percentage_used}${data_units_read}${data_units_written}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, { itemId: &#39;ssd_sda&#39;, colspan: 2, printBar: false, title: gettext(&#39;/dev/sda&#39;), textField: &#39;smartctl_hdd1_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var serial_number = &#39; | 序列号: &#39; + value[&#39;serial_number&#39;];} catch(e) {var serial_number = &#39;&#39;;} try {var power_on_time = &#39; | &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${serial_number}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, 搜索widget.pveNodeStatus 将 height: 300 （默认值） 改大为 420，或者更大，然后保存（每多一行大概增大 20~25） systemctl restart pveproxy.service 检查WEB界面是否正常显示 powersave模式 默认使用高性能模式，切换为低性能模式 查看支持的 CPU 电源模式 cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_governors 只有两种结果powersave、performance为intel pstate 受害者 查看当前的 CPU 电源模式 cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor apt install linux-cpupower -y cpupower -c all frequency-info cpupower -c all frequency-set -g powersave 持久化 / cpupower开机启动 nano /etc/systemd/system/cpupower.service [Unit] Description=CPU powersave [Service] Type=oneshot ExecStart=/usr/bin/cpupower frequency-set -g powersave [Install] WantedBy=multi-user.target systemctl daemon-reload systemctl enable cpupower.service APC UPS 连接 apt-get install apcupsd nano /etc/apcupsd/apcupsd.conf 必要的配置： 在 UPSNAME 后面给个易懂的名字 在 UPSCABLE 后指定为 usb 在 UPSTYPE 后更改为 usb 在 DEVICE 后为空，这样系统便会自动检测 USB 连接 UPS 其他的随便找个教程即可，注意：关机触发条件，有剩余电量和剩余时间，默认为5%和3分钟。注意这里只要满足其中任一条件便会触发 nano /etc/default/apcupsd ISCONFIGURED=no 更改为 yes 任何教程都没提，太坑了！来源 /etc/init.d/apcupsd restart systemctl enable apcupsd.service systemctl status apcupsd.service 查看ups运行状态 apcaccess 安装Tailscale curl -fsSL https://tailscale.com/install.sh | sh tailscale up --advertise-exit-node --accept-routes --accept-dns=false 点击/打开终端给的链接，授权登录 不要关闭浏览器，在管理员界面找到这台机器 设置里面关闭登录过期，打开exit node 也可以预设密钥登录 tailscale up --advertise-exit-node --accept-routes --accept-dns=false --authkey=tskey-auth-xxxx NODE01 tailscale up --advertise-routes=192.168.2.32/29 --accept-dns=false --accept-routes --advertise-exit-node NODE02 tailscale up --advertise-exit-node --accept-dns=false --accept-routes --advertise-routes=192.168.1.96/27,192.168.1.128/27,192.168.1.192/27,192.168.1.0/28 ZFS池 参考资料 为新手解释 VDev、zpool、ZIL 和 L2ARC 的幻灯片！ 2023.9 ZFS 能用于数据盘吗？关于 PVE 下 ZFS RAID 等相关 10 个疑问 李守中 Wiki ZFS on Linux 踩坑集 学习笔记 开始 PVE管理界面组ZFS池，选择4块hdd，名称z2pool，RAID级别RAIDZ2，压缩lz4，ashift：12 注，示例池名称为z2pool ZFS 严重依赖内存，因此至少需要 8GB 才能启动 专用缓存和/或日志磁盘，则应使用企业级 SSD。这可以显着提高整体性能。 VM 内安装 Proxmox VE（嵌套虚拟化），请不要对该 VM 的磁盘使用virtio，因为 ZFS 不支持它们。请改用 IDE 或 SCSI（也适用于virtio SCSI 控制器类型） zpool status zfs list zfs get volsize,refreservation,used &lt;pool&gt;/vm-&lt;vmid&gt;-disk-X 阅读手册 man zpool man zfs 限制ZFS内存使用（ARC） 默认情况下， ZFS 将50%的主机内存用于自适应替换缓存(ARC)。为 ARC 分配足够的内存对于 IO 性能至关重要，因此请谨慎减少内存。根据一般经验，至少分配2 GiB Base + 1 GiB/TiB-Storage。例如，如果您有一个具有 8 TiB可用存储空间的池，那么您应该为 ARC使用`10 GiB内存。 您可以通过直接写入zfs_arc_max模块参数来更改当前启动的 ARC 使用限制（重新启动会再次重置此更改）： echo &quot;$[10 * 1024*1024*1024]&quot; &gt;/sys/module/zfs/parameters/zfs_arc_max 要永久更改ARC 限制，请将以下行添加到 /etc/modprobe.d/zfs.conf：（8G) options zfs zfs_arc_max=8589934592 如果您所需的zfs_arc_max值低于或等于 zfs_arc_min（默认为系统内存的 1/32），则zfs_arc_max将被忽略，除非您还将zfs_arc_min设置为最多zfs_arc_max - 1. echo &quot;$[8 * 1024*1024*1024 - 1]&quot; &gt;/sys/module/zfs/parameters/zfs_arc_min echo &quot;$[8 * 1024*1024*1024]&quot; &gt;/sys/module/zfs/parameters/zfs_arc_max 交换分区 SWAP 最好在物理磁盘上创建一个分区并将其用作交换设备，请勿在ZFS上使用swap，BUG 使用fdisk对SSD进行分区 n、1、p、…..w mkswap /dev/nvme1n1p3 swapon /dev/nvme1n1p3 nano /etc/fstab 增加一行 UUID=xxxxx你的UUID swap swap defaults 0 0 修改 swapiness 对于服务器来说，swapiness推荐为 10 临时 sysctl -w vm.swappiness=10 永久 nano /etc/sysctl.conf 增加一行 vm.swappiness = 10 生效 sysctl -p swappiness值 策略 0 内核只会交换以避免内存不足的情况 1 无需完全禁用的最小交换量 10 当系统中有足够的内存时，有时建议使用此值来提高性能 60 默认值 100 内核将积极地交换 举例： 我的笔记本电脑有 16 GB 的内存和 8 GB 的交换空间。如果我在内核参数中使用 60 swappiness，那么在使用大约 6 GB （16G*40% = 6.4G）的内存后，我的机器开始使用交换 ZIL 和 L2ARC 检查nvme状态 适用于转接卡等情况 lspci 获取设备编号，通过编号查询id lspci -n | grep -i 02:00.0 获取硬件id，查看指定PCI设备的带宽 lspci -n -d 144d:a80a -vvv | grep --color Width 例如： Speed 8GT/s, Width x4 Speed 16GT/s, Width x4 使用fdisk对SSD进行分区，请看前文，不再赘述 注：必须使用GPT分区表，不能使用MBR分区表 查看硬盘uuid blkid 或者 lsblk -fl 将 ZIL 镜像添加到池中 ZFS ZIL(SLOG)虽然用起来有写缓存的效果，但 ZIL 不是写缓存 。 ZIL 写入操作全是 4K 写操作，所以 ZFS 搞出了一个 SLOG ( Separate intent LOG ) 组件， SLOG 组件必须是一个独立设备或分区，专门存放 ZIL 数据 。 zpool add z2pool log mirror /dev/disk/by-partuuid/xxxxx你的UUID /dev/disk/by-partuuid/xxxxx你的UUID 将 L2ARC 设备添加到池中 一般建议不超过内存容量*10 zpool add z2pool cache /dev/disk/by-partuuid/xxxxx你的UUID 检查L2ARC持久化 cat /sys/module/zfs/parameters/l2arc_rebuild_enabled 默认值为 1 。 l2arc_rebuild_enabled=1 表示打开 L2ARC 持久化，即重启之后 L2ARC Deivce 中的数据还能用 小技巧 基础 zpool create &lt;pool_name&gt; &lt;pool_type&gt; &lt;device_name&gt; 创建一个存储池。 zpool attach &lt;pool_name&gt; &lt;device_in_pool&gt; &lt;device_name&gt; 向池中添加一个设备使 strip 变成 mirror 。 zpool detach &lt;pool_name&gt; &lt;pool_device_name&gt; 让一个池中的设备脱离池。 zpool remove &lt;pool_name&gt; &lt;pool_device_name&gt; 从一个池中删除一个设备。 zpool offline &lt;pool_name&gt; &lt;device_name&gt; 让一个池中的设备离线。 zpool scrub &lt;pool_name&gt; 同步池中的数据后，检测池中数据的错误并修复。 zpool add &lt;zpool_name&gt; log &lt;device&gt; 给没有 SLOG 设备的池添加一个 SLOG 设备。 zpool attach &lt;zpool_name&gt; &lt;log_device&gt; &lt;device&gt; 向已有一个 SLOG 设备的池添加另一个 SLOG 设备使之互为镜像。 zpool add &lt;zpool_name&gt; log mirror &lt;device_a&gt; &lt;device_b&gt; 直接添加两个互为镜像的 SLOG 设备。 文件系统 请勿直接使用zfs根目录，如/z2pool 创建一个新的文件系统并挂载: zfs create z2pool/docs -o mountpoint=/docs 快照相关 虚拟机快照显示 zfs set snapdev=visible z2pool/vm-303-disk-1 这样可以直接在/dev/zvol/z2pool目录（或/dev/z2pool目录）找到对应的快照，然后方便的通过各种备份工具进行备份，例如restic 创建一个快照 zfs snapshot z2pool/home@tuesday 按日期创建快照 name=`date +&quot;%Y-%m-%d&quot;` zfs snapshot z2pool/home@$name 查看所有快照 zfs list -t snapshot zfs list -t snapshot z2pool/home 回滚到前一个快照 zfs rollback z2pool/home@monday 删除一个快照 zfs destroy -R z2pool/home@monday 重命名快照 zfs rename z2pool/home@version1 z2pool/home@version2 注意: 当一个 dataset 存在快照时，无法直接删除。但可使用 -r 参数强制删除。 zfs destroy -r z2pool/home 克隆 克隆只能从快照中创建，在删除克隆以前，对应的快照无法删除。 zfs clone z2pool/home@monday z2pool/home2 复制 直接复制快照即可 待补充 其他 可通过命令查询文件系统的所有属性 zfs get all z2pool/home 可通过命令查询存储池的所有属性 zpool get all z2pool 查看存储池当前状态和 I/O 状况 zpool status -v zpool iostat 显示存储池所有操作历史记录 zpool history z2pool 开始虚拟机安装 Cloudinit 方式安装 教程贴子：https://gist.github.com/chriswayg/b6421dcc69cb3b7e41f2998f1150e1df 下载镜像：Ubuntu23.04 推荐这个 Debian12 推荐这个 任意地方上传下载的镜像，例如/root/debian-12-genericcloud-amd64.qcow2 除了qm importdisk 其他命令均可用在web界面操作 创建模板 正常方式创建虚拟机 qm create 902 --name debian12-templ --memory 2048 --net0 virtio,bridge=vmbr0 添加cloudinit系统盘 自行确认需要存放虚拟机的位置，示例为local-lvm qm importdisk 902 /root/debian-12-genericcloud-amd64.qcow2 local-lvm 使用cloudinit系统盘 qm set 902 --scsihw virtio-scsi-pci --scsi0 local-lvm:vm-902-disk-0 添加cloudinit设备 qm set 902 --ide2 local-lvm:cloudinit --boot c --bootdisk scsi0 --serial0 socket --vga serial0 增加系统盘空间 qm resize 902 scsi0 +30G 设置网络 qm set 902 --ipconfig0 ip=dhcp qm set 902 --ipconfig0 ip=10.10.10.222/24,gw=10.10.10.1 qm set 902 --ipconfig0 ip=192.168.2.34/24,gw=192.168.2.1,ip6=auto 设置密钥或密码 qm set 902 --sshkey ~/.ssh/id_rsa.pub qm set 902 --cipassword 你的密码 建议直接在web界面设置用户为root或你的用户名 检查设置 qm cloudinit dump 902 user SSH进入VM，按自己的习惯设置 Debian cloudinit换源 nano /etc/apt/mirrors/debian.list nano /etc/apt/mirrors/debian-security.list 分别修改为 https://mirrors.ustc.edu.cn/debian/ https://mirrors.ustc.edu.cn/debian-security/ 换源操作转换为模板后会丢失 阿里源安装docker curl -fsSL https://get.docker.com | bash -s docker --mirror Aliyun 来宾代理 Guest Agent web界面开启QEUM Guest Agent apt install qemu-guest-agent -y 其他 nali q apt install htop cron screen nano -y wget https://conf.totoro.pub/bash/q -O /usr/bin/q wget https://conf.totoro.pub/bash/nali -O /usr/bin/nali chmod +X /usr/bin/q chmod +X /usr/bin/nali chmod 777 /usr/bin/q chmod 777 /usr/bin/nali q www.baidu.com|nali mkdir /data mkdir /data/ssl 特殊的，只在专用服务器设置 curl https://get.acme.sh | sh -s email=my@example.com apt install ufw -y crontab -e 添加我的SSL更新命令 37 7 2 * * wget Update-Url -O xxx.cer 38 7 2 * * wget Update-Url -O xxx.key 47 12 1 * * &quot;/root/.acme.sh&quot;/acme.sh --issue --dns dns_dp --server google --challenge-alias acme.example.com --keylength ec-256 -d example.com -d *.example.com -d *.01.example.com -d *.02.example.com -d *.03.example.com --force 37 13 1 * * &quot;/root/.acme.sh&quot;/acme.sh --install-cert -d example.com --key-file /data/ssl/example.com.key --fullchain-file /data/ssl/example.com.cer poweroff 设置为模板，并通过模板创建虚拟机 qm template 902 qm clone 902 190 --name debian12 qm start 190 调整 VM 磁盘的大小 qm shutdown 190 &amp;&amp; qm wait qm resize 190 scsi0 +8G qm start 190 直接使用ISO安装 Debian ISO 下载 Ubuntu ISO 下载 Windows ISO 下载 第三方精简版： Tiny10 ISO Tiny11 ISO 有用的CDROM GParted Live CD/USB/HD/PXE Bootable Image 分区用 使用IMG安装 OpenWrt 推荐的系统镜像 SuLingGG openwrt-18.06-k5.4 文档 ImmortalWrt OpenWrt官方 在线编译 安装方法 上传你的img，设置好网卡后，正常流程创建虚拟机，导入一下硬盘即可 qm importdisk 100 /var/lib/vz/template/iso/openwrt-xxx.img local-lvm 激活硬盘，即可正常使用 网络配置 正常用户都可以直接web设置这些内容 不正常的用户通过shell修改 修改LAN ipaddr vi /etc/config/network 使用LXC 不推荐使用任何LXC容器 使用Proxmox VE Helper Scripts创建LXC 请先使用软路由保障PVE全局的网络 Plex Media Server bash -c &quot;$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/ct/plex.sh)&quot; Emby Media Server bash -c &quot;$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/ct/emby.sh)&quot; Jellyfin Media Server bash -c &quot;$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/ct/jellyfin.sh)&quot; Nextcloud bash -c &quot;$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/ct/nextcloudpi.sh)&quot; PhotoPrism bash -c &quot;$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/ct/photoprism.sh)&quot; AdGuard Home bash -c &quot;$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/ct/adguard.sh)&quot; Transmission bash -c &quot;$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/ct/transmission.sh)&quot; Vaultwarden bash -c &quot;$(wget -qO - https://github.com/tteck/Proxmox/raw/main/ct/alpine-vaultwarden.sh)&quot; VM使用 数据盘及swap fdisk -l fdisk /dev/sdb n、1、p、…..w mkfs.ext4 /dev/sdb1 mount /dev/sdb1 /data mkswap /dev/sdc swapon /dev/sdc nano /etc/fstab 增加一行 UUID=xxxxx你的UUID swap swap defaults 0 0 UUID=xxxxx你的UUID /data ext4 defaults 0 2 systemctl daemon-reload reboot 检查磁盘挂载情况 df -h 重复一下换源 nano /etc/apt/mirrors/debian.list nano /etc/apt/mirrors/debian-security.list 分别修改为 https://mirrors.ustc.edu.cn/debian/ https://mirrors.ustc.edu.cn/debian-security/ 安装Tailscale curl -fsSL https://tailscale.com/install.sh | sh tailscale up --advertise-exit-node --accept-routes --accept-dns=false 点击/打开终端给的链接，授权登录 不要关闭浏览器，在管理员界面找到这台机器 设置里面关闭登录过期，打开exit node 也可以预设密钥登录 tailscale up --advertise-exit-node --accept-routes --accept-dns=false --authkey=tskey-auth-xxxx 如果是LXC nano /etc/pve/lxc/401.conf 添加 lxc.cgroup2.devices.allow: c 10:200 rwm lxc.mount.entry: /dev/net/tun dev/net/tun none bind,create=file DDNS docker run -d --name ddns-go --restart=always --net=host -v /opt/ddns-go:/root jeessy/ddns-go:latest web访问ip:9876，配置密钥 Plex wget xxx # https://www.plex.tv/media-server-downloads/ dpkg -i plexmediaserver_1.32.6.7557-1cf77d501_amd64.deb systemctl status plexmediaserver.service docker run -d \ --name plex \ --network=host \ -e TZ=&quot;Asia/Shanghai&quot; \ -e PLEX_CLAIM=&quot;claim-xxx&quot; \ -v /data/plexconfig:/config \ -v /data/plextranscode:/transcode \ -v /data/plexmedia:/data \ plexinc/pms-docker 其他 ShellClash Clash.Meta 常用命令 zfs list zpool status zpool iostat -v 1 rsync -aiv --progress /mnt/usb/ /data/xxx/xxx pct set 401 -mp0 /data/archive,mp=/archive SeafilePro Pro版本3用户以内免费，部署方式查看官方中文教程 官方英文教程【推荐】 命令行客户端 wget https://linux-clients.seafile.com/seafile.asc -O /usr/share/keyrings/seafile-keyring.asc echo &quot;deb [arch=amd64 signed-by=/usr/share/keyrings/seafile-keyring.asc] https://linux-clients.seafile.com/seafile-deb/$(lsb_release -cs)/ stable main&quot; | sudo tee /etc/apt/sources.list.d/seafile.list &gt; /dev/null apt update apt install seafile-cli -y mkdir /data/seafile-client seaf-cli init -d /data/seafile-client seaf-cli start seaf-cli sync -l &quot;the id of the library&quot; -s &quot;the url + port of server&quot; -d &quot;the folder which the library will be synced with&quot; -u &quot;username on server&quot; [-p &quot;password&quot;] seaf-cli status seaf-cli list DEBUG docker-compose logs -f --tail 10 BUG示例 seafile-mysql | 2077-77-77 77:77:77 3064 [ERROR] Incorrect definition of table mysql.column_stats: expected column &#39;hist_type&#39; at position 9 to have type enum(&#39;SINGLE_PREC_HB&#39;,&#39;DOUBLE_PREC_HB&#39;,&#39;JSON_HB&#39;), found type enum(&#39;SINGLE_PREC_HB&#39;,&#39;DOUBLE_PREC_HB&#39;). seafile-mysql | 2077-77-77 77:77:77 3064 [ERROR] Incorrect definition of table mysql.column_stats: expected column &#39;histogram&#39; at position 10 to have type longblob, found type varbinary(255). 解决办法 docker exec -it seafile-mysql bash mysql_upgrade --user=root --password=xxxx exit docker-compose down docker-compose up -d BUG示例2 seaf-cli status Traceback (most recent call last): File &quot;/usr/lib/python3/dist-packages/pysearpc/named_pipe.py&quot;, line 85, in _get_transport transport = self._pool.get(False) 解决办法 seaf-cli start 一劳永逸 加入开机启动 nano /etc/systemd/system/seafile.service [Unit] Description=seafile [Service] Type=oneshot ExecStart=/usr/bin/seaf-cli start [Install] WantedBy=multi-user.target systemctl daemon-reload systemctl enable seafile.service" />
+<link rel="canonical" href="https://totoro.ink/newpve" />
+<meta property="og:url" content="https://totoro.ink/newpve" />
+<meta property="og:site_name" content="TOTORO625" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2023-10-01T00:00:00+08:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="新的PVE，新的开始" />
+<script type="application/ld+json">
+{"headline":"新的PVE，新的开始","dateModified":"2023-10-01T00:00:00+08:00","datePublished":"2023-10-01T00:00:00+08:00","@type":"BlogPosting","url":"https://totoro.ink/newpve","author":{"@type":"Person","name":"totoro625"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://totoro.ink/newpve"},"description":"旧机器的性能太差了，正好淘汰了一台电脑，改成PVE了 引 - 全新PVE宿主机，写个自己的小Tips Docker不得在宿主机及LXC上安装 vm全部使用cloudimg构建 UFW安装在对外的服务器上 数据盘4块HC550 16T 组建ZFS存储池RaidZ-2 每个VM安装不再安装Tailscale、zerotier、frpc、CFtunnel 独立的swap硬盘用于各VM，及PVE（宿主机64G，UFW 16G，Seafile 16G，Mt-photo 16G） 独立的固态用于PVE安装 参考资料 国光的 PVE 环境搭建教程 N5105 Proxmox VE (PVE) 主页添加温度硬盘等信息 开始安装系统 官方网站下载ISO，用ventoy制作启动工具，插上网线再开机（键盘和显示器是必须的），根据引导走完全部流程 系统盘请使用ext4格式，避免问题 swap设置为0G，后期自行添加专用swap硬盘，减少系统盘的磨损 在tabby添加配置（直连和转发） 特殊情况 DEBUG 网络故障/pcie插拔 键盘、屏幕连接好后 ip a 或者 ip addr 查看一下网卡是什么，例如：enp8s0 nano /etc/network/interfaces 修改网卡 宿主机重启后VM内开机启动程序未启动 PVE开机后重新启动 nano /etc/systemd/system/vmreboot.service [Unit] Description=VM reboot [Service] 待更新 qm stop 202 qm status 202 qm start 202 [Install] WantedBy=multi-user.target systemctl daemon-reload systemctl enable vmreboot.service 硬盘空间不足 unable to initialize physical volume /dev/nvmeon1p3 分区时硬盘总容量选择小几个GB即可 Proxmox VE 8 换源 注1：在前面加#注释掉全部内容，添加以下内容 注2：Ctrl + O 保存，Ctrl + X 退出 nano /etc/apt/sources.list deb https://mirrors.ustc.edu.cn/debian/ bookworm main non-free non-free-firmware contrib deb-src https://mirrors.ustc.edu.cn/debian/ bookworm main non-free non-free-firmware contrib deb https://mirrors.ustc.edu.cn/debian-security/ bookworm-security main deb-src https://mirrors.ustc.edu.cn/debian-security/ bookworm-security main deb https://mirrors.ustc.edu.cn/debian/ bookworm-updates main non-free non-free-firmware contrib deb-src https://mirrors.ustc.edu.cn/debian/ bookworm-updates main non-free non-free-firmware contrib deb https://mirrors.ustc.edu.cn/debian/ bookworm-backports main non-free non-free-firmware contrib deb-src https://mirrors.ustc.edu.cn/debian/ bookworm-backports main non-free non-free-firmware contrib 或者: sed -i &#39;s|http://deb.debian.org/debian|https://mirrors.ustc.edu.cn/debian|g&#39; /etc/apt/sources.list sed -i &#39;s|http://security.debian.org/debian|https://mirrors.ustc.edu.cn/debian|g&#39; /etc/apt/sources.list nano /etc/apt/sources.list.d/pve-enterprise.list deb https://mirrors.ustc.edu.cn/proxmox/debian bookworm pve-no-subscription nano /etc/apt/sources.list.d/ceph.list deb https://mirrors.ustc.edu.cn/proxmox/debian/ceph-quincy bookworm no-subscription apt update 更新 LXC（CT Template）源 sed -i &#39;s|http://download.proxmox.com|https://mirrors.tuna.tsinghua.edu.cn/proxmox|g&#39; /usr/share/perl5/PVE/APLInfo.pm systemctl restart pvedaemon.service 直通 / 开启 IOMMU 和 SR-IOV 默认大家BIOS设置好啦，新机器请看这个教程 nano /etc/default/grub 修改GRUB_CMDLINE_LINUX_DEFAULT字段 Intel GRUB_CMDLINE_LINUX_DEFAULT=&quot;quiet intel_iommu=on iommu=pt textonly nomodeset nofb pci=noaer pcie_acs_override=downstream,multifunction&quot; AMD GRUB_CMDLINE_LINUX_DEFAULT=&quot;quiet amd_iommu=on iommu=pt textonly nomodeset nofb pci=noaer pcie_acs_override=downstream,multifunction&quot; update-grub &amp;&amp; reboot 带显卡直通看这个教程 个性化配置 自定义pveproxy web界面（非必须，just好看） 删除订阅弹窗 sed -Ezi.bak &quot;s/(Ext.Msg.show\\(\\{\\s+title: gettext\\(&#39;No valid sub)/void\\(\\{ \\/\\/\\1/g&quot; /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js systemctl restart pveproxy.service 首页显示 CPU、主板、NVME、硬盘 温度等信息 apt update apt install lm-sensors patch -y sensors-detect 全部回车 chmod +s /usr/sbin/smartctl export LC_ALL=en_US.UTF-8 sensors reboot 懒人一键教程 看一下自己几个NVME smartctl -a -j /dev/nvme? 看一下自己几个硬盘 smartctl -a -j /dev/sd? nano /usr/share/perl5/PVE/API2/Nodes.pm Ctrl + w 搜索shared =&gt; $meminfo-&gt;{memshared} 在该段结束后（；为结束）换行添加（记得tab一下对齐） $res-&gt;{sensinfo} = `sensors`; $res-&gt;{cpusensors} = `lscpu | grep MHz`; $res-&gt;{smartctl_nvme0_json} = `smartctl -a -j /dev/nvme0`; $res-&gt;{smartctl_nvme1_json} = `smartctl -a -j /dev/nvme1`; $res-&gt;{smartctl_nvme2_json} = `smartctl -a -j /dev/nvme2`; $res-&gt;{smartctl_hdd1_json} = `smartctl -a -j /dev/sda`; $res-&gt;{smartctl_hdd2_json} = `smartctl -a -j /dev/sdb`; $res-&gt;{smartctl_hdd3_json} = `smartctl -a -j /dev/sdc`; $res-&gt;{smartctl_hdd4_json} = `smartctl -a -j /dev/sdd`; 注：该示例为3块nvme + 4块硬盘 nano /usr/share/pve-manager/js/pvemanagerlib.js 建议使用winscp打开，notepad++编辑 搜索 PVE Manager Version新版本为Manager Version 旧的配置1 { itemId: &#39;sensinfo&#39;, colspan: 2, printBar: false, title: gettext(&#39;CPU温度&#39;), textField: &#39;sensinfo&#39;, renderer:function(value){ const c0 = value.match(/Core 0.*?\\+([\\d\\.]+)?/)[1]; const c1 = value.match(/Core 1.*?\\+([\\d\\.]+)?/)[1]; const c2 = value.match(/Core 2.*?\\+([\\d\\.]+)?/)[1]; const c3 = value.match(/Core 3.*?\\+([\\d\\.]+)?/)[1]; const c4 = value.match(/Core 4.*?\\+([\\d\\.]+)?/)[1]; const c5 = value.match(/Core 5.*?\\+([\\d\\.]+)?/)[1]; const p0 = value.match(/Package id 0.*?\\+([\\d\\.]+)?/)[1]; const b0 = value.match(/temp1.*?\\+([\\d\\.]+)?/)[1]; return `表面: ${p0} ℃ | 核心: ${c0}|${c1}|${c2}|${c3}|${c4}|${c5} ℃ | 主板: ${b0} ℃` } }, { itemId: &#39;MHz&#39;, colspan: 2, printBar: false, title: gettext(&#39;CPU频率&#39;), textField: &#39;cpusensors&#39;, renderer:function(value){ const f0 = value.match(/CPU.*scaling MHz.*?([\\d]+)/)[1]; const f1 = value.match(/CPU min MHz.*?([\\d]+)/)[1]; const f2 = value.match(/CPU max MHz.*?([\\d]+)/)[1]; const f3 = f0*f2/100; return `实时: ${f3} MHz(${f0}%) | 最小: ${f1} MHz | 最大: ${f2} MHz ` } }, { itemId: &#39;nvme_ssd0&#39;, colspan: 2, printBar: false, title: gettext(&#39;NVME槽0：pcie槽转接&#39;), textField: &#39;smartctl_nvme0_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var percentage_used = &#39; | 使用寿命: &#39; + value[&#39;nvme_smart_health_information_log&#39;][&#39;percentage_used&#39;].toFixed(0) + &#39;% &#39;;} catch(e) {var percentage_used = &#39;&#39;;} try {var data_units_read = value[&#39;nvme_smart_health_information_log&#39;][&#39;data_units_read&#39;]*512/1024/1024;var data_units_read = &#39;(读: &#39; + data_units_read.toFixed(2) + &#39;GB, &#39;;} catch(e) {var data_units_read = &#39;&#39;;} try {var data_units_written = value[&#39;nvme_smart_health_information_log&#39;][&#39;data_units_written&#39;]*512/1024/1024;var data_units_written = &#39;写: &#39; + data_units_written.toFixed(2) + &#39;GB)&#39;;} catch(e) {var data_units_written = &#39;&#39;;} try {var power_on_time = &#39; | 通电: &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | 温度: &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${percentage_used}${data_units_read}${data_units_written}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, { itemId: &#39;nvme_ssd1&#39;, colspan: 2, printBar: false, title: gettext(&#39;NVME槽1：主板正面pcie4.0&#39;), textField: &#39;smartctl_nvme1_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var percentage_used = &#39; | 使用寿命: &#39; + value[&#39;nvme_smart_health_information_log&#39;][&#39;percentage_used&#39;].toFixed(0) + &#39;% &#39;;} catch(e) {var percentage_used = &#39;&#39;;} try {var data_units_read = value[&#39;nvme_smart_health_information_log&#39;][&#39;data_units_read&#39;]*512/1024/1024;var data_units_read = &#39;(读: &#39; + data_units_read.toFixed(2) + &#39;GB, &#39;;} catch(e) {var data_units_read = &#39;&#39;;} try {var data_units_written = value[&#39;nvme_smart_health_information_log&#39;][&#39;data_units_written&#39;]*512/1024/1024;var data_units_written = &#39;写: &#39; + data_units_written.toFixed(2) + &#39;GB)&#39;;} catch(e) {var data_units_written = &#39;&#39;;} try {var power_on_time = &#39; | 通电: &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | 温度: &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${percentage_used}${data_units_read}${data_units_written}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, { itemId: &#39;nvme_ssd2&#39;, colspan: 2, printBar: false, title: gettext(&#39;NVME槽2：主板背面pcie3.0&#39;), textField: &#39;smartctl_nvme2_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var percentage_used = &#39; | 使用寿命: &#39; + value[&#39;nvme_smart_health_information_log&#39;][&#39;percentage_used&#39;].toFixed(0) + &#39;% &#39;;} catch(e) {var percentage_used = &#39;&#39;;} try {var data_units_read = value[&#39;nvme_smart_health_information_log&#39;][&#39;data_units_read&#39;]*512/1024/1024;var data_units_read = &#39;(读: &#39; + data_units_read.toFixed(2) + &#39;GB, &#39;;} catch(e) {var data_units_read = &#39;&#39;;} try {var data_units_written = value[&#39;nvme_smart_health_information_log&#39;][&#39;data_units_written&#39;]*512/1024/1024;var data_units_written = &#39;写: &#39; + data_units_written.toFixed(2) + &#39;GB)&#39;;} catch(e) {var data_units_written = &#39;&#39;;} try {var power_on_time = &#39; | 通电: &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | 温度: &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${percentage_used}${data_units_read}${data_units_written}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, { itemId: &#39;hdd_sda&#39;, colspan: 2, printBar: false, title: gettext(&#39;机械硬盘sda&#39;), textField: &#39;smartctl_hdd1_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var serial_number = &#39; | 序列号: &#39; + value[&#39;serial_number&#39;];} catch(e) {var serial_number = &#39;&#39;;} try {var power_cycle_count = &#39; | 通电: &#39; + value[&#39;power_cycle_count&#39;] + &#39;次&#39;;} catch(e) {var power_cycle_count = &#39;&#39;;} try {var power_on_time = &#39; | 通电: &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | 温度: &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${serial_number}${power_cycle_count}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, { itemId: &#39;hdd_sdb&#39;, colspan: 2, printBar: false, title: gettext(&#39;机械硬盘sdb&#39;), textField: &#39;smartctl_hdd2_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var serial_number = &#39; | 序列号: &#39; + value[&#39;serial_number&#39;];} catch(e) {var serial_number = &#39;&#39;;} try {var power_cycle_count = &#39; | 通电: &#39; + value[&#39;power_cycle_count&#39;] + &#39;次&#39;;} catch(e) {var power_cycle_count = &#39;&#39;;} try {var power_on_time = &#39; | 通电: &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | 温度: &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${serial_number}${power_cycle_count}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, { itemId: &#39;hdd_sdc&#39;, colspan: 2, printBar: false, title: gettext(&#39;机械硬盘sdc&#39;), textField: &#39;smartctl_hdd3_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var serial_number = &#39; | 序列号: &#39; + value[&#39;serial_number&#39;];} catch(e) {var serial_number = &#39;&#39;;} try {var power_cycle_count = &#39; | 通电: &#39; + value[&#39;power_cycle_count&#39;] + &#39;次&#39;;} catch(e) {var power_cycle_count = &#39;&#39;;} try {var power_on_time = &#39; | 通电: &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | 温度: &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${serial_number}${power_cycle_count}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, { itemId: &#39;hdd_sdd&#39;, colspan: 2, printBar: false, title: gettext(&#39;机械硬盘sdd&#39;), textField: &#39;smartctl_hdd4_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var serial_number = &#39; | 序列号: &#39; + value[&#39;serial_number&#39;];} catch(e) {var serial_number = &#39;&#39;;} try {var power_cycle_count = &#39; | 通电: &#39; + value[&#39;power_cycle_count&#39;] + &#39;次&#39;;} catch(e) {var power_cycle_count = &#39;&#39;;} try {var power_on_time = &#39; | 通电: &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | 温度: &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${serial_number}${power_cycle_count}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, 现在使用配置2 { itemId: &#39;sensinfo&#39;, colspan: 2, printBar: false, title: gettext(&#39;CPU温度&#39;), textField: &#39;sensinfo&#39;, renderer:function(value){ const c0 = value.match(/Core 0.*?\\+([\\d\\.]+)?/)[1]; const c1 = value.match(/Core 1.*?\\+([\\d\\.]+)?/)[1]; const c2 = value.match(/Core 2.*?\\+([\\d\\.]+)?/)[1]; const c3 = value.match(/Core 3.*?\\+([\\d\\.]+)?/)[1]; const c4 = value.match(/Core 4.*?\\+([\\d\\.]+)?/)[1]; const c5 = value.match(/Core 5.*?\\+([\\d\\.]+)?/)[1]; const p0 = value.match(/Package id 0.*?\\+([\\d\\.]+)?/)[1]; const b0 = value.match(/temp1.*?\\+([\\d\\.]+)?/)[1]; return `表面: ${p0} ℃ | 核心: ${c0}|${c1}|${c2}|${c3}|${c4}|${c5} ℃ | 主板: ${b0} ℃` } }, { itemId: &#39;MHz&#39;, colspan: 2, printBar: false, title: gettext(&#39;CPU频率&#39;), textField: &#39;cpusensors&#39;, renderer:function(value){ const f0 = value.match(/CPU.*scaling MHz.*?([\\d]+)/)[1]; const f1 = value.match(/CPU min MHz.*?([\\d]+)/)[1]; const f2 = value.match(/CPU max MHz.*?([\\d]+)/)[1]; const f3 = f0*f2/100; return `实时: ${f3} MHz(${f0}%) | 最小: ${f1} MHz | 最大: ${f2} MHz ` } }, { itemId: &#39;nvme_ssd0&#39;, colspan: 2, printBar: false, title: gettext(&#39;/dev/nvme0&#39;), textField: &#39;smartctl_nvme0_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var percentage_used = &#39; | 磨损: &#39; + value[&#39;nvme_smart_health_information_log&#39;][&#39;percentage_used&#39;].toFixed(0) + &#39;% &#39;;} catch(e) {var percentage_used = &#39;&#39;;} try {var data_units_read = value[&#39;nvme_smart_health_information_log&#39;][&#39;data_units_read&#39;]*512/1024/1024/1024;var data_units_read = &#39;(读: &#39; + data_units_read.toFixed(2) + &#39;TB, &#39;;} catch(e) {var data_units_read = &#39;&#39;;} try {var data_units_written = value[&#39;nvme_smart_health_information_log&#39;][&#39;data_units_written&#39;]*512/1024/1024/1024;var data_units_written = &#39;写: &#39; + data_units_written.toFixed(2) + &#39;TB)&#39;;} catch(e) {var data_units_written = &#39;&#39;;} try {var power_on_time = &#39; | &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${percentage_used}${data_units_read}${data_units_written}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, { itemId: &#39;nvme_ssd1&#39;, colspan: 2, printBar: false, title: gettext(&#39;/dev/nvme1&#39;), textField: &#39;smartctl_nvme1_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var percentage_used = &#39; | 磨损: &#39; + value[&#39;nvme_smart_health_information_log&#39;][&#39;percentage_used&#39;].toFixed(0) + &#39;% &#39;;} catch(e) {var percentage_used = &#39;&#39;;} try {var data_units_read = value[&#39;nvme_smart_health_information_log&#39;][&#39;data_units_read&#39;]*512/1024/1024/1024;var data_units_read = &#39;(读: &#39; + data_units_read.toFixed(2) + &#39;TB, &#39;;} catch(e) {var data_units_read = &#39;&#39;;} try {var data_units_written = value[&#39;nvme_smart_health_information_log&#39;][&#39;data_units_written&#39;]*512/1024/1024/1024;var data_units_written = &#39;写: &#39; + data_units_written.toFixed(2) + &#39;TB)&#39;;} catch(e) {var data_units_written = &#39;&#39;;} try {var power_on_time = &#39; | &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${percentage_used}${data_units_read}${data_units_written}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, { itemId: &#39;nvme_ssd2&#39;, colspan: 2, printBar: false, title: gettext(&#39;/dev/nvme2&#39;), textField: &#39;smartctl_nvme2_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var percentage_used = &#39; | 磨损: &#39; + value[&#39;nvme_smart_health_information_log&#39;][&#39;percentage_used&#39;].toFixed(0) + &#39;% &#39;;} catch(e) {var percentage_used = &#39;&#39;;} try {var data_units_read = value[&#39;nvme_smart_health_information_log&#39;][&#39;data_units_read&#39;]*512/1024/1024/1024;var data_units_read = &#39;(读: &#39; + data_units_read.toFixed(2) + &#39;TB, &#39;;} catch(e) {var data_units_read = &#39;&#39;;} try {var data_units_written = value[&#39;nvme_smart_health_information_log&#39;][&#39;data_units_written&#39;]*512/1024/1024/1024;var data_units_written = &#39;写: &#39; + data_units_written.toFixed(2) + &#39;TB)&#39;;} catch(e) {var data_units_written = &#39;&#39;;} try {var power_on_time = &#39; | &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${percentage_used}${data_units_read}${data_units_written}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, { itemId: &#39;hdd_sda&#39;, colspan: 2, printBar: false, title: gettext(&#39;/dev/sda&#39;), textField: &#39;smartctl_hdd1_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var serial_number = &#39; | 序列号: &#39; + value[&#39;serial_number&#39;];} catch(e) {var serial_number = &#39;&#39;;} try {var power_cycle_count = &#39; | &#39; + value[&#39;power_cycle_count&#39;] + &#39;次&#39;;} catch(e) {var power_cycle_count = &#39;&#39;;} try {var power_on_time = &#39; | &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${serial_number}${power_cycle_count}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, { itemId: &#39;hdd_sdb&#39;, colspan: 2, printBar: false, title: gettext(&#39;/dev/sdb&#39;), textField: &#39;smartctl_hdd2_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var serial_number = &#39; | 序列号: &#39; + value[&#39;serial_number&#39;];} catch(e) {var serial_number = &#39;&#39;;} try {var power_cycle_count = &#39; | &#39; + value[&#39;power_cycle_count&#39;] + &#39;次&#39;;} catch(e) {var power_cycle_count = &#39;&#39;;} try {var power_on_time = &#39; | &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${serial_number}${power_cycle_count}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, { itemId: &#39;hdd_sdc&#39;, colspan: 2, printBar: false, title: gettext(&#39;/dev/sdc&#39;), textField: &#39;smartctl_hdd3_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var serial_number = &#39; | 序列号: &#39; + value[&#39;serial_number&#39;];} catch(e) {var serial_number = &#39;&#39;;} try {var power_cycle_count = &#39; | &#39; + value[&#39;power_cycle_count&#39;] + &#39;次&#39;;} catch(e) {var power_cycle_count = &#39;&#39;;} try {var power_on_time = &#39; | &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${serial_number}${power_cycle_count}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, { itemId: &#39;hdd_sdd&#39;, colspan: 2, printBar: false, title: gettext(&#39;/dev/sdd&#39;), textField: &#39;smartctl_hdd4_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var serial_number = &#39; | 序列号: &#39; + value[&#39;serial_number&#39;];} catch(e) {var serial_number = &#39;&#39;;} try {var power_cycle_count = &#39; | &#39; + value[&#39;power_cycle_count&#39;] + &#39;次&#39;;} catch(e) {var power_cycle_count = &#39;&#39;;} try {var power_on_time = &#39; | &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${serial_number}${power_cycle_count}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, 注：该示例为6核心 NUC配置 { itemId: &#39;sensinfo&#39;, colspan: 2, printBar: false, title: gettext(&#39;CPU温度&#39;), textField: &#39;sensinfo&#39;, renderer:function(value){ const c0 = value.match(/Core 0.*?\\+([\\d\\.]+)?/)[1]; const c1 = value.match(/Core 1.*?\\+([\\d\\.]+)?/)[1]; const c2 = value.match(/Core 2.*?\\+([\\d\\.]+)?/)[1]; const c3 = value.match(/Core 3.*?\\+([\\d\\.]+)?/)[1]; const p0 = value.match(/Package id 0.*?\\+([\\d\\.]+)?/)[1]; const b0 = value.match(/temp1.*?\\+([\\d\\.]+)?/)[1]; return `表面: ${p0} ℃ | 核心: ${c0}|${c1}|${c2}|${c3} ℃ | 主板: ${b0} ℃` } }, { itemId: &#39;MHz&#39;, colspan: 2, printBar: false, title: gettext(&#39;CPU频率&#39;), textField: &#39;cpusensors&#39;, renderer:function(value){ const f0 = value.match(/CPU.*scaling MHz.*?([\\d]+)/)[1]; const f1 = value.match(/CPU min MHz.*?([\\d]+)/)[1]; const f2 = value.match(/CPU max MHz.*?([\\d]+)/)[1]; const f3 = f0*f2/100; return `实时: ${f3} MHz(${f0}%) | 最小: ${f1} MHz | 最大: ${f2} MHz ` } }, { itemId: &#39;nvme_ssd0&#39;, colspan: 2, printBar: false, title: gettext(&#39;/dev/nvme0&#39;), textField: &#39;smartctl_nvme0_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var percentage_used = &#39; | 磨损: &#39; + value[&#39;nvme_smart_health_information_log&#39;][&#39;percentage_used&#39;].toFixed(0) + &#39;% &#39;;} catch(e) {var percentage_used = &#39;&#39;;} try {var data_units_read = value[&#39;nvme_smart_health_information_log&#39;][&#39;data_units_read&#39;]*512/1024/1024/1024;var data_units_read = &#39;(读: &#39; + data_units_read.toFixed(2) + &#39;TB, &#39;;} catch(e) {var data_units_read = &#39;&#39;;} try {var data_units_written = value[&#39;nvme_smart_health_information_log&#39;][&#39;data_units_written&#39;]*512/1024/1024/1024;var data_units_written = &#39;写: &#39; + data_units_written.toFixed(2) + &#39;TB)&#39;;} catch(e) {var data_units_written = &#39;&#39;;} try {var power_on_time = &#39; | &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${percentage_used}${data_units_read}${data_units_written}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, { itemId: &#39;ssd_sda&#39;, colspan: 2, printBar: false, title: gettext(&#39;/dev/sda&#39;), textField: &#39;smartctl_hdd1_json&#39;, renderer: function(value) { value = JSON.parse(value); if (value[&#39;model_name&#39;]) { try {var model_name = value[&#39;model_name&#39;];} catch(e) {var model_name = &#39;&#39;;} try {var serial_number = &#39; | 序列号: &#39; + value[&#39;serial_number&#39;];} catch(e) {var serial_number = &#39;&#39;;} try {var power_on_time = &#39; | &#39; + value[&#39;power_on_time&#39;][&#39;hours&#39;].toFixed(0) + &#39;小时&#39;;} catch(e) {var power_on_time = &#39;&#39;;} try {var temperature = &#39; | &#39; + value[&#39;temperature&#39;][&#39;current&#39;].toFixed(1) + &#39;°C&#39;;} catch(e) {var temperature = &#39;&#39;;} return `${model_name}${serial_number}${power_on_time}${temperature}`; } else { return `提示: 未安装硬盘或已直通硬盘控制器`; } } }, 搜索widget.pveNodeStatus 将 height: 300 （默认值） 改大为 420，或者更大，然后保存（每多一行大概增大 20~25） systemctl restart pveproxy.service 检查WEB界面是否正常显示 powersave模式 默认使用高性能模式，切换为低性能模式 查看支持的 CPU 电源模式 cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_governors 只有两种结果powersave、performance为intel pstate 受害者 查看当前的 CPU 电源模式 cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor apt install linux-cpupower -y cpupower -c all frequency-info cpupower -c all frequency-set -g powersave 持久化 / cpupower开机启动 nano /etc/systemd/system/cpupower.service [Unit] Description=CPU powersave [Service] Type=oneshot ExecStart=/usr/bin/cpupower frequency-set -g powersave [Install] WantedBy=multi-user.target systemctl daemon-reload systemctl enable cpupower.service APC UPS 连接 apt-get install apcupsd nano /etc/apcupsd/apcupsd.conf 必要的配置： 在 UPSNAME 后面给个易懂的名字 在 UPSCABLE 后指定为 usb 在 UPSTYPE 后更改为 usb 在 DEVICE 后为空，这样系统便会自动检测 USB 连接 UPS 其他的随便找个教程即可，注意：关机触发条件，有剩余电量和剩余时间，默认为5%和3分钟。注意这里只要满足其中任一条件便会触发 nano /etc/default/apcupsd ISCONFIGURED=no 更改为 yes 任何教程都没提，太坑了！来源 /etc/init.d/apcupsd restart systemctl enable apcupsd.service systemctl status apcupsd.service 查看ups运行状态 apcaccess 安装Tailscale curl -fsSL https://tailscale.com/install.sh | sh tailscale up --advertise-exit-node --accept-routes --accept-dns=false 点击/打开终端给的链接，授权登录 不要关闭浏览器，在管理员界面找到这台机器 设置里面关闭登录过期，打开exit node 也可以预设密钥登录 tailscale up --advertise-exit-node --accept-routes --accept-dns=false --authkey=tskey-auth-xxxx NODE01 tailscale up --advertise-routes=192.168.2.32/29 --accept-dns=false --accept-routes --advertise-exit-node NODE02 tailscale up --advertise-exit-node --accept-dns=false --accept-routes --advertise-routes=192.168.1.96/27,192.168.1.128/27,192.168.1.192/27,192.168.1.0/28 ZFS池 参考资料 为新手解释 VDev、zpool、ZIL 和 L2ARC 的幻灯片！ 2023.9 ZFS 能用于数据盘吗？关于 PVE 下 ZFS RAID 等相关 10 个疑问 李守中 Wiki ZFS on Linux 踩坑集 学习笔记 开始 PVE管理界面组ZFS池，选择4块hdd，名称z2pool，RAID级别RAIDZ2，压缩lz4，ashift：12 注，示例池名称为z2pool ZFS 严重依赖内存，因此至少需要 8GB 才能启动 专用缓存和/或日志磁盘，则应使用企业级 SSD。这可以显着提高整体性能。 VM 内安装 Proxmox VE（嵌套虚拟化），请不要对该 VM 的磁盘使用virtio，因为 ZFS 不支持它们。请改用 IDE 或 SCSI（也适用于virtio SCSI 控制器类型） zpool status zfs list zfs get volsize,refreservation,used &lt;pool&gt;/vm-&lt;vmid&gt;-disk-X 阅读手册 man zpool man zfs 限制ZFS内存使用（ARC） 默认情况下， ZFS 将50%的主机内存用于自适应替换缓存(ARC)。为 ARC 分配足够的内存对于 IO 性能至关重要，因此请谨慎减少内存。根据一般经验，至少分配2 GiB Base + 1 GiB/TiB-Storage。例如，如果您有一个具有 8 TiB可用存储空间的池，那么您应该为 ARC使用`10 GiB内存。 您可以通过直接写入zfs_arc_max模块参数来更改当前启动的 ARC 使用限制（重新启动会再次重置此更改）： echo &quot;$[10 * 1024*1024*1024]&quot; &gt;/sys/module/zfs/parameters/zfs_arc_max 要永久更改ARC 限制，请将以下行添加到 /etc/modprobe.d/zfs.conf：（8G) options zfs zfs_arc_max=8589934592 如果您所需的zfs_arc_max值低于或等于 zfs_arc_min（默认为系统内存的 1/32），则zfs_arc_max将被忽略，除非您还将zfs_arc_min设置为最多zfs_arc_max - 1. echo &quot;$[8 * 1024*1024*1024 - 1]&quot; &gt;/sys/module/zfs/parameters/zfs_arc_min echo &quot;$[8 * 1024*1024*1024]&quot; &gt;/sys/module/zfs/parameters/zfs_arc_max 交换分区 SWAP 最好在物理磁盘上创建一个分区并将其用作交换设备，请勿在ZFS上使用swap，BUG 使用fdisk对SSD进行分区 n、1、p、…..w mkswap /dev/nvme1n1p3 swapon /dev/nvme1n1p3 nano /etc/fstab 增加一行 UUID=xxxxx你的UUID swap swap defaults 0 0 修改 swapiness 对于服务器来说，swapiness推荐为 10 临时 sysctl -w vm.swappiness=10 永久 nano /etc/sysctl.conf 增加一行 vm.swappiness = 10 生效 sysctl -p swappiness值 策略 0 内核只会交换以避免内存不足的情况 1 无需完全禁用的最小交换量 10 当系统中有足够的内存时，有时建议使用此值来提高性能 60 默认值 100 内核将积极地交换 举例： 我的笔记本电脑有 16 GB 的内存和 8 GB 的交换空间。如果我在内核参数中使用 60 swappiness，那么在使用大约 6 GB （16G*40% = 6.4G）的内存后，我的机器开始使用交换 ZIL 和 L2ARC 检查nvme状态 适用于转接卡等情况 lspci 获取设备编号，通过编号查询id lspci -n | grep -i 02:00.0 获取硬件id，查看指定PCI设备的带宽 lspci -n -d 144d:a80a -vvv | grep --color Width 例如： Speed 8GT/s, Width x4 Speed 16GT/s, Width x4 使用fdisk对SSD进行分区，请看前文，不再赘述 注：必须使用GPT分区表，不能使用MBR分区表 查看硬盘uuid blkid 或者 lsblk -fl 将 ZIL 镜像添加到池中 ZFS ZIL(SLOG)虽然用起来有写缓存的效果，但 ZIL 不是写缓存 。 ZIL 写入操作全是 4K 写操作，所以 ZFS 搞出了一个 SLOG ( Separate intent LOG ) 组件， SLOG 组件必须是一个独立设备或分区，专门存放 ZIL 数据 。 zpool add z2pool log mirror /dev/disk/by-partuuid/xxxxx你的UUID /dev/disk/by-partuuid/xxxxx你的UUID 将 L2ARC 设备添加到池中 一般建议不超过内存容量*10 zpool add z2pool cache /dev/disk/by-partuuid/xxxxx你的UUID 检查L2ARC持久化 cat /sys/module/zfs/parameters/l2arc_rebuild_enabled 默认值为 1 。 l2arc_rebuild_enabled=1 表示打开 L2ARC 持久化，即重启之后 L2ARC Deivce 中的数据还能用 小技巧 基础 zpool create &lt;pool_name&gt; &lt;pool_type&gt; &lt;device_name&gt; 创建一个存储池。 zpool attach &lt;pool_name&gt; &lt;device_in_pool&gt; &lt;device_name&gt; 向池中添加一个设备使 strip 变成 mirror 。 zpool detach &lt;pool_name&gt; &lt;pool_device_name&gt; 让一个池中的设备脱离池。 zpool remove &lt;pool_name&gt; &lt;pool_device_name&gt; 从一个池中删除一个设备。 zpool offline &lt;pool_name&gt; &lt;device_name&gt; 让一个池中的设备离线。 zpool scrub &lt;pool_name&gt; 同步池中的数据后，检测池中数据的错误并修复。 zpool add &lt;zpool_name&gt; log &lt;device&gt; 给没有 SLOG 设备的池添加一个 SLOG 设备。 zpool attach &lt;zpool_name&gt; &lt;log_device&gt; &lt;device&gt; 向已有一个 SLOG 设备的池添加另一个 SLOG 设备使之互为镜像。 zpool add &lt;zpool_name&gt; log mirror &lt;device_a&gt; &lt;device_b&gt; 直接添加两个互为镜像的 SLOG 设备。 文件系统 请勿直接使用zfs根目录，如/z2pool 创建一个新的文件系统并挂载: zfs create z2pool/docs -o mountpoint=/docs 快照相关 虚拟机快照显示 zfs set snapdev=visible z2pool/vm-303-disk-1 这样可以直接在/dev/zvol/z2pool目录（或/dev/z2pool目录）找到对应的快照，然后方便的通过各种备份工具进行备份，例如restic 创建一个快照 zfs snapshot z2pool/home@tuesday 按日期创建快照 name=`date +&quot;%Y-%m-%d&quot;` zfs snapshot z2pool/home@$name 查看所有快照 zfs list -t snapshot zfs list -t snapshot z2pool/home 回滚到前一个快照 zfs rollback z2pool/home@monday 删除一个快照 zfs destroy -R z2pool/home@monday 重命名快照 zfs rename z2pool/home@version1 z2pool/home@version2 注意: 当一个 dataset 存在快照时，无法直接删除。但可使用 -r 参数强制删除。 zfs destroy -r z2pool/home 克隆 克隆只能从快照中创建，在删除克隆以前，对应的快照无法删除。 zfs clone z2pool/home@monday z2pool/home2 复制 直接复制快照即可 待补充 其他 可通过命令查询文件系统的所有属性 zfs get all z2pool/home 可通过命令查询存储池的所有属性 zpool get all z2pool 查看存储池当前状态和 I/O 状况 zpool status -v zpool iostat 显示存储池所有操作历史记录 zpool history z2pool 开始虚拟机安装 Cloudinit 方式安装 教程贴子：https://gist.github.com/chriswayg/b6421dcc69cb3b7e41f2998f1150e1df 下载镜像：Ubuntu23.04 推荐这个 Debian12 推荐这个 任意地方上传下载的镜像，例如/root/debian-12-genericcloud-amd64.qcow2 除了qm importdisk 其他命令均可用在web界面操作 创建模板 正常方式创建虚拟机 qm create 902 --name debian12-templ --memory 2048 --net0 virtio,bridge=vmbr0 添加cloudinit系统盘 自行确认需要存放虚拟机的位置，示例为local-lvm qm importdisk 902 /root/debian-12-genericcloud-amd64.qcow2 local-lvm 使用cloudinit系统盘 qm set 902 --scsihw virtio-scsi-pci --scsi0 local-lvm:vm-902-disk-0 添加cloudinit设备 qm set 902 --ide2 local-lvm:cloudinit --boot c --bootdisk scsi0 --serial0 socket --vga serial0 增加系统盘空间 qm resize 902 scsi0 +30G 设置网络 qm set 902 --ipconfig0 ip=dhcp qm set 902 --ipconfig0 ip=10.10.10.222/24,gw=10.10.10.1 qm set 902 --ipconfig0 ip=192.168.2.34/24,gw=192.168.2.1,ip6=auto 设置密钥或密码 qm set 902 --sshkey ~/.ssh/id_rsa.pub qm set 902 --cipassword 你的密码 建议直接在web界面设置用户为root或你的用户名 检查设置 qm cloudinit dump 902 user SSH进入VM，按自己的习惯设置 Debian cloudinit换源 nano /etc/apt/mirrors/debian.list nano /etc/apt/mirrors/debian-security.list 分别修改为 https://mirrors.ustc.edu.cn/debian/ https://mirrors.ustc.edu.cn/debian-security/ 换源操作转换为模板后会丢失 阿里源安装docker curl -fsSL https://get.docker.com | bash -s docker --mirror Aliyun 来宾代理 Guest Agent web界面开启QEUM Guest Agent apt install qemu-guest-agent -y 其他 nali q apt install htop cron screen nano -y wget https://conf.totoro.pub/bash/q -O /usr/bin/q wget https://conf.totoro.pub/bash/nali -O /usr/bin/nali chmod +X /usr/bin/q chmod +X /usr/bin/nali chmod 777 /usr/bin/q chmod 777 /usr/bin/nali q www.baidu.com|nali mkdir /data mkdir /data/ssl 特殊的，只在专用服务器设置 curl https://get.acme.sh | sh -s email=my@example.com apt install ufw -y crontab -e 添加我的SSL更新命令 37 7 2 * * wget Update-Url -O xxx.cer 38 7 2 * * wget Update-Url -O xxx.key 47 12 1 * * &quot;/root/.acme.sh&quot;/acme.sh --issue --dns dns_dp --server google --challenge-alias acme.example.com --keylength ec-256 -d example.com -d *.example.com -d *.01.example.com -d *.02.example.com -d *.03.example.com --force 37 13 1 * * &quot;/root/.acme.sh&quot;/acme.sh --install-cert -d example.com --key-file /data/ssl/example.com.key --fullchain-file /data/ssl/example.com.cer poweroff 设置为模板，并通过模板创建虚拟机 qm template 902 qm clone 902 190 --name debian12 qm start 190 调整 VM 磁盘的大小 qm shutdown 190 &amp;&amp; qm wait qm resize 190 scsi0 +8G qm start 190 直接使用ISO安装 Debian ISO 下载 Ubuntu ISO 下载 Windows ISO 下载 第三方精简版： Tiny10 ISO Tiny11 ISO 有用的CDROM GParted Live CD/USB/HD/PXE Bootable Image 分区用 使用IMG安装 OpenWrt 推荐的系统镜像 SuLingGG openwrt-18.06-k5.4 文档 ImmortalWrt OpenWrt官方 在线编译 安装方法 上传你的img，设置好网卡后，正常流程创建虚拟机，导入一下硬盘即可 qm importdisk 100 /var/lib/vz/template/iso/openwrt-xxx.img local-lvm 激活硬盘，即可正常使用 网络配置 正常用户都可以直接web设置这些内容 不正常的用户通过shell修改 修改LAN ipaddr vi /etc/config/network 使用LXC 不推荐使用任何LXC容器 使用Proxmox VE Helper Scripts创建LXC 请先使用软路由保障PVE全局的网络 Plex Media Server bash -c &quot;$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/ct/plex.sh)&quot; Emby Media Server bash -c &quot;$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/ct/emby.sh)&quot; Jellyfin Media Server bash -c &quot;$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/ct/jellyfin.sh)&quot; Nextcloud bash -c &quot;$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/ct/nextcloudpi.sh)&quot; PhotoPrism bash -c &quot;$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/ct/photoprism.sh)&quot; AdGuard Home bash -c &quot;$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/ct/adguard.sh)&quot; Transmission bash -c &quot;$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/ct/transmission.sh)&quot; Vaultwarden bash -c &quot;$(wget -qO - https://github.com/tteck/Proxmox/raw/main/ct/alpine-vaultwarden.sh)&quot; VM使用 数据盘及swap fdisk -l fdisk /dev/sdb n、1、p、…..w mkfs.ext4 /dev/sdb1 mount /dev/sdb1 /data mkswap /dev/sdc swapon /dev/sdc nano /etc/fstab 增加一行 UUID=xxxxx你的UUID swap swap defaults 0 0 UUID=xxxxx你的UUID /data ext4 defaults 0 2 systemctl daemon-reload reboot 检查磁盘挂载情况 df -h 重复一下换源 nano /etc/apt/mirrors/debian.list nano /etc/apt/mirrors/debian-security.list 分别修改为 https://mirrors.ustc.edu.cn/debian/ https://mirrors.ustc.edu.cn/debian-security/ 安装Tailscale curl -fsSL https://tailscale.com/install.sh | sh tailscale up --advertise-exit-node --accept-routes --accept-dns=false 点击/打开终端给的链接，授权登录 不要关闭浏览器，在管理员界面找到这台机器 设置里面关闭登录过期，打开exit node 也可以预设密钥登录 tailscale up --advertise-exit-node --accept-routes --accept-dns=false --authkey=tskey-auth-xxxx 如果是LXC nano /etc/pve/lxc/401.conf 添加 lxc.cgroup2.devices.allow: c 10:200 rwm lxc.mount.entry: /dev/net/tun dev/net/tun none bind,create=file DDNS docker run -d --name ddns-go --restart=always --net=host -v /opt/ddns-go:/root jeessy/ddns-go:latest web访问ip:9876，配置密钥 Plex wget xxx # https://www.plex.tv/media-server-downloads/ dpkg -i plexmediaserver_1.32.6.7557-1cf77d501_amd64.deb systemctl status plexmediaserver.service docker run -d \\ --name plex \\ --network=host \\ -e TZ=&quot;Asia/Shanghai&quot; \\ -e PLEX_CLAIM=&quot;claim-xxx&quot; \\ -v /data/plexconfig:/config \\ -v /data/plextranscode:/transcode \\ -v /data/plexmedia:/data \\ plexinc/pms-docker 其他 ShellClash Clash.Meta 常用命令 zfs list zpool status zpool iostat -v 1 rsync -aiv --progress /mnt/usb/ /data/xxx/xxx pct set 401 -mp0 /data/archive,mp=/archive SeafilePro Pro版本3用户以内免费，部署方式查看官方中文教程 官方英文教程【推荐】 命令行客户端 wget https://linux-clients.seafile.com/seafile.asc -O /usr/share/keyrings/seafile-keyring.asc echo &quot;deb [arch=amd64 signed-by=/usr/share/keyrings/seafile-keyring.asc] https://linux-clients.seafile.com/seafile-deb/$(lsb_release -cs)/ stable main&quot; | sudo tee /etc/apt/sources.list.d/seafile.list &gt; /dev/null apt update apt install seafile-cli -y mkdir /data/seafile-client seaf-cli init -d /data/seafile-client seaf-cli start seaf-cli sync -l &quot;the id of the library&quot; -s &quot;the url + port of server&quot; -d &quot;the folder which the library will be synced with&quot; -u &quot;username on server&quot; [-p &quot;password&quot;] seaf-cli status seaf-cli list DEBUG docker-compose logs -f --tail 10 BUG示例 seafile-mysql | 2077-77-77 77:77:77 3064 [ERROR] Incorrect definition of table mysql.column_stats: expected column &#39;hist_type&#39; at position 9 to have type enum(&#39;SINGLE_PREC_HB&#39;,&#39;DOUBLE_PREC_HB&#39;,&#39;JSON_HB&#39;), found type enum(&#39;SINGLE_PREC_HB&#39;,&#39;DOUBLE_PREC_HB&#39;). seafile-mysql | 2077-77-77 77:77:77 3064 [ERROR] Incorrect definition of table mysql.column_stats: expected column &#39;histogram&#39; at position 10 to have type longblob, found type varbinary(255). 解决办法 docker exec -it seafile-mysql bash mysql_upgrade --user=root --password=xxxx exit docker-compose down docker-compose up -d BUG示例2 seaf-cli status Traceback (most recent call last): File &quot;/usr/lib/python3/dist-packages/pysearpc/named_pipe.py&quot;, line 85, in _get_transport transport = self._pool.get(False) 解决办法 seaf-cli start 一劳永逸 加入开机启动 nano /etc/systemd/system/seafile.service [Unit] Description=seafile [Service] Type=oneshot ExecStart=/usr/bin/seaf-cli start [Install] WantedBy=multi-user.target systemctl daemon-reload systemctl enable seafile.service","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link type="application/atom+xml" rel="alternate" href="https://totoro.ink/feed.xml" title="TOTORO625" /><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="/assets/css/main.css" />
+</head><body a="light">
+    <main class="page-content" aria-label="Content">
+      <div class="w">
+        <a href="/">『返回』首页</a>
+
+<p class="post-meta">
+<a href="/archive">归档</a> | <a href="/link">大佬们</a> | <a href="/about">关于我</a>
+</p>
+<article>
+  <p class="post-meta">
+    <time datetime="2023-10-01 00:00:00 +0800">『时间』2023年10月01日</time>
+  </p>
+  
+  <h1>新的PVE，新的开始</h1>
+
+  <p>旧机器的性能太差了，正好淘汰了一台电脑，改成PVE了</p>
+
+<h1 id="引---全新pve宿主机写个自己的小tips">引 - 全新PVE宿主机，写个自己的小Tips</h1>
+
+<ol>
+  <li>Docker不得在宿主机及LXC上安装</li>
+  <li>vm全部使用cloudimg构建</li>
+  <li>UFW安装在对外的服务器上</li>
+  <li>数据盘4块HC550 16T 组建ZFS存储池RaidZ-2</li>
+  <li>每个VM安装不再安装Tailscale、zerotier、frpc、CFtunnel</li>
+  <li>独立的swap硬盘用于各VM，及PVE（宿主机64G，UFW 16G，Seafile 16G，Mt-photo 16G）</li>
+  <li>独立的固态用于PVE安装</li>
+</ol>
+
+<h2 id="参考资料">参考资料</h2>
+
+<ol>
+  <li><a href="https://pve.sqlsec.com/">国光的 PVE 环境搭建教程</a></li>
+  <li><a href="https://rushb.pro/article/N5105-PVE-Nvme-sensor.html">N5105 Proxmox VE (PVE) 主页添加温度硬盘等信息</a></li>
+</ol>
+
+<h1 id="开始安装系统">开始安装系统</h1>
+
+<p><a href="https://www.proxmox.com/en/downloads">官方网站</a>下载ISO，用<a href="https://www.ventoy.net/en/download.html">ventoy</a>制作启动工具，插上网线再开机（键盘和显示器是必须的），根据引导走完全部流程</p>
+
+<p>系统盘请使用ext4格式，避免问题</p>
+
+<p>swap设置为0G，后期自行添加专用swap硬盘，减少系统盘的磨损</p>
+
+<p>在<a href="https://tabby.sh/">tabby</a>添加配置（直连和转发）</p>
+
+<h1 id="特殊情况">特殊情况</h1>
+
+<p>DEBUG</p>
+
+<h2 id="网络故障pcie插拔">网络故障/pcie插拔</h2>
+
+<p>键盘、屏幕连接好后</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ip a 或者 ip addr
+</code></pre></div></div>
+
+<p>查看一下网卡是什么，例如：enp8s0</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nano /etc/network/interfaces
+</code></pre></div></div>
+
+<p>修改网卡</p>
+
+<h2 id="宿主机重启后vm内开机启动程序未启动">宿主机重启后VM内开机启动程序未启动</h2>
+
+<h3 id="pve开机后重新启动">PVE开机后重新启动</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nano /etc/systemd/system/vmreboot.service
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[Unit]
+Description=VM reboot
+[Service]
+待更新
+qm stop 202
+qm status 202
+qm start 202
+[Install]
+WantedBy=multi-user.target
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>systemctl daemon-reload
+systemctl enable vmreboot.service
+</code></pre></div></div>
+
+<h2 id="硬盘空间不足">硬盘空间不足</h2>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>unable to initialize physical volume /dev/nvmeon1p3
+</code></pre></div></div>
+
+<p>分区时硬盘总容量选择小几个GB即可</p>
+
+<h1 id="proxmox-ve-8-换源">Proxmox VE 8 换源</h1>
+
+<p>注1：在前面加<code class="language-plaintext highlighter-rouge">#</code>注释掉全部内容，添加以下内容</p>
+
+<p>注2：Ctrl + O 保存，Ctrl + X 退出</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nano /etc/apt/sources.list
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>deb https://mirrors.ustc.edu.cn/debian/ bookworm main non-free non-free-firmware contrib
+deb-src https://mirrors.ustc.edu.cn/debian/ bookworm main non-free non-free-firmware contrib
+deb https://mirrors.ustc.edu.cn/debian-security/ bookworm-security main
+deb-src https://mirrors.ustc.edu.cn/debian-security/ bookworm-security main
+deb https://mirrors.ustc.edu.cn/debian/ bookworm-updates main non-free non-free-firmware contrib
+deb-src https://mirrors.ustc.edu.cn/debian/ bookworm-updates main non-free non-free-firmware contrib
+deb https://mirrors.ustc.edu.cn/debian/ bookworm-backports main non-free non-free-firmware contrib
+deb-src https://mirrors.ustc.edu.cn/debian/ bookworm-backports main non-free non-free-firmware contrib
+</code></pre></div></div>
+
+<p>或者:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sed -i 's|http://deb.debian.org/debian|https://mirrors.ustc.edu.cn/debian|g' /etc/apt/sources.list
+sed -i 's|http://security.debian.org/debian|https://mirrors.ustc.edu.cn/debian|g' /etc/apt/sources.list
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nano /etc/apt/sources.list.d/pve-enterprise.list
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>deb https://mirrors.ustc.edu.cn/proxmox/debian bookworm pve-no-subscription
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nano /etc/apt/sources.list.d/ceph.list
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>deb https://mirrors.ustc.edu.cn/proxmox/debian/ceph-quincy bookworm no-subscription
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apt update
+</code></pre></div></div>
+
+<h1 id="更新-lxcct-template源">更新 LXC（CT Template）源</h1>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sed -i 's|http://download.proxmox.com|https://mirrors.tuna.tsinghua.edu.cn/proxmox|g' /usr/share/perl5/PVE/APLInfo.pm
+systemctl restart pvedaemon.service
+</code></pre></div></div>
+
+<h1 id="直通--开启-iommu-和-sr-iov">直通 / 开启 IOMMU 和 SR-IOV</h1>
+
+<p>默认大家BIOS设置好啦，新机器请看<a href="https://pve.sqlsec.com/2/1/">这个教程</a></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nano /etc/default/grub
+</code></pre></div></div>
+
+<p>修改GRUB_CMDLINE_LINUX_DEFAULT字段</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> Intel
+GRUB_CMDLINE_LINUX_DEFAULT="quiet intel_iommu=on iommu=pt textonly nomodeset nofb pci=noaer pcie_acs_override=downstream,multifunction"
+ AMD
+GRUB_CMDLINE_LINUX_DEFAULT="quiet amd_iommu=on iommu=pt textonly nomodeset nofb pci=noaer pcie_acs_override=downstream,multifunction"
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>update-grub &amp;&amp; reboot
+</code></pre></div></div>
+
+<p>带显卡直通看<a href="https://pve.sqlsec.com/4/2/">这个教程</a></p>
+
+<h1 id="个性化配置">个性化配置</h1>
+
+<p>自定义pveproxy web界面（非必须，just好看）</p>
+
+<h2 id="删除订阅弹窗">删除订阅弹窗</h2>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sed -Ezi.bak "s/(Ext.Msg.show\(\{\s+title: gettext\('No valid sub)/void\(\{ \/\/\1/g" /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js
+systemctl restart pveproxy.service
+</code></pre></div></div>
+
+<h2 id="首页显示-cpu主板nvme硬盘-温度等信息">首页显示 CPU、主板、NVME、硬盘 温度等信息</h2>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apt update
+apt install lm-sensors patch -y
+sensors-detect
+</code></pre></div></div>
+
+<p>全部回车</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>chmod +s /usr/sbin/smartctl
+export LC_ALL=en_US.UTF-8
+sensors
+reboot
+</code></pre></div></div>
+
+<p>懒人<a href="https://tty228.github.io/2022/06/18/%E3%80%90Proxmox%20VE%E3%80%91PVE%20%E9%A6%96%E9%A1%B5%E6%98%BE%E7%A4%BA%20CPU%E3%80%81%E4%B8%BB%E6%9D%BF%E3%80%81NVME%E3%80%81%E7%A1%AC%E7%9B%98%20%E6%B8%A9%E5%BA%A6%E7%AD%89%E4%BF%A1%E6%81%AF/">一键教程</a></p>
+
+<p>看一下自己几个NVME</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>smartctl -a -j /dev/nvme? 
+</code></pre></div></div>
+
+<p>看一下自己几个硬盘</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>smartctl -a -j /dev/sd? 
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nano /usr/share/perl5/PVE/API2/Nodes.pm
+</code></pre></div></div>
+
+<p>Ctrl + w 搜索<code class="language-plaintext highlighter-rouge">shared =&gt; $meminfo-&gt;{memshared}</code></p>
+
+<p>在该段结束后（；为结束）换行添加（记得tab一下对齐）</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$res-&gt;{sensinfo} = `sensors`;
+$res-&gt;{cpusensors} = `lscpu | grep MHz`;
+$res-&gt;{smartctl_nvme0_json} = `smartctl -a -j /dev/nvme0`;
+$res-&gt;{smartctl_nvme1_json} = `smartctl -a -j /dev/nvme1`;
+$res-&gt;{smartctl_nvme2_json} = `smartctl -a -j /dev/nvme2`;
+$res-&gt;{smartctl_hdd1_json} = `smartctl -a -j /dev/sda`;
+$res-&gt;{smartctl_hdd2_json} = `smartctl -a -j /dev/sdb`;
+$res-&gt;{smartctl_hdd3_json} = `smartctl -a -j /dev/sdc`;
+$res-&gt;{smartctl_hdd4_json} = `smartctl -a -j /dev/sdd`;
+</code></pre></div></div>
+
+<p>注：该示例为3块nvme + 4块硬盘</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nano /usr/share/pve-manager/js/pvemanagerlib.js
+</code></pre></div></div>
+
+<p>建议使用<a href="https://winscp.net/eng/download.php">winscp</a>打开，<a href="https://notepad-plus-plus.org/downloads/">notepad++</a>编辑</p>
+
+<p>搜索<code class="language-plaintext highlighter-rouge"> PVE Manager Version</code>新版本为<code class="language-plaintext highlighter-rouge">Manager Version</code></p>
+
+<h4 id="旧的配置1">旧的配置1</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{
+            itemId: 'sensinfo',
+            colspan: 2,
+            printBar: false,
+            title: gettext('CPU温度'),
+            textField: 'sensinfo',
+            renderer:function(value){
+            const c0 = value.match(/Core 0.*?\+([\d\.]+)?/)[1];
+            const c1 = value.match(/Core 1.*?\+([\d\.]+)?/)[1];
+            const c2 = value.match(/Core 2.*?\+([\d\.]+)?/)[1];
+            const c3 = value.match(/Core 3.*?\+([\d\.]+)?/)[1];
+            const c4 = value.match(/Core 4.*?\+([\d\.]+)?/)[1];
+			const c5 = value.match(/Core 5.*?\+([\d\.]+)?/)[1];
+			const p0 = value.match(/Package id 0.*?\+([\d\.]+)?/)[1];
+			const b0 = value.match(/temp1.*?\+([\d\.]+)?/)[1];
+             return `表面: ${p0} ℃ | 核心: ${c0}|${c1}|${c2}|${c3}|${c4}|${c5} ℃ | 主板: ${b0} ℃`
+             }
+	},
+	{
+          itemId: 'MHz',
+          colspan: 2,
+          printBar: false,
+          title: gettext('CPU频率'),
+          textField: 'cpusensors',
+          renderer:function(value){
+			  const f0 = value.match(/CPU.*scaling MHz.*?([\d]+)/)[1];
+			  const f1 = value.match(/CPU min MHz.*?([\d]+)/)[1];
+			  const f2 = value.match(/CPU max MHz.*?([\d]+)/)[1];
+			  const f3 = f0*f2/100;
+			  return `实时: ${f3} MHz(${f0}%) | 最小: ${f1} MHz | 最大: ${f2} MHz `
+            }
+	},
+	{        
+        itemId: 'nvme_ssd0',
+        colspan: 2,
+        printBar: false,
+        title: gettext('NVME槽0：pcie槽转接'),
+        textField: 'smartctl_nvme0_json',
+        renderer: function(value) {
+            value = JSON.parse(value);
+            if (value['model_name']) {
+                try {var model_name = value['model_name'];} catch(e) {var model_name = '';} 
+                try {var percentage_used = ' | 使用寿命: ' + value['nvme_smart_health_information_log']['percentage_used'].toFixed(0) + '% ';} catch(e) {var percentage_used = '';} 
+                try {var data_units_read = value['nvme_smart_health_information_log']['data_units_read']*512/1024/1024;var data_units_read = '(读: ' + data_units_read.toFixed(2) + 'GB, ';} catch(e) {var data_units_read = '';} 
+                try {var data_units_written = value['nvme_smart_health_information_log']['data_units_written']*512/1024/1024;var data_units_written = '写: ' + data_units_written.toFixed(2) + 'GB)';} catch(e) {var data_units_written = '';} 
+                try {var power_on_time = ' | 通电: ' + value['power_on_time']['hours'].toFixed(0) + '小时';} catch(e) {var power_on_time = '';} 
+                try {var temperature = ' | 温度: ' + value['temperature']['current'].toFixed(1) + '°C';} catch(e) {var temperature = '';} 
+                return `${model_name}${percentage_used}${data_units_read}${data_units_written}${power_on_time}${temperature}`;
+            } else { 
+                return `提示: 未安装硬盘或已直通硬盘控制器`;
+            }
+        }
+    },
+	{        
+        itemId: 'nvme_ssd1',
+        colspan: 2,
+        printBar: false,
+        title: gettext('NVME槽1：主板正面pcie4.0'),
+        textField: 'smartctl_nvme1_json',
+        renderer: function(value) {
+            value = JSON.parse(value);
+            if (value['model_name']) {
+                try {var model_name = value['model_name'];} catch(e) {var model_name = '';} 
+                try {var percentage_used = ' | 使用寿命: ' + value['nvme_smart_health_information_log']['percentage_used'].toFixed(0) + '% ';} catch(e) {var percentage_used = '';} 
+                try {var data_units_read = value['nvme_smart_health_information_log']['data_units_read']*512/1024/1024;var data_units_read = '(读: ' + data_units_read.toFixed(2) + 'GB, ';} catch(e) {var data_units_read = '';} 
+                try {var data_units_written = value['nvme_smart_health_information_log']['data_units_written']*512/1024/1024;var data_units_written = '写: ' + data_units_written.toFixed(2) + 'GB)';} catch(e) {var data_units_written = '';} 
+                try {var power_on_time = ' | 通电: ' + value['power_on_time']['hours'].toFixed(0) + '小时';} catch(e) {var power_on_time = '';} 
+                try {var temperature = ' | 温度: ' + value['temperature']['current'].toFixed(1) + '°C';} catch(e) {var temperature = '';} 
+                return `${model_name}${percentage_used}${data_units_read}${data_units_written}${power_on_time}${temperature}`;
+            } else { 
+                return `提示: 未安装硬盘或已直通硬盘控制器`;
+            }
+        }
+    },
+	{        
+        itemId: 'nvme_ssd2',
+        colspan: 2,
+        printBar: false,
+        title: gettext('NVME槽2：主板背面pcie3.0'),
+        textField: 'smartctl_nvme2_json',
+        renderer: function(value) {
+            value = JSON.parse(value);
+            if (value['model_name']) {
+                try {var model_name = value['model_name'];} catch(e) {var model_name = '';} 
+                try {var percentage_used = ' | 使用寿命: ' + value['nvme_smart_health_information_log']['percentage_used'].toFixed(0) + '% ';} catch(e) {var percentage_used = '';} 
+                try {var data_units_read = value['nvme_smart_health_information_log']['data_units_read']*512/1024/1024;var data_units_read = '(读: ' + data_units_read.toFixed(2) + 'GB, ';} catch(e) {var data_units_read = '';} 
+                try {var data_units_written = value['nvme_smart_health_information_log']['data_units_written']*512/1024/1024;var data_units_written = '写: ' + data_units_written.toFixed(2) + 'GB)';} catch(e) {var data_units_written = '';} 
+                try {var power_on_time = ' | 通电: ' + value['power_on_time']['hours'].toFixed(0) + '小时';} catch(e) {var power_on_time = '';} 
+                try {var temperature = ' | 温度: ' + value['temperature']['current'].toFixed(1) + '°C';} catch(e) {var temperature = '';} 
+                return `${model_name}${percentage_used}${data_units_read}${data_units_written}${power_on_time}${temperature}`;
+            } else { 
+                return `提示: 未安装硬盘或已直通硬盘控制器`;
+            }
+        }
+    },
+	{        
+        itemId: 'hdd_sda',
+        colspan: 2,
+        printBar: false,
+        title: gettext('机械硬盘sda'),
+        textField: 'smartctl_hdd1_json',
+        renderer: function(value) {
+            value = JSON.parse(value);
+            if (value['model_name']) {
+                try {var model_name = value['model_name'];} catch(e) {var model_name = '';}
+				try {var serial_number = ' | 序列号: ' +  value['serial_number'];} catch(e) {var serial_number = '';} 
+				try {var power_cycle_count = ' | 通电: ' + value['power_cycle_count'] + '次';} catch(e) {var power_cycle_count = '';} 
+                try {var power_on_time = ' | 通电: ' + value['power_on_time']['hours'].toFixed(0) + '小时';} catch(e) {var power_on_time = '';} 
+                try {var temperature = ' | 温度: ' + value['temperature']['current'].toFixed(1) + '°C';} catch(e) {var temperature = '';} 
+                return `${model_name}${serial_number}${power_cycle_count}${power_on_time}${temperature}`;
+            } else { 
+                return `提示: 未安装硬盘或已直通硬盘控制器`;
+            }
+        }
+    },
+	{        
+        itemId: 'hdd_sdb',
+        colspan: 2,
+        printBar: false,
+        title: gettext('机械硬盘sdb'),
+        textField: 'smartctl_hdd2_json',
+        renderer: function(value) {
+            value = JSON.parse(value);
+            if (value['model_name']) {
+                try {var model_name = value['model_name'];} catch(e) {var model_name = '';}
+				try {var serial_number = ' | 序列号: ' +  value['serial_number'];} catch(e) {var serial_number = '';} 
+				try {var power_cycle_count = ' | 通电: ' + value['power_cycle_count'] + '次';} catch(e) {var power_cycle_count = '';} 
+                try {var power_on_time = ' | 通电: ' + value['power_on_time']['hours'].toFixed(0) + '小时';} catch(e) {var power_on_time = '';} 
+                try {var temperature = ' | 温度: ' + value['temperature']['current'].toFixed(1) + '°C';} catch(e) {var temperature = '';} 
+                return `${model_name}${serial_number}${power_cycle_count}${power_on_time}${temperature}`;
+            } else { 
+                return `提示: 未安装硬盘或已直通硬盘控制器`;
+            }
+        }
+    },
+	{        
+        itemId: 'hdd_sdc',
+        colspan: 2,
+        printBar: false,
+        title: gettext('机械硬盘sdc'),
+        textField: 'smartctl_hdd3_json',
+        renderer: function(value) {
+            value = JSON.parse(value);
+            if (value['model_name']) {
+                try {var model_name = value['model_name'];} catch(e) {var model_name = '';}
+				try {var serial_number = ' | 序列号: ' +  value['serial_number'];} catch(e) {var serial_number = '';} 
+				try {var power_cycle_count = ' | 通电: ' + value['power_cycle_count'] + '次';} catch(e) {var power_cycle_count = '';} 
+                try {var power_on_time = ' | 通电: ' + value['power_on_time']['hours'].toFixed(0) + '小时';} catch(e) {var power_on_time = '';} 
+                try {var temperature = ' | 温度: ' + value['temperature']['current'].toFixed(1) + '°C';} catch(e) {var temperature = '';} 
+                return `${model_name}${serial_number}${power_cycle_count}${power_on_time}${temperature}`;
+            } else { 
+                return `提示: 未安装硬盘或已直通硬盘控制器`;
+            }
+        }
+    },
+	{        
+        itemId: 'hdd_sdd',
+        colspan: 2,
+        printBar: false,
+        title: gettext('机械硬盘sdd'),
+        textField: 'smartctl_hdd4_json',
+        renderer: function(value) {
+            value = JSON.parse(value);
+            if (value['model_name']) {
+                try {var model_name = value['model_name'];} catch(e) {var model_name = '';}
+				try {var serial_number = ' | 序列号: ' +  value['serial_number'];} catch(e) {var serial_number = '';} 
+				try {var power_cycle_count = ' | 通电: ' + value['power_cycle_count'] + '次';} catch(e) {var power_cycle_count = '';} 
+                try {var power_on_time = ' | 通电: ' + value['power_on_time']['hours'].toFixed(0) + '小时';} catch(e) {var power_on_time = '';} 
+                try {var temperature = ' | 温度: ' + value['temperature']['current'].toFixed(1) + '°C';} catch(e) {var temperature = '';} 
+                return `${model_name}${serial_number}${power_cycle_count}${power_on_time}${temperature}`;
+            } else { 
+                return `提示: 未安装硬盘或已直通硬盘控制器`;
+            }
+        }
+    },
+</code></pre></div></div>
+
+<h4 id="现在使用配置2">现在使用配置2</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>	{
+            itemId: 'sensinfo',
+            colspan: 2,
+            printBar: false,
+            title: gettext('CPU温度'),
+            textField: 'sensinfo',
+            renderer:function(value){
+            const c0 = value.match(/Core 0.*?\+([\d\.]+)?/)[1];
+            const c1 = value.match(/Core 1.*?\+([\d\.]+)?/)[1];
+            const c2 = value.match(/Core 2.*?\+([\d\.]+)?/)[1];
+            const c3 = value.match(/Core 3.*?\+([\d\.]+)?/)[1];
+            const c4 = value.match(/Core 4.*?\+([\d\.]+)?/)[1];
+			const c5 = value.match(/Core 5.*?\+([\d\.]+)?/)[1];
+			const p0 = value.match(/Package id 0.*?\+([\d\.]+)?/)[1];
+			const b0 = value.match(/temp1.*?\+([\d\.]+)?/)[1];
+             return `表面: ${p0} ℃ | 核心: ${c0}|${c1}|${c2}|${c3}|${c4}|${c5} ℃ | 主板: ${b0} ℃`
+             }
+	},
+	{
+          itemId: 'MHz',
+          colspan: 2,
+          printBar: false,
+          title: gettext('CPU频率'),
+          textField: 'cpusensors',
+          renderer:function(value){
+			  const f0 = value.match(/CPU.*scaling MHz.*?([\d]+)/)[1];
+			  const f1 = value.match(/CPU min MHz.*?([\d]+)/)[1];
+			  const f2 = value.match(/CPU max MHz.*?([\d]+)/)[1];
+			  const f3 = f0*f2/100;
+			  return `实时: ${f3} MHz(${f0}%) | 最小: ${f1} MHz | 最大: ${f2} MHz `
+            }
+	},
+	{        
+        itemId: 'nvme_ssd0',
+        colspan: 2,
+        printBar: false,
+        title: gettext('/dev/nvme0'),
+        textField: 'smartctl_nvme0_json',
+        renderer: function(value) {
+            value = JSON.parse(value);
+            if (value['model_name']) {
+                try {var model_name = value['model_name'];} catch(e) {var model_name = '';} 
+                try {var percentage_used = ' | 磨损: ' + value['nvme_smart_health_information_log']['percentage_used'].toFixed(0) + '% ';} catch(e) {var percentage_used = '';} 
+                try {var data_units_read = value['nvme_smart_health_information_log']['data_units_read']*512/1024/1024/1024;var data_units_read = '(读: ' + data_units_read.toFixed(2) + 'TB, ';} catch(e) {var data_units_read = '';} 
+                try {var data_units_written = value['nvme_smart_health_information_log']['data_units_written']*512/1024/1024/1024;var data_units_written = '写: ' + data_units_written.toFixed(2) + 'TB)';} catch(e) {var data_units_written = '';} 
+                try {var power_on_time = ' | ' + value['power_on_time']['hours'].toFixed(0) + '小时';} catch(e) {var power_on_time = '';} 
+                try {var temperature = ' | ' + value['temperature']['current'].toFixed(1) + '°C';} catch(e) {var temperature = '';} 
+                return `${model_name}${percentage_used}${data_units_read}${data_units_written}${power_on_time}${temperature}`;
+            } else { 
+                return `提示: 未安装硬盘或已直通硬盘控制器`;
+            }
+        }
+    },
+	{        
+        itemId: 'nvme_ssd1',
+        colspan: 2,
+        printBar: false,
+        title: gettext('/dev/nvme1'),
+        textField: 'smartctl_nvme1_json',
+        renderer: function(value) {
+            value = JSON.parse(value);
+            if (value['model_name']) {
+                try {var model_name = value['model_name'];} catch(e) {var model_name = '';} 
+                try {var percentage_used = ' | 磨损: ' + value['nvme_smart_health_information_log']['percentage_used'].toFixed(0) + '% ';} catch(e) {var percentage_used = '';} 
+                try {var data_units_read = value['nvme_smart_health_information_log']['data_units_read']*512/1024/1024/1024;var data_units_read = '(读: ' + data_units_read.toFixed(2) + 'TB, ';} catch(e) {var data_units_read = '';} 
+                try {var data_units_written = value['nvme_smart_health_information_log']['data_units_written']*512/1024/1024/1024;var data_units_written = '写: ' + data_units_written.toFixed(2) + 'TB)';} catch(e) {var data_units_written = '';} 
+                try {var power_on_time = ' | ' + value['power_on_time']['hours'].toFixed(0) + '小时';} catch(e) {var power_on_time = '';} 
+                try {var temperature = ' | ' + value['temperature']['current'].toFixed(1) + '°C';} catch(e) {var temperature = '';} 
+                return `${model_name}${percentage_used}${data_units_read}${data_units_written}${power_on_time}${temperature}`;
+            } else { 
+                return `提示: 未安装硬盘或已直通硬盘控制器`;
+            }
+        }
+    },
+	{        
+        itemId: 'nvme_ssd2',
+        colspan: 2,
+        printBar: false,
+        title: gettext('/dev/nvme2'),
+        textField: 'smartctl_nvme2_json',
+        renderer: function(value) {
+            value = JSON.parse(value);
+            if (value['model_name']) {
+                try {var model_name = value['model_name'];} catch(e) {var model_name = '';} 
+                try {var percentage_used = ' | 磨损: ' + value['nvme_smart_health_information_log']['percentage_used'].toFixed(0) + '% ';} catch(e) {var percentage_used = '';} 
+                try {var data_units_read = value['nvme_smart_health_information_log']['data_units_read']*512/1024/1024/1024;var data_units_read = '(读: ' + data_units_read.toFixed(2) + 'TB, ';} catch(e) {var data_units_read = '';} 
+                try {var data_units_written = value['nvme_smart_health_information_log']['data_units_written']*512/1024/1024/1024;var data_units_written = '写: ' + data_units_written.toFixed(2) + 'TB)';} catch(e) {var data_units_written = '';} 
+                try {var power_on_time = ' | ' + value['power_on_time']['hours'].toFixed(0) + '小时';} catch(e) {var power_on_time = '';} 
+                try {var temperature = ' | ' + value['temperature']['current'].toFixed(1) + '°C';} catch(e) {var temperature = '';} 
+                return `${model_name}${percentage_used}${data_units_read}${data_units_written}${power_on_time}${temperature}`;
+            } else { 
+                return `提示: 未安装硬盘或已直通硬盘控制器`;
+            }
+        }
+    },
+	{        
+        itemId: 'hdd_sda',
+        colspan: 2,
+        printBar: false,
+        title: gettext('/dev/sda'),
+        textField: 'smartctl_hdd1_json',
+        renderer: function(value) {
+            value = JSON.parse(value);
+            if (value['model_name']) {
+                try {var model_name = value['model_name'];} catch(e) {var model_name = '';}
+				try {var serial_number = ' | 序列号: ' +  value['serial_number'];} catch(e) {var serial_number = '';} 
+				try {var power_cycle_count = ' | ' + value['power_cycle_count'] + '次';} catch(e) {var power_cycle_count = '';} 
+                try {var power_on_time = ' | ' + value['power_on_time']['hours'].toFixed(0) + '小时';} catch(e) {var power_on_time = '';} 
+                try {var temperature = ' | ' + value['temperature']['current'].toFixed(1) + '°C';} catch(e) {var temperature = '';} 
+                return `${model_name}${serial_number}${power_cycle_count}${power_on_time}${temperature}`;
+            } else { 
+                return `提示: 未安装硬盘或已直通硬盘控制器`;
+            }
+        }
+    },
+	{        
+        itemId: 'hdd_sdb',
+        colspan: 2,
+        printBar: false,
+        title: gettext('/dev/sdb'),
+        textField: 'smartctl_hdd2_json',
+        renderer: function(value) {
+            value = JSON.parse(value);
+            if (value['model_name']) {
+                try {var model_name = value['model_name'];} catch(e) {var model_name = '';}
+				try {var serial_number = ' | 序列号: ' +  value['serial_number'];} catch(e) {var serial_number = '';} 
+				try {var power_cycle_count = ' | ' + value['power_cycle_count'] + '次';} catch(e) {var power_cycle_count = '';} 
+                try {var power_on_time = ' | ' + value['power_on_time']['hours'].toFixed(0) + '小时';} catch(e) {var power_on_time = '';} 
+                try {var temperature = ' | ' + value['temperature']['current'].toFixed(1) + '°C';} catch(e) {var temperature = '';} 
+                return `${model_name}${serial_number}${power_cycle_count}${power_on_time}${temperature}`;
+            } else { 
+                return `提示: 未安装硬盘或已直通硬盘控制器`;
+            }
+        }
+    },
+	{        
+        itemId: 'hdd_sdc',
+        colspan: 2,
+        printBar: false,
+        title: gettext('/dev/sdc'),
+        textField: 'smartctl_hdd3_json',
+        renderer: function(value) {
+            value = JSON.parse(value);
+            if (value['model_name']) {
+                try {var model_name = value['model_name'];} catch(e) {var model_name = '';}
+				try {var serial_number = ' | 序列号: ' +  value['serial_number'];} catch(e) {var serial_number = '';} 
+				try {var power_cycle_count = ' | ' + value['power_cycle_count'] + '次';} catch(e) {var power_cycle_count = '';} 
+                try {var power_on_time = ' | ' + value['power_on_time']['hours'].toFixed(0) + '小时';} catch(e) {var power_on_time = '';} 
+                try {var temperature = ' | ' + value['temperature']['current'].toFixed(1) + '°C';} catch(e) {var temperature = '';} 
+                return `${model_name}${serial_number}${power_cycle_count}${power_on_time}${temperature}`;
+            } else { 
+                return `提示: 未安装硬盘或已直通硬盘控制器`;
+            }
+        }
+    },
+	{        
+        itemId: 'hdd_sdd',
+        colspan: 2,
+        printBar: false,
+        title: gettext('/dev/sdd'),
+        textField: 'smartctl_hdd4_json',
+        renderer: function(value) {
+            value = JSON.parse(value);
+            if (value['model_name']) {
+                try {var model_name = value['model_name'];} catch(e) {var model_name = '';}
+				try {var serial_number = ' | 序列号: ' +  value['serial_number'];} catch(e) {var serial_number = '';} 
+				try {var power_cycle_count = ' | ' + value['power_cycle_count'] + '次';} catch(e) {var power_cycle_count = '';} 
+                try {var power_on_time = ' | ' + value['power_on_time']['hours'].toFixed(0) + '小时';} catch(e) {var power_on_time = '';} 
+                try {var temperature = ' | ' + value['temperature']['current'].toFixed(1) + '°C';} catch(e) {var temperature = '';} 
+                return `${model_name}${serial_number}${power_cycle_count}${power_on_time}${temperature}`;
+            } else { 
+                return `提示: 未安装硬盘或已直通硬盘控制器`;
+            }
+        }
+    },
+</code></pre></div></div>
+
+<p>注：该示例为6核心</p>
+
+<h4 id="nuc配置">NUC配置</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>	{
+            itemId: 'sensinfo',
+            colspan: 2,
+            printBar: false,
+            title: gettext('CPU温度'),
+            textField: 'sensinfo',
+            renderer:function(value){
+            const c0 = value.match(/Core 0.*?\+([\d\.]+)?/)[1];
+            const c1 = value.match(/Core 1.*?\+([\d\.]+)?/)[1];
+            const c2 = value.match(/Core 2.*?\+([\d\.]+)?/)[1];
+            const c3 = value.match(/Core 3.*?\+([\d\.]+)?/)[1];
+			const p0 = value.match(/Package id 0.*?\+([\d\.]+)?/)[1];
+			const b0 = value.match(/temp1.*?\+([\d\.]+)?/)[1];
+             return `表面: ${p0} ℃ | 核心: ${c0}|${c1}|${c2}|${c3} ℃ | 主板: ${b0} ℃`
+             }
+	},
+	{
+          itemId: 'MHz',
+          colspan: 2,
+          printBar: false,
+          title: gettext('CPU频率'),
+          textField: 'cpusensors',
+          renderer:function(value){
+			  const f0 = value.match(/CPU.*scaling MHz.*?([\d]+)/)[1];
+			  const f1 = value.match(/CPU min MHz.*?([\d]+)/)[1];
+			  const f2 = value.match(/CPU max MHz.*?([\d]+)/)[1];
+			  const f3 = f0*f2/100;
+			  return `实时: ${f3} MHz(${f0}%) | 最小: ${f1} MHz | 最大: ${f2} MHz `
+            }
+	},
+	{        
+        itemId: 'nvme_ssd0',
+        colspan: 2,
+        printBar: false,
+        title: gettext('/dev/nvme0'),
+        textField: 'smartctl_nvme0_json',
+        renderer: function(value) {
+            value = JSON.parse(value);
+            if (value['model_name']) {
+                try {var model_name = value['model_name'];} catch(e) {var model_name = '';} 
+                try {var percentage_used = ' | 磨损: ' + value['nvme_smart_health_information_log']['percentage_used'].toFixed(0) + '% ';} catch(e) {var percentage_used = '';} 
+                try {var data_units_read = value['nvme_smart_health_information_log']['data_units_read']*512/1024/1024/1024;var data_units_read = '(读: ' + data_units_read.toFixed(2) + 'TB, ';} catch(e) {var data_units_read = '';} 
+                try {var data_units_written = value['nvme_smart_health_information_log']['data_units_written']*512/1024/1024/1024;var data_units_written = '写: ' + data_units_written.toFixed(2) + 'TB)';} catch(e) {var data_units_written = '';} 
+                try {var power_on_time = ' | ' + value['power_on_time']['hours'].toFixed(0) + '小时';} catch(e) {var power_on_time = '';} 
+                try {var temperature = ' | ' + value['temperature']['current'].toFixed(1) + '°C';} catch(e) {var temperature = '';} 
+                return `${model_name}${percentage_used}${data_units_read}${data_units_written}${power_on_time}${temperature}`;
+            } else { 
+                return `提示: 未安装硬盘或已直通硬盘控制器`;
+            }
+        }
+    },
+	{        
+        itemId: 'ssd_sda',
+        colspan: 2,
+        printBar: false,
+        title: gettext('/dev/sda'),
+        textField: 'smartctl_hdd1_json',
+        renderer: function(value) {
+            value = JSON.parse(value);
+            if (value['model_name']) {
+                try {var model_name = value['model_name'];} catch(e) {var model_name = '';}
+				try {var serial_number = ' | 序列号: ' +  value['serial_number'];} catch(e) {var serial_number = '';} 
+                try {var power_on_time = ' | ' + value['power_on_time']['hours'].toFixed(0) + '小时';} catch(e) {var power_on_time = '';} 
+                try {var temperature = ' | ' + value['temperature']['current'].toFixed(1) + '°C';} catch(e) {var temperature = '';} 
+                return `${model_name}${serial_number}${power_on_time}${temperature}`;
+            } else { 
+                return `提示: 未安装硬盘或已直通硬盘控制器`;
+            }
+        }
+    },
+</code></pre></div></div>
+
+<p>搜索<code class="language-plaintext highlighter-rouge">widget.pveNodeStatus</code></p>
+
+<p>将 height: 300 （默认值） 改大为 420，或者更大，然后保存（每多一行大概增大 20~25）</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>systemctl restart pveproxy.service
+</code></pre></div></div>
+
+<p>检查WEB界面是否正常显示</p>
+
+<h1 id="powersave模式">powersave模式</h1>
+
+<p>默认使用高性能模式，切换为低性能模式</p>
+
+<p>查看支持的 CPU 电源模式</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_governors
+</code></pre></div></div>
+
+<p>只有两种结果powersave、performance为intel pstate 受害者</p>
+
+<p>查看当前的 CPU 电源模式</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apt install linux-cpupower -y
+cpupower -c all frequency-info
+cpupower -c all frequency-set -g powersave
+</code></pre></div></div>
+
+<h2 id="持久化---cpupower开机启动">持久化  / cpupower开机启动</h2>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nano /etc/systemd/system/cpupower.service
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[Unit]
+
+Description=CPU powersave
+
+[Service]
+
+Type=oneshot
+ExecStart=/usr/bin/cpupower frequency-set -g powersave  
+
+[Install]
+
+WantedBy=multi-user.target
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>systemctl daemon-reload
+systemctl enable cpupower.service
+</code></pre></div></div>
+
+<h1 id="apc-ups-连接">APC UPS 连接</h1>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apt-get install apcupsd
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nano /etc/apcupsd/apcupsd.conf
+</code></pre></div></div>
+
+<p>必要的配置：
+在 UPSNAME 后面给个易懂的名字
+在 UPSCABLE 后指定为 usb
+在 UPSTYPE 后更改为 usb
+在 DEVICE 后为空，这样系统便会自动检测 USB 连接 UPS</p>
+
+<p>其他的随便找个教程即可，注意：关机触发条件，有剩余电量和剩余时间，默认为5%和3分钟。注意这里<strong>只要满足其中任一条件</strong>便会触发</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nano /etc/default/apcupsd
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ISCONFIGURED=no 更改为 yes
+</code></pre></div></div>
+
+<p>任何教程都没提，太坑了！<a href="https://unix.stackexchange.com/questions/494295/apcupsd-on-debian-stretch-9-no-connection-to-ups">来源</a></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/etc/init.d/apcupsd restart
+systemctl enable apcupsd.service
+systemctl status apcupsd.service 
+</code></pre></div></div>
+
+<p>查看ups运行状态</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apcaccess
+</code></pre></div></div>
+
+<h1 id="安装tailscale">安装Tailscale</h1>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl -fsSL https://tailscale.com/install.sh | sh
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>tailscale up --advertise-exit-node --accept-routes --accept-dns=false
+</code></pre></div></div>
+
+<p>点击/打开终端给的链接，授权登录</p>
+
+<p>不要关闭浏览器，在管理员界面找到这台机器</p>
+
+<p>设置里面关闭登录过期，打开exit node</p>
+
+<p>也可以预设密钥登录</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>tailscale up --advertise-exit-node --accept-routes --accept-dns=false --authkey=tskey-auth-xxxx
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>NODE01
+tailscale up --advertise-routes=192.168.2.32/29 --accept-dns=false --accept-routes --advertise-exit-node
+NODE02
+tailscale up --advertise-exit-node --accept-dns=false --accept-routes --advertise-routes=192.168.1.96/27,192.168.1.128/27,192.168.1.192/27,192.168.1.0/28
+</code></pre></div></div>
+
+<h1 id="zfs池">ZFS池</h1>
+
+<h2 id="参考资料-1">参考资料</h2>
+
+<ol>
+  <li><a href="https://www.truenas.com/community/threads/slideshow-explaining-vdev-zpool-zil-and-l2arc-for-noobs.7775/">为新手解释 VDev、zpool、ZIL 和 L2ARC 的幻灯片！</a></li>
+  <li><a href="https://www.v2ex.com/t/972903">2023.9 ZFS 能用于数据盘吗？关于 PVE 下 ZFS RAID 等相关 10 个疑问</a></li>
+  <li><a href="https://note.lishouzhong.com/article/wiki/sitemap-index.html">李守中 Wiki</a></li>
+  <li><a href="https://pve.proxmox.com/wiki/ZFS_on_Linux">ZFS on Linux</a></li>
+  <li><a href="https://dapeng.li/learning/zfs/index.html">踩坑集 学习笔记</a></li>
+</ol>
+
+<h2 id="开始">开始</h2>
+
+<p>PVE管理界面组ZFS池，选择4块hdd，名称z2pool，RAID级别RAIDZ2，压缩lz4，ashift：12</p>
+
+<p>注，示例池名称为z2pool</p>
+
+<p>ZFS 严重依赖内存，因此至少需要 8GB 才能启动</p>
+
+<p>专用缓存和/或日志磁盘，则应使用企业级 SSD。这可以显着提高整体性能。</p>
+
+<p>VM 内安装 Proxmox VE（嵌套虚拟化），请不要对该 VM 的磁盘使用virtio，因为 ZFS 不支持它们。请改用 IDE 或 SCSI（也适用于virtio SCSI 控制器类型）</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>zpool status
+zfs list
+zfs get volsize,refreservation,used &lt;pool&gt;/vm-&lt;vmid&gt;-disk-X
+</code></pre></div></div>
+
+<p>阅读手册</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>man zpool
+man zfs
+</code></pre></div></div>
+
+<h2 id="限制zfs内存使用arc">限制ZFS内存使用（ARC）</h2>
+
+<p><strong>默认情况</strong>下， ZFS 将<em>50%</em>的主机内存用于<strong>自适应</strong>替换<strong>缓存</strong>(ARC)。为 ARC 分配足够的内存对于 IO 性能至关重要，因此请谨慎减少内存。根据一般经验，至少分配<code class="language-plaintext highlighter-rouge">2 GiB Base + 1 GiB/TiB-Storage</code>。例如，如果您有一个具有 <code class="language-plaintext highlighter-rouge">8 TiB</code>可用存储空间的池，那么您应该为 ARC使用`10 GiB内存。</p>
+
+<p>您可以通过直接写入<code class="language-plaintext highlighter-rouge">zfs_arc_max</code>模块参数来更改当前启动的 ARC 使用限制（重新启动会再次重置此更改）：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>echo "$[10 * 1024*1024*1024]" &gt;/sys/module/zfs/parameters/zfs_arc_max
+</code></pre></div></div>
+
+<p>要<strong>永久更改</strong>ARC 限制，请将以下行添加到 <code class="language-plaintext highlighter-rouge">/etc/modprobe.d/zfs.conf</code>：（8G)</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>options zfs zfs_arc_max=8589934592
+</code></pre></div></div>
+
+<p>如果您所需的<code class="language-plaintext highlighter-rouge">zfs_arc_max</code>值低于或等于 <code class="language-plaintext highlighter-rouge">zfs_arc_min</code>（默认为系统内存的 1/32），则<code class="language-plaintext highlighter-rouge">zfs_arc_max</code>将被忽略，除非您还将<code class="language-plaintext highlighter-rouge">zfs_arc_min</code>设置为最多<code class="language-plaintext highlighter-rouge">zfs_arc_max - 1</code>.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>echo "$[8 * 1024*1024*1024 - 1]" &gt;/sys/module/zfs/parameters/zfs_arc_min
+echo "$[8 * 1024*1024*1024]" &gt;/sys/module/zfs/parameters/zfs_arc_max
+</code></pre></div></div>
+
+<h2 id="交换分区-swap">交换分区 SWAP</h2>
+
+<p>最好在物理磁盘上创建一个分区并将其用作交换设备，<strong>请勿在ZFS上使用swap</strong>，<a href="https://github.com/openzfs/zfs/issues/7734">BUG</a></p>
+
+<h3 id="使用fdisk对ssd进行分区">使用fdisk对SSD进行分区</h3>
+
+<p>n、1、p、…..w</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mkswap /dev/nvme1n1p3
+swapon /dev/nvme1n1p3
+nano /etc/fstab
+</code></pre></div></div>
+
+<p>增加一行</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>UUID=xxxxx你的UUID swap swap defaults 0 0
+</code></pre></div></div>
+
+<h3 id="修改-swapiness">修改 swapiness</h3>
+
+<p>对于服务器来说，swapiness推荐为 10</p>
+
+<p>临时</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sysctl -w vm.swappiness=10
+</code></pre></div></div>
+
+<p>永久</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nano /etc/sysctl.conf
+</code></pre></div></div>
+
+<p>增加一行</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vm.swappiness = 10
+</code></pre></div></div>
+
+<p>生效</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sysctl -p
+</code></pre></div></div>
+
+<table>
+  <thead>
+    <tr>
+      <th>swappiness值</th>
+      <th>策略</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>内核只会交换以避免<em>内存不足的</em>情况</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>无需完全禁用的最小交换量</td>
+    </tr>
+    <tr>
+      <td>10</td>
+      <td>当系统中有足够的内存时，有时建议使用此值来提高性能</td>
+    </tr>
+    <tr>
+      <td>60</td>
+      <td>默认值</td>
+    </tr>
+    <tr>
+      <td>100</td>
+      <td>内核将积极地交换</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>举例： 我的笔记本电脑有 16 GB 的内存和 8 GB 的交换空间。如果我在内核参数中使用 60 swappiness，那么在使用大约 6 GB （16G*40% = 6.4G）的内存后，我的机器开始使用交换</p>
+
+<h2 id="zil-和-l2arc">ZIL 和 L2ARC</h2>
+
+<h3 id="检查nvme状态">检查nvme状态</h3>
+
+<p>适用于转接卡等情况</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>lspci
+</code></pre></div></div>
+
+<p>获取设备编号，通过编号查询id</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>lspci -n | grep -i 02:00.0
+</code></pre></div></div>
+
+<p>获取硬件id，查看指定PCI设备的带宽</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>lspci -n -d 144d:a80a -vvv | grep --color Width
+</code></pre></div></div>
+
+<p>例如：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Speed 8GT/s, Width x4
+Speed 16GT/s, Width x4
+</code></pre></div></div>
+
+<p>使用fdisk对SSD进行分区，请看前文，不再赘述</p>
+
+<p><strong>注：必须使用GPT分区表，不能使用MBR分区表</strong></p>
+
+<h3 id="查看硬盘uuid">查看硬盘uuid</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>blkid
+</code></pre></div></div>
+
+<p>或者</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>lsblk -fl
+</code></pre></div></div>
+
+<h3 id="将-zil-镜像添加到池中">将 ZIL 镜像添加到池中</h3>
+
+<p>ZFS ZIL(SLOG)虽然用起来有写缓存的效果，但 <strong>ZIL 不是写缓存</strong> 。</p>
+
+<p><strong>ZIL 写入操作全是 4K 写操作</strong>，所以 ZFS 搞出了一个 SLOG ( Separate intent LOG ) 组件， <strong>SLOG 组件必须是一个独立设备或分区，专门存放 ZIL 数据</strong> 。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>zpool add z2pool log mirror /dev/disk/by-partuuid/xxxxx你的UUID /dev/disk/by-partuuid/xxxxx你的UUID
+</code></pre></div></div>
+
+<h3 id="将-l2arc-设备添加到池中">将 L2ARC 设备添加到池中</h3>
+
+<p>一般建议不超过内存容量*10</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>zpool add z2pool cache /dev/disk/by-partuuid/xxxxx你的UUID
+</code></pre></div></div>
+
+<h3 id="检查l2arc持久化">检查L2ARC持久化</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cat /sys/module/zfs/parameters/l2arc_rebuild_enabled
+</code></pre></div></div>
+
+<p>默认值为 <code class="language-plaintext highlighter-rouge">1</code> 。</p>
+
+<p><code class="language-plaintext highlighter-rouge">l2arc_rebuild_enabled=1</code> 表示打开 L2ARC 持久化，即重启之后 L2ARC Deivce 中的数据还能用</p>
+
+<h2 id="小技巧">小技巧</h2>
+
+<h3 id="基础">基础</h3>
+
+<p><code class="language-plaintext highlighter-rouge">zpool create &lt;pool_name&gt; &lt;pool_type&gt; &lt;device_name&gt;</code> 创建一个存储池。</p>
+
+<p><code class="language-plaintext highlighter-rouge">zpool attach &lt;pool_name&gt; &lt;device_in_pool&gt; &lt;device_name&gt;</code> 向池中添加一个设备使 <em>strip</em> 变成 <em>mirror</em> 。</p>
+
+<p><code class="language-plaintext highlighter-rouge">zpool detach &lt;pool_name&gt; &lt;pool_device_name&gt;</code> 让一个池中的设备脱离池。</p>
+
+<p><code class="language-plaintext highlighter-rouge">zpool remove &lt;pool_name&gt; &lt;pool_device_name&gt;</code> 从一个池中删除一个设备。</p>
+
+<p><code class="language-plaintext highlighter-rouge">zpool offline &lt;pool_name&gt; &lt;device_name&gt;</code> 让一个池中的设备离线。</p>
+
+<p><code class="language-plaintext highlighter-rouge">zpool scrub &lt;pool_name&gt;</code> 同步池中的数据后，检测池中数据的错误并修复。</p>
+
+<p><code class="language-plaintext highlighter-rouge">zpool add &lt;zpool_name&gt; log &lt;device&gt;</code> 给没有 SLOG 设备的池添加一个 SLOG 设备。</p>
+
+<p><code class="language-plaintext highlighter-rouge">zpool attach &lt;zpool_name&gt; &lt;log_device&gt; &lt;device&gt;</code> 向已有一个 SLOG 设备的池添加另一个 SLOG 设备使之互为镜像。</p>
+
+<p><code class="language-plaintext highlighter-rouge">zpool add &lt;zpool_name&gt; log mirror &lt;device_a&gt; &lt;device_b&gt;</code> 直接添加两个互为镜像的 SLOG 设备。</p>
+
+<h3 id="文件系统">文件系统</h3>
+
+<p>请勿直接使用zfs根目录，如<code class="language-plaintext highlighter-rouge">/z2pool</code></p>
+
+<h4 id="创建一个新的文件系统并挂载">创建一个新的文件系统并挂载:</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>zfs create z2pool/docs -o mountpoint=/docs
+</code></pre></div></div>
+
+<h3 id="快照相关">快照相关</h3>
+
+<h4 id="虚拟机快照显示">虚拟机快照显示</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>zfs set snapdev=visible z2pool/vm-303-disk-1
+</code></pre></div></div>
+
+<p>这样可以直接在<code class="language-plaintext highlighter-rouge">/dev/zvol/z2pool</code>目录（或<code class="language-plaintext highlighter-rouge">/dev/z2pool</code>目录）找到对应的快照，然后方便的通过各种备份工具进行备份，例如<a href="https://restic.net/">restic</a></p>
+
+<h4 id="创建一个快照">创建一个快照</h4>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>zfs snapshot z2pool/home@tuesday
+</code></pre></div></div>
+
+<h4 id="按日期创建快照">按日期创建快照</h4>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">name</span><span class="o">=</span><span class="sb">`</span><span class="nb">date</span> +<span class="s2">"%Y-%m-%d"</span><span class="sb">`</span>
+zfs snapshot z2pool/home@<span class="nv">$name</span>
+</code></pre></div></div>
+
+<h4 id="查看所有快照">查看所有快照</h4>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>zfs list <span class="nt">-t</span> snapshot
+zfs list <span class="nt">-t</span> snapshot z2pool/home
+</code></pre></div></div>
+
+<h4 id="回滚到前一个快照">回滚到前一个快照</h4>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>zfs rollback z2pool/home@monday
+</code></pre></div></div>
+
+<h4 id="删除一个快照">删除一个快照</h4>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>zfs destroy <span class="nt">-R</span> z2pool/home@monday
+</code></pre></div></div>
+
+<h4 id="重命名快照">重命名快照</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>zfs rename z2pool/home@version1 z2pool/home@version2
+</code></pre></div></div>
+
+<p>注意: 当一个 <em>dataset</em> 存在快照时，无法直接删除。但可使用 <code class="language-plaintext highlighter-rouge">-r</code> 参数强制删除。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>zfs destroy -r z2pool/home
+</code></pre></div></div>
+
+<h3 id="克隆">克隆</h3>
+
+<p><strong>克隆只能从快照中创建，在删除克隆以前，对应的快照无法删除。</strong></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>zfs clone z2pool/home@monday z2pool/home2
+</code></pre></div></div>
+
+<h3 id="复制">复制</h3>
+
+<p>直接复制快照即可</p>
+
+<p>待补充</p>
+
+<h3 id="其他">其他</h3>
+
+<h4 id="可通过命令查询文件系统的所有属性">可通过命令查询文件系统的所有属性</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>zfs get all z2pool/home
+</code></pre></div></div>
+
+<h4 id="可通过命令查询存储池的所有属性">可通过命令查询存储池的所有属性</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  zpool get all z2pool
+</code></pre></div></div>
+
+<h4 id="查看存储池当前状态和-io-状况">查看存储池当前状态和 I/O 状况</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>zpool status -v
+zpool iostat
+</code></pre></div></div>
+
+<h4 id="显示存储池所有操作历史记录">显示存储池所有操作历史记录</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  zpool history z2pool
+</code></pre></div></div>
+
+<h1 id="开始虚拟机安装">开始虚拟机安装</h1>
+
+<h2 id="cloudinit-方式安装">Cloudinit 方式安装</h2>
+
+<p>教程贴子：https://gist.github.com/chriswayg/b6421dcc69cb3b7e41f2998f1150e1df</p>
+
+<table>
+  <tbody>
+    <tr>
+      <td>下载镜像：<a href="http://cloud-images.ubuntu.com/releases/23.04/release/">Ubuntu23.04</a></td>
+      <td><a href="http://cloud-images.ubuntu.com/releases/23.04/release/ubuntu-23.04-server-cloudimg-amd64.img">推荐这个</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<table>
+  <tbody>
+    <tr>
+      <td><a href="https://cloud.debian.org/cdimage/cloud/bookworm/latest/">Debian12</a></td>
+      <td><a href="https://cloud.debian.org/cdimage/cloud/bookworm/latest/debian-12-genericcloud-amd64.qcow2">推荐这个</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>任意地方上传下载的镜像，例如<code class="language-plaintext highlighter-rouge">/root/debian-12-genericcloud-amd64.qcow2</code>
+除了<code class="language-plaintext highlighter-rouge">qm importdisk</code> 其他命令均可用在web界面操作</p>
+
+<h3 id="创建模板">创建模板</h3>
+
+<h4 id="正常方式创建虚拟机">正常方式创建虚拟机</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>qm create 902 --name debian12-templ --memory 2048 --net0 virtio,bridge=vmbr0
+</code></pre></div></div>
+
+<h4 id="添加cloudinit系统盘">添加cloudinit系统盘</h4>
+
+<p>自行确认需要存放虚拟机的位置，示例为<code class="language-plaintext highlighter-rouge">local-lvm</code></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>qm importdisk 902 /root/debian-12-genericcloud-amd64.qcow2 local-lvm
+</code></pre></div></div>
+
+<h4 id="使用cloudinit系统盘">使用cloudinit系统盘</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>qm set 902 --scsihw virtio-scsi-pci --scsi0 local-lvm:vm-902-disk-0
+</code></pre></div></div>
+
+<h4 id="添加cloudinit设备">添加cloudinit设备</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>qm set 902 --ide2 local-lvm:cloudinit --boot c --bootdisk scsi0 --serial0 socket --vga serial0
+</code></pre></div></div>
+
+<h4 id="增加系统盘空间">增加系统盘空间</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>qm resize 902 scsi0 +30G
+</code></pre></div></div>
+
+<h4 id="设置网络">设置网络</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>qm set 902 --ipconfig0 ip=dhcp
+qm set 902 --ipconfig0 ip=10.10.10.222/24,gw=10.10.10.1
+qm set 902 --ipconfig0 ip=192.168.2.34/24,gw=192.168.2.1,ip6=auto
+</code></pre></div></div>
+
+<h4 id="设置密钥或密码">设置密钥或密码</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>qm set 902 --sshkey ~/.ssh/id_rsa.pub
+qm set 902 --cipassword 你的密码
+</code></pre></div></div>
+
+<p>建议直接在web界面设置用户为root或你的用户名</p>
+
+<h4 id="检查设置">检查设置</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>qm cloudinit dump 902 user
+</code></pre></div></div>
+
+<h3 id="ssh进入vm按自己的习惯设置">SSH进入VM，按自己的习惯设置</h3>
+
+<h4 id="debian-cloudinit换源">Debian cloudinit换源</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nano /etc/apt/mirrors/debian.list
+nano /etc/apt/mirrors/debian-security.list
+</code></pre></div></div>
+
+<p>分别修改为</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>https://mirrors.ustc.edu.cn/debian/
+https://mirrors.ustc.edu.cn/debian-security/
+</code></pre></div></div>
+
+<p>换源操作转换为模板后会丢失</p>
+
+<h4 id="阿里源安装docker">阿里源安装docker</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl -fsSL https://get.docker.com | bash -s docker --mirror Aliyun
+</code></pre></div></div>
+
+<h4 id="来宾代理-guest-agent">来宾代理 Guest Agent</h4>
+
+<p>web界面开启QEUM Guest Agent</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apt install qemu-guest-agent -y
+</code></pre></div></div>
+
+<h4 id="其他-1">其他</h4>
+
+<table>
+  <tbody>
+    <tr>
+      <td><a href="https://github.com/zu1k/nali/releases">nali</a></td>
+      <td><a href="https://github.com/natesales/q">q</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apt install htop cron screen nano -y
+wget https://conf.totoro.pub/bash/q -O /usr/bin/q
+wget https://conf.totoro.pub/bash/nali -O /usr/bin/nali
+chmod +X /usr/bin/q
+chmod +X /usr/bin/nali
+chmod 777 /usr/bin/q
+chmod 777 /usr/bin/nali
+q www.baidu.com|nali
+mkdir /data
+mkdir /data/ssl
+</code></pre></div></div>
+
+<p>特殊的，只在专用服务器设置</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl https://get.acme.sh | sh -s email=my@example.com
+apt install ufw -y
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>crontab -e
+</code></pre></div></div>
+
+<p>添加我的SSL更新命令</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>37 7    2 * *   wget Update-Url -O xxx.cer
+38 7    2 * *   wget Update-Url -O xxx.key
+47 12 1 * * "/root/.acme.sh"/acme.sh --issue --dns dns_dp --server google --challenge-alias acme.example.com --keylength ec-256 -d example.com -d *.example.com -d *.01.example.com -d *.02.example.com -d *.03.example.com --force
+37 13 1 * * "/root/.acme.sh"/acme.sh --install-cert -d example.com --key-file /data/ssl/example.com.key --fullchain-file /data/ssl/example.com.cer
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>poweroff
+</code></pre></div></div>
+
+<h3 id="设置为模板并通过模板创建虚拟机">设置为模板，并通过模板创建虚拟机</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>qm template 902
+qm clone 902 190 --name debian12
+qm start 190
+</code></pre></div></div>
+
+<h3 id="调整-vm-磁盘的大小">调整 VM 磁盘的大小</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>qm shutdown 190 &amp;&amp; qm wait
+qm resize 190 scsi0 +8G
+qm start 190
+</code></pre></div></div>
+
+<h2 id="直接使用iso安装">直接使用ISO安装</h2>
+
+<ol>
+  <li><a href="https://www.debian.org/distrib/netinst">Debian ISO 下载</a></li>
+  <li><a href="https://ubuntu.com/download/server#downloads">Ubuntu ISO 下载</a></li>
+  <li>
+    <table>
+      <tbody>
+        <tr>
+          <td><a href="https://next.itellyou.cn/Original/#">Windows ISO 下载</a></td>
+          <td>第三方精简版： <a href="https://www.techworm.net/2023/08/download-tiny10-iso-pc-windows-10.html">Tiny10 ISO</a></td>
+          <td><a href="https://www.techworm.net/2023/08/download-tiny11-iso-pc-windows-11-lite.html">Tiny11 ISO</a></td>
+        </tr>
+      </tbody>
+    </table>
+  </li>
+</ol>
+
+<h2 id="有用的cdrom">有用的CDROM</h2>
+
+<ol>
+  <li><a href="https://gparted.org/download.php">GParted Live CD/USB/HD/PXE Bootable Image</a> 分区用</li>
+</ol>
+
+<h2 id="使用img安装">使用IMG安装</h2>
+
+<h3 id="openwrt">OpenWrt</h3>
+
+<h4 id="推荐的系统镜像">推荐的系统镜像</h4>
+
+<ol>
+  <li><a href="https://openwrt.cc/releases/targets/x86/64/">SuLingGG</a> openwrt-18.06-k5.4 <a href="https://doc.openwrt.cc/">文档</a></li>
+  <li><a href="https://downloads.immortalwrt.org/">ImmortalWrt</a></li>
+  <li><a href="https://downloads.openwrt.org/releases/">OpenWrt官方</a></li>
+  <li><a href="https://openwrt.ai/">在线编译</a></li>
+</ol>
+
+<h3 id="安装方法">安装方法</h3>
+
+<p>上传你的img，设置好网卡后，正常流程创建虚拟机，导入一下硬盘即可</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>qm importdisk 100 /var/lib/vz/template/iso/openwrt-xxx.img local-lvm
+</code></pre></div></div>
+
+<p>激活硬盘，即可正常使用</p>
+
+<h3 id="网络配置">网络配置</h3>
+
+<p>正常用户都可以直接web设置这些内容</p>
+
+<p>不正常的用户通过shell修改</p>
+
+<h4 id="修改lan-ipaddr">修改LAN ipaddr</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vi /etc/config/network
+</code></pre></div></div>
+
+<h1 id="使用lxc">使用LXC</h1>
+
+<p>不推荐使用任何LXC容器</p>
+
+<h2 id="使用proxmox-ve-helper-scripts创建lxc">使用<a href="https://tteck.github.io/Proxmox/">Proxmox VE Helper Scripts</a>创建LXC</h2>
+
+<p>请先使用软路由保障PVE全局的网络</p>
+
+<h3 id="plex-media-server">Plex Media Server</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash -c "$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/ct/plex.sh)"
+</code></pre></div></div>
+
+<h3 id="emby-media-server">Emby Media Server</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash -c "$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/ct/emby.sh)"
+</code></pre></div></div>
+
+<h3 id="jellyfin-media-server">Jellyfin Media Server</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash -c "$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/ct/jellyfin.sh)"
+</code></pre></div></div>
+
+<h3 id="nextcloud">Nextcloud</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash -c "$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/ct/nextcloudpi.sh)"
+</code></pre></div></div>
+
+<h3 id="photoprism">PhotoPrism</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash -c "$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/ct/photoprism.sh)"
+</code></pre></div></div>
+
+<h3 id="adguard-home">AdGuard Home</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash -c "$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/ct/adguard.sh)"
+</code></pre></div></div>
+
+<h3 id="transmission">Transmission</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash -c "$(wget -qLO - https://github.com/tteck/Proxmox/raw/main/ct/transmission.sh)"
+</code></pre></div></div>
+
+<h3 id="vaultwarden">Vaultwarden</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bash -c "$(wget -qO - https://github.com/tteck/Proxmox/raw/main/ct/alpine-vaultwarden.sh)"
+</code></pre></div></div>
+
+<h1 id="vm使用">VM使用</h1>
+
+<h2 id="数据盘及swap">数据盘及swap</h2>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>fdisk -l
+fdisk /dev/sdb
+</code></pre></div></div>
+
+<p>n、1、p、…..w</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mkfs.ext4 /dev/sdb1
+mount /dev/sdb1 /data
+mkswap /dev/sdc
+swapon /dev/sdc
+nano /etc/fstab
+</code></pre></div></div>
+
+<p>增加一行</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>UUID=xxxxx你的UUID swap swap defaults 0 0
+UUID=xxxxx你的UUID /data ext4 defaults 0 2
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>systemctl daemon-reload
+reboot
+</code></pre></div></div>
+
+<h3 id="检查磁盘挂载情况">检查磁盘挂载情况</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>df -h
+</code></pre></div></div>
+
+<h2 id="重复一下换源">重复一下换源</h2>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nano /etc/apt/mirrors/debian.list
+nano /etc/apt/mirrors/debian-security.list
+</code></pre></div></div>
+
+<p>分别修改为</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>https://mirrors.ustc.edu.cn/debian/
+https://mirrors.ustc.edu.cn/debian-security/
+</code></pre></div></div>
+
+<h2 id="安装tailscale-1">安装Tailscale</h2>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl -fsSL https://tailscale.com/install.sh | sh
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>tailscale up --advertise-exit-node --accept-routes --accept-dns=false
+</code></pre></div></div>
+
+<p>点击/打开终端给的链接，授权登录</p>
+
+<p>不要关闭浏览器，在管理员界面找到这台机器</p>
+
+<p>设置里面关闭登录过期，打开exit node</p>
+
+<p>也可以预设密钥登录</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>tailscale up --advertise-exit-node --accept-routes --accept-dns=false --authkey=tskey-auth-xxxx
+</code></pre></div></div>
+
+<h3 id="如果是lxc">如果是LXC</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nano /etc/pve/lxc/401.conf
+</code></pre></div></div>
+
+<p>添加</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>lxc.cgroup2.devices.allow: c 10:200 rwm
+lxc.mount.entry: /dev/net/tun dev/net/tun none bind,create=file
+</code></pre></div></div>
+
+<h2 id="ddns">DDNS</h2>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker run -d --name ddns-go --restart=always --net=host -v /opt/ddns-go:/root jeessy/ddns-go:latest
+</code></pre></div></div>
+
+<p>web访问ip:9876，配置密钥</p>
+
+<h2 id="plex">Plex</h2>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>wget xxx # https://www.plex.tv/media-server-downloads/
+dpkg -i plexmediaserver_1.32.6.7557-1cf77d501_amd64.deb
+systemctl status plexmediaserver.service
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker run -d \
+--name plex \
+--network=host \
+-e TZ="Asia/Shanghai" \
+-e PLEX_CLAIM="claim-xxx" \
+-v /data/plexconfig:/config \
+-v /data/plextranscode:/transcode \
+-v /data/plexmedia:/data \
+plexinc/pms-docker
+</code></pre></div></div>
+
+<h1 id="其他-2">其他</h1>
+
+<ol>
+  <li><a href="https://github.com/juewuy/ShellClash/blob/master/README_CN.md">ShellClash</a></li>
+  <li><a href="https://github.com/MetaCubeX/Clash.Meta/blob/Alpha/docs/config.yaml">Clash.Meta</a></li>
+</ol>
+
+<h1 id="常用命令">常用命令</h1>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>zfs list
+zpool status
+zpool iostat -v 1
+rsync -aiv --progress /mnt/usb/ /data/xxx/xxx
+pct set 401 -mp0 /data/archive,mp=/archive
+</code></pre></div></div>
+
+<h1 id="seafilepro">SeafilePro</h1>
+
+<p>Pro版本3用户以内免费，部署方式查看<a href="https://cloud.seafile.com/published/seafile-manual-cn/docker/pro-edition/%E7%94%A8Docker%E9%83%A8%E7%BD%B2Seafile.md">官方中文教程</a> <a href="https://manual.seafile.com/docker/pro-edition/deploy_seafile_pro_with_docker/">官方英文教程【推荐】</a></p>
+
+<h2 id="命令行客户端">命令行客户端</h2>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>wget https://linux-clients.seafile.com/seafile.asc -O /usr/share/keyrings/seafile-keyring.asc
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/seafile-keyring.asc] https://linux-clients.seafile.com/seafile-deb/$(lsb_release -cs)/ stable main" | sudo tee /etc/apt/sources.list.d/seafile.list &gt; /dev/null
+apt update
+apt install seafile-cli -y
+mkdir /data/seafile-client
+seaf-cli init -d /data/seafile-client
+seaf-cli start
+seaf-cli sync -l "the id of the library" -s  "the url + port of server" -d "the folder which the library will be synced with" -u "username on server" [-p "password"]
+seaf-cli status
+seaf-cli list
+</code></pre></div></div>
+
+<h2 id="debug">DEBUG</h2>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker-compose logs -f --tail 10
+</code></pre></div></div>
+
+<h3 id="bug示例">BUG示例</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>seafile-mysql    | 2077-77-77  77:77:77 3064 [ERROR] Incorrect definition of table mysql.column_stats: expected column 'hist_type' at position 9 to have type enum('SINGLE_PREC_HB','DOUBLE_PREC_HB','JSON_HB'), found type enum('SINGLE_PREC_HB','DOUBLE_PREC_HB').
+seafile-mysql    | 2077-77-77  77:77:77 3064 [ERROR] Incorrect definition of table mysql.column_stats: expected column 'histogram' at position 10 to have type longblob, found type varbinary(255).
+</code></pre></div></div>
+
+<h3 id="解决办法">解决办法</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker exec -it seafile-mysql bash
+mysql_upgrade --user=root --password=xxxx
+exit
+docker-compose down
+docker-compose up -d
+</code></pre></div></div>
+
+<h3 id="bug示例2">BUG示例2</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>seaf-cli status Traceback (most recent call last): File "/usr/lib/python3/dist-packages/pysearpc/named_pipe.py", line 85, in _get_transport transport = self._pool.get(False)
+</code></pre></div></div>
+
+<h3 id="解决办法-1">解决办法</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>seaf-cli start
+</code></pre></div></div>
+
+<h4 id="一劳永逸-加入开机启动">一劳永逸 加入开机启动</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nano /etc/systemd/system/seafile.service
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[Unit]
+
+Description=seafile
+
+[Service]
+
+Type=oneshot
+ExecStart=/usr/bin/seaf-cli start
+
+[Install]
+
+WantedBy=multi-user.target
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>systemctl daemon-reload
+systemctl enable seafile.service
+</code></pre></div></div>
+
+
+</article>
+      </div>
+    </main>
+    <div class="cprt">
+© 2015 - 至今 | Powered by <a href="https://jekyllrb.com">Jekyll</a> | Theme - <a href="https://github.com/riggraz/no-style-please">no style, please!</a>
+<br>主站：<a href="https://totoro.ink">TOTORO625</a> | 镜像：<a href="https://www.totoro.pub">橙汁不甜</a> | <a href="/feed.xml">站点地图</a>
+</div>
+<style type="text/css">
+.cprt {
+	max-width: 640px;
+	margin: 0 auto;
+	padding: 4rem 2rem;
+	text-align: center;
+	font-size: 16px;
+	opacity: 0.8;
+	color: #000;
+}
+}
+</style>
+</body>
+</html>

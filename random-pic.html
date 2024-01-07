@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh_cn"><head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>随机图片api与一言(hitokoto)api</title><!-- Begin Jekyll SEO tag v2.7.1 -->
+<meta name="generator" content="Jekyll v3.9.3" />
+<meta property="og:title" content="随机图片api与一言(hitokoto)api" />
+<meta name="author" content="totoro625" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="想法来源 日常逛博客看到未闻花名的博客 头部图片一直在变换，F12看到用了一个PHP来加载随机图片。 不得不感慨一句和泉沙雾最可爱了，你们不要跟我抢 顺着链接爬到了月宅酱的漫月api ，看到他每个月维护所需的花费那么巨大，我还是撸一个自己用吧 （其实主要是可用的接口过少）目前有一个公开接口 以及一个博文内隐藏接口-小忍壁纸 还有我爬取到的和泉沙雾 。和泉沙雾最可爱 顺手爬了一下月宅酱的和泉沙雾api接口内的全部图片，一共50张(相册) 由于很久没有写PHP的原因，月宅酱的漫月api也没有公开源码我打算照抄一下一言(hitokoto)api的源码来写这个随机图片的api 寻找一言API lwl12的 LWL-Hitokoto API（一言-纯净API） 未开源 狂放的 [开源]一言纯净API 开源 也很好用 在狂放的评论区找到了后宫学长的超简洁版api 使用“一言”为博客增加文雅气息 差不多7行代码就搞定 新建一个文件夹，名为：hitokoto 复制以下代码，保存为 index.php 文件，并放置上面的文件夹中 &lt;?php //获取句子文件的绝对路径 $path = dirname(__FILE__); $file = file($path.&quot;/hitokoto.txt&quot;); //随机读取一行 $arr = mt_rand( 0, count( $file ) - 1 ); $hitokoto = trim($file[$arr]); //输出内容 echo $hitokoto; ?&gt; 把你的一言名言写进 hitokoto.txt 文件中，一句话一行，并放置上面的文件夹中 示例： 有你在的日子才是我的日常。 夹在我女友与前女友与青梅竹马间的果然是修罗场！ 既然如此，就再努力一次吧。别在这里愁眉不展，也不要再自欺欺人，重新来过！ 比自己,比梦想更重要的东西永远都存在着… 嘛，那又怎么样呢？ 就这样就可以了 改造成随机图片API 那么一言api有了之后，我们该如何改造他变成一个随机图片api呢？ http的303跳转的作用是：对于POST请求，它表示请求已经被处理，客户端可以接着使用GET方法去请求Location里的URI 这样我们可以用 if (isset($url)) { Header(&quot;HTTP/1.1 303 See Other&quot;); Header(&quot;Location: $url&quot;); exit; } 来进行跳转 在原有的API基础上修改一下就是 &lt;?php //获取句子文件的绝对路径 $path = dirname(__FILE__); $file = file($path.&quot;/pics.txt&quot;); //随机读取一行 $arr = mt_rand( 0, count( $file ) - 1 ); $url = trim($file[$arr]); //输出内容 #echo $url; //303跳转 if (isset($url)) { Header(&quot;HTTP/1.1 303 See Other&quot;); Header(&quot;Location: $url&quot;); exit; } ?&gt; 新建一个pics.txt写入你所需要的随机展示的图片即可食用 我的和泉沙雾是 https://img.example.com/images/2018/01/15/mVKl.png https://img.example.com/images/2018/01/15/muqM.jpg https://img.example.com/images/2018/01/15/mj3d.png https://img.example.com/images/2018/01/15/mqJ9.jpg https://img.example.com/images/2018/01/15/mHNR.png https://img.example.com/images/2018/01/15/miMI.jpg https://img.example.com/images/2018/01/15/m291.jpg https://img.example.com/images/2018/01/15/m4Ca.jpg https://img.example.com/images/2018/01/15/mnng.jpg https://img.example.com/images/2018/01/15/mZEP.jpg https://img.example.com/images/2018/01/15/mfzT.jpg https://img.example.com/images/2018/01/15/mXTU.jpg https://img.example.com/images/2018/01/15/mW33.jpg https://img.example.com/images/2018/01/15/mMFV.jpg https://img.example.com/images/2018/01/15/msNJ.jpg https://img.example.com/images/2018/01/15/mDMs.jpg https://img.example.com/images/2018/01/15/mAek.jpg https://img.example.com/images/2018/01/15/m3C7.jpg https://img.example.com/images/2018/01/15/monX.jpg https://img.example.com/images/2018/01/15/mhBy.jpg https://img.example.com/images/2018/01/15/mPzp.jpg https://img.example.com/images/2018/01/15/mGTn.jpg https://img.example.com/images/2018/01/15/mEoS.jpg https://img.example.com/images/2018/01/15/mBFE.jpg https://img.example.com/images/2018/01/15/mr8i.jpg https://img.example.com/images/2018/01/15/mpwK.jpg https://img.example.com/images/2018/01/15/mmeh.jpg https://img.example.com/images/2018/01/15/meyj.jpg https://img.example.com/images/2018/01/15/m7n0.jpg https://img.example.com/images/2018/01/15/mxBA.jpg https://img.example.com/images/2018/01/15/mLg8.jpg https://img.example.com/images/2018/01/15/mJTl.jpg https://img.example.com/images/2018/01/15/mFoM.jpg https://img.example.com/images/2018/01/15/m00d.jpg https://img.example.com/images/2018/01/15/9U89.jpg https://img.example.com/images/2018/01/15/9OwR.jpg https://img.example.com/images/2018/01/15/9K7I.jpg https://img.example.com/images/2018/01/15/9gy1.jpg https://img.example.com/images/2018/01/15/9cZa.jpg https://img.example.com/images/2018/01/15/9S1g.jpg https://img.example.com/images/2018/01/15/9IgP.jpg https://img.example.com/images/2018/01/15/9CHT.jpg https://img.example.com/images/2018/01/15/9yhU.jpg https://img.example.com/images/2018/01/15/9t03.jpg https://img.example.com/images/2018/01/15/95bV.jpg https://img.example.com/images/2018/01/15/9kwJ.jpg https://img.example.com/images/2018/01/15/9N7s.jpg https://img.example.com/images/2018/01/15/9btk.jpg https://img.example.com/images/2018/01/15/9VZ7.jpg https://img.example.com/images/2018/01/15/9u1X.jpg https://img.example.com/images/2018/01/15/9qcy.jpg https://img.example.com/images/2018/01/15/9THp.jpg https://img.example.com/images/2018/01/15/9Hhn.jpg https://img.example.com/images/2018/01/15/92vS.jpg https://img.example.com/images/2018/01/15/9abE.jpg https://img.example.com/images/2018/01/15/94si.jpg 就这样，一份随机图片api就写好了，不用受到别人的约束，自己写的才是最好用的。" />
+<meta property="og:description" content="想法来源 日常逛博客看到未闻花名的博客 头部图片一直在变换，F12看到用了一个PHP来加载随机图片。 不得不感慨一句和泉沙雾最可爱了，你们不要跟我抢 顺着链接爬到了月宅酱的漫月api ，看到他每个月维护所需的花费那么巨大，我还是撸一个自己用吧 （其实主要是可用的接口过少）目前有一个公开接口 以及一个博文内隐藏接口-小忍壁纸 还有我爬取到的和泉沙雾 。和泉沙雾最可爱 顺手爬了一下月宅酱的和泉沙雾api接口内的全部图片，一共50张(相册) 由于很久没有写PHP的原因，月宅酱的漫月api也没有公开源码我打算照抄一下一言(hitokoto)api的源码来写这个随机图片的api 寻找一言API lwl12的 LWL-Hitokoto API（一言-纯净API） 未开源 狂放的 [开源]一言纯净API 开源 也很好用 在狂放的评论区找到了后宫学长的超简洁版api 使用“一言”为博客增加文雅气息 差不多7行代码就搞定 新建一个文件夹，名为：hitokoto 复制以下代码，保存为 index.php 文件，并放置上面的文件夹中 &lt;?php //获取句子文件的绝对路径 $path = dirname(__FILE__); $file = file($path.&quot;/hitokoto.txt&quot;); //随机读取一行 $arr = mt_rand( 0, count( $file ) - 1 ); $hitokoto = trim($file[$arr]); //输出内容 echo $hitokoto; ?&gt; 把你的一言名言写进 hitokoto.txt 文件中，一句话一行，并放置上面的文件夹中 示例： 有你在的日子才是我的日常。 夹在我女友与前女友与青梅竹马间的果然是修罗场！ 既然如此，就再努力一次吧。别在这里愁眉不展，也不要再自欺欺人，重新来过！ 比自己,比梦想更重要的东西永远都存在着… 嘛，那又怎么样呢？ 就这样就可以了 改造成随机图片API 那么一言api有了之后，我们该如何改造他变成一个随机图片api呢？ http的303跳转的作用是：对于POST请求，它表示请求已经被处理，客户端可以接着使用GET方法去请求Location里的URI 这样我们可以用 if (isset($url)) { Header(&quot;HTTP/1.1 303 See Other&quot;); Header(&quot;Location: $url&quot;); exit; } 来进行跳转 在原有的API基础上修改一下就是 &lt;?php //获取句子文件的绝对路径 $path = dirname(__FILE__); $file = file($path.&quot;/pics.txt&quot;); //随机读取一行 $arr = mt_rand( 0, count( $file ) - 1 ); $url = trim($file[$arr]); //输出内容 #echo $url; //303跳转 if (isset($url)) { Header(&quot;HTTP/1.1 303 See Other&quot;); Header(&quot;Location: $url&quot;); exit; } ?&gt; 新建一个pics.txt写入你所需要的随机展示的图片即可食用 我的和泉沙雾是 https://img.example.com/images/2018/01/15/mVKl.png https://img.example.com/images/2018/01/15/muqM.jpg https://img.example.com/images/2018/01/15/mj3d.png https://img.example.com/images/2018/01/15/mqJ9.jpg https://img.example.com/images/2018/01/15/mHNR.png https://img.example.com/images/2018/01/15/miMI.jpg https://img.example.com/images/2018/01/15/m291.jpg https://img.example.com/images/2018/01/15/m4Ca.jpg https://img.example.com/images/2018/01/15/mnng.jpg https://img.example.com/images/2018/01/15/mZEP.jpg https://img.example.com/images/2018/01/15/mfzT.jpg https://img.example.com/images/2018/01/15/mXTU.jpg https://img.example.com/images/2018/01/15/mW33.jpg https://img.example.com/images/2018/01/15/mMFV.jpg https://img.example.com/images/2018/01/15/msNJ.jpg https://img.example.com/images/2018/01/15/mDMs.jpg https://img.example.com/images/2018/01/15/mAek.jpg https://img.example.com/images/2018/01/15/m3C7.jpg https://img.example.com/images/2018/01/15/monX.jpg https://img.example.com/images/2018/01/15/mhBy.jpg https://img.example.com/images/2018/01/15/mPzp.jpg https://img.example.com/images/2018/01/15/mGTn.jpg https://img.example.com/images/2018/01/15/mEoS.jpg https://img.example.com/images/2018/01/15/mBFE.jpg https://img.example.com/images/2018/01/15/mr8i.jpg https://img.example.com/images/2018/01/15/mpwK.jpg https://img.example.com/images/2018/01/15/mmeh.jpg https://img.example.com/images/2018/01/15/meyj.jpg https://img.example.com/images/2018/01/15/m7n0.jpg https://img.example.com/images/2018/01/15/mxBA.jpg https://img.example.com/images/2018/01/15/mLg8.jpg https://img.example.com/images/2018/01/15/mJTl.jpg https://img.example.com/images/2018/01/15/mFoM.jpg https://img.example.com/images/2018/01/15/m00d.jpg https://img.example.com/images/2018/01/15/9U89.jpg https://img.example.com/images/2018/01/15/9OwR.jpg https://img.example.com/images/2018/01/15/9K7I.jpg https://img.example.com/images/2018/01/15/9gy1.jpg https://img.example.com/images/2018/01/15/9cZa.jpg https://img.example.com/images/2018/01/15/9S1g.jpg https://img.example.com/images/2018/01/15/9IgP.jpg https://img.example.com/images/2018/01/15/9CHT.jpg https://img.example.com/images/2018/01/15/9yhU.jpg https://img.example.com/images/2018/01/15/9t03.jpg https://img.example.com/images/2018/01/15/95bV.jpg https://img.example.com/images/2018/01/15/9kwJ.jpg https://img.example.com/images/2018/01/15/9N7s.jpg https://img.example.com/images/2018/01/15/9btk.jpg https://img.example.com/images/2018/01/15/9VZ7.jpg https://img.example.com/images/2018/01/15/9u1X.jpg https://img.example.com/images/2018/01/15/9qcy.jpg https://img.example.com/images/2018/01/15/9THp.jpg https://img.example.com/images/2018/01/15/9Hhn.jpg https://img.example.com/images/2018/01/15/92vS.jpg https://img.example.com/images/2018/01/15/9abE.jpg https://img.example.com/images/2018/01/15/94si.jpg 就这样，一份随机图片api就写好了，不用受到别人的约束，自己写的才是最好用的。" />
+<link rel="canonical" href="https://totoro.ink/random-pic" />
+<meta property="og:url" content="https://totoro.ink/random-pic" />
+<meta property="og:site_name" content="TOTORO625" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2018-01-15T00:00:00+08:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="随机图片api与一言(hitokoto)api" />
+<script type="application/ld+json">
+{"headline":"随机图片api与一言(hitokoto)api","dateModified":"2018-01-15T00:00:00+08:00","datePublished":"2018-01-15T00:00:00+08:00","@type":"BlogPosting","url":"https://totoro.ink/random-pic","author":{"@type":"Person","name":"totoro625"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://totoro.ink/random-pic"},"description":"想法来源 日常逛博客看到未闻花名的博客 头部图片一直在变换，F12看到用了一个PHP来加载随机图片。 不得不感慨一句和泉沙雾最可爱了，你们不要跟我抢 顺着链接爬到了月宅酱的漫月api ，看到他每个月维护所需的花费那么巨大，我还是撸一个自己用吧 （其实主要是可用的接口过少）目前有一个公开接口 以及一个博文内隐藏接口-小忍壁纸 还有我爬取到的和泉沙雾 。和泉沙雾最可爱 顺手爬了一下月宅酱的和泉沙雾api接口内的全部图片，一共50张(相册) 由于很久没有写PHP的原因，月宅酱的漫月api也没有公开源码我打算照抄一下一言(hitokoto)api的源码来写这个随机图片的api 寻找一言API lwl12的 LWL-Hitokoto API（一言-纯净API） 未开源 狂放的 [开源]一言纯净API 开源 也很好用 在狂放的评论区找到了后宫学长的超简洁版api 使用“一言”为博客增加文雅气息 差不多7行代码就搞定 新建一个文件夹，名为：hitokoto 复制以下代码，保存为 index.php 文件，并放置上面的文件夹中 &lt;?php //获取句子文件的绝对路径 $path = dirname(__FILE__); $file = file($path.&quot;/hitokoto.txt&quot;); //随机读取一行 $arr = mt_rand( 0, count( $file ) - 1 ); $hitokoto = trim($file[$arr]); //输出内容 echo $hitokoto; ?&gt; 把你的一言名言写进 hitokoto.txt 文件中，一句话一行，并放置上面的文件夹中 示例： 有你在的日子才是我的日常。 夹在我女友与前女友与青梅竹马间的果然是修罗场！ 既然如此，就再努力一次吧。别在这里愁眉不展，也不要再自欺欺人，重新来过！ 比自己,比梦想更重要的东西永远都存在着… 嘛，那又怎么样呢？ 就这样就可以了 改造成随机图片API 那么一言api有了之后，我们该如何改造他变成一个随机图片api呢？ http的303跳转的作用是：对于POST请求，它表示请求已经被处理，客户端可以接着使用GET方法去请求Location里的URI 这样我们可以用 if (isset($url)) { Header(&quot;HTTP/1.1 303 See Other&quot;); Header(&quot;Location: $url&quot;); exit; } 来进行跳转 在原有的API基础上修改一下就是 &lt;?php //获取句子文件的绝对路径 $path = dirname(__FILE__); $file = file($path.&quot;/pics.txt&quot;); //随机读取一行 $arr = mt_rand( 0, count( $file ) - 1 ); $url = trim($file[$arr]); //输出内容 #echo $url; //303跳转 if (isset($url)) { Header(&quot;HTTP/1.1 303 See Other&quot;); Header(&quot;Location: $url&quot;); exit; } ?&gt; 新建一个pics.txt写入你所需要的随机展示的图片即可食用 我的和泉沙雾是 https://img.example.com/images/2018/01/15/mVKl.png https://img.example.com/images/2018/01/15/muqM.jpg https://img.example.com/images/2018/01/15/mj3d.png https://img.example.com/images/2018/01/15/mqJ9.jpg https://img.example.com/images/2018/01/15/mHNR.png https://img.example.com/images/2018/01/15/miMI.jpg https://img.example.com/images/2018/01/15/m291.jpg https://img.example.com/images/2018/01/15/m4Ca.jpg https://img.example.com/images/2018/01/15/mnng.jpg https://img.example.com/images/2018/01/15/mZEP.jpg https://img.example.com/images/2018/01/15/mfzT.jpg https://img.example.com/images/2018/01/15/mXTU.jpg https://img.example.com/images/2018/01/15/mW33.jpg https://img.example.com/images/2018/01/15/mMFV.jpg https://img.example.com/images/2018/01/15/msNJ.jpg https://img.example.com/images/2018/01/15/mDMs.jpg https://img.example.com/images/2018/01/15/mAek.jpg https://img.example.com/images/2018/01/15/m3C7.jpg https://img.example.com/images/2018/01/15/monX.jpg https://img.example.com/images/2018/01/15/mhBy.jpg https://img.example.com/images/2018/01/15/mPzp.jpg https://img.example.com/images/2018/01/15/mGTn.jpg https://img.example.com/images/2018/01/15/mEoS.jpg https://img.example.com/images/2018/01/15/mBFE.jpg https://img.example.com/images/2018/01/15/mr8i.jpg https://img.example.com/images/2018/01/15/mpwK.jpg https://img.example.com/images/2018/01/15/mmeh.jpg https://img.example.com/images/2018/01/15/meyj.jpg https://img.example.com/images/2018/01/15/m7n0.jpg https://img.example.com/images/2018/01/15/mxBA.jpg https://img.example.com/images/2018/01/15/mLg8.jpg https://img.example.com/images/2018/01/15/mJTl.jpg https://img.example.com/images/2018/01/15/mFoM.jpg https://img.example.com/images/2018/01/15/m00d.jpg https://img.example.com/images/2018/01/15/9U89.jpg https://img.example.com/images/2018/01/15/9OwR.jpg https://img.example.com/images/2018/01/15/9K7I.jpg https://img.example.com/images/2018/01/15/9gy1.jpg https://img.example.com/images/2018/01/15/9cZa.jpg https://img.example.com/images/2018/01/15/9S1g.jpg https://img.example.com/images/2018/01/15/9IgP.jpg https://img.example.com/images/2018/01/15/9CHT.jpg https://img.example.com/images/2018/01/15/9yhU.jpg https://img.example.com/images/2018/01/15/9t03.jpg https://img.example.com/images/2018/01/15/95bV.jpg https://img.example.com/images/2018/01/15/9kwJ.jpg https://img.example.com/images/2018/01/15/9N7s.jpg https://img.example.com/images/2018/01/15/9btk.jpg https://img.example.com/images/2018/01/15/9VZ7.jpg https://img.example.com/images/2018/01/15/9u1X.jpg https://img.example.com/images/2018/01/15/9qcy.jpg https://img.example.com/images/2018/01/15/9THp.jpg https://img.example.com/images/2018/01/15/9Hhn.jpg https://img.example.com/images/2018/01/15/92vS.jpg https://img.example.com/images/2018/01/15/9abE.jpg https://img.example.com/images/2018/01/15/94si.jpg 就这样，一份随机图片api就写好了，不用受到别人的约束，自己写的才是最好用的。","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link type="application/atom+xml" rel="alternate" href="https://totoro.ink/feed.xml" title="TOTORO625" /><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="/assets/css/main.css" />
+</head><body a="light">
+    <main class="page-content" aria-label="Content">
+      <div class="w">
+        <a href="/">『返回』首页</a>
+
+<p class="post-meta">
+<a href="/archive">归档</a> | <a href="/link">大佬们</a> | <a href="/about">关于我</a>
+</p>
+<article>
+  <p class="post-meta">
+    <time datetime="2018-01-15 00:00:00 +0800">『时间』2018年01月15日</time>
+  </p>
+  
+  <h1>随机图片api与一言(hitokoto)api</h1>
+
+  <h2 id="想法来源">想法来源</h2>
+
+<p>日常逛博客看到<a href="https://snrat.com/">未闻花名的博客</a> 头部图片一直在变换，F12看到用了一个<a href="https://api.ikmoe.com/shawu-rand-background.php">PHP</a>来加载随机图片。</p>
+
+<p><del>不得不感慨一句和泉沙雾最可爱了，你们不要跟我抢</del>
+<!--more-->
+顺着链接爬到了<a href="https://ikmoe.com">月宅酱</a>的<a href="https://random.ikmoe.com/">漫月api</a> ，看到他每个月<a href="https://ikmoe.com/5722.html">维护所需的花费</a>那么巨大，我还是撸一个自己用吧</p>
+
+<p>（其实主要是可用的接口过少）目前有一个<a href="https://api.ikmoe.com/moeu-rand-background.php">公开接口</a> 以及一个博文内<a href="https://api.ikmoe.com/xiao-ren-api.php">隐藏接口-小忍壁纸</a> 还有我爬取到的<a href="https://api.ikmoe.com/shawu-rand-background.php">和泉沙雾</a> 。<del>和泉沙雾最可爱</del></p>
+
+<p>顺手爬了一下月宅酱的和泉沙雾api接口内的全部图片，<a href="https://img.example.com/album/m7n">一共50张(相册)</a></p>
+
+<p>由于很久没有写PHP的原因，月宅酱的漫月api也没有公开源码我打算照抄一下一言(hitokoto)api的源码来写这个随机图片的api</p>
+
+<h2 id="寻找一言api">寻找一言API</h2>
+
+<p>lwl12的 <a href="https://blog.lwl12.com/read/hitokoto-api.html">LWL-Hitokoto API（一言-纯净API）</a> 未开源</p>
+
+<p>狂放的 <a href="https://www.iknet.top/568.html">[开源]一言纯净API</a>  <a href="https://github.com/kfangf/hitokoto">开源</a> 也很好用</p>
+
+<p>在狂放的评论区找到了后宫学长的超简洁版api <a href="https://haremu.com/p/94">使用“一言”为博客增加文雅气息</a> 差不多7行代码就搞定</p>
+
+<ul>
+  <li>新建一个文件夹，名为：hitokoto</li>
+  <li>复制以下代码，保存为 index.php 文件，并放置上面的文件夹中</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;?php
+//获取句子文件的绝对路径
+$path = dirname(__FILE__);
+$file = file($path."/hitokoto.txt");
+//随机读取一行
+$arr  = mt_rand( 0, count( $file ) - 1 );
+$hitokoto  = trim($file[$arr]);
+//输出内容
+echo $hitokoto;
+?&gt;
+</code></pre></div></div>
+
+<ul>
+  <li>把你的一言名言写进 hitokoto.txt 文件中，一句话一行，并放置上面的文件夹中</li>
+</ul>
+
+<p><strong>示例：</strong></p>
+
+<blockquote>
+  <p>有你在的日子才是我的日常。
+夹在我女友与前女友与青梅竹马间的果然是修罗场！
+既然如此，就再努力一次吧。别在这里愁眉不展，也不要再自欺欺人，重新来过！
+比自己,比梦想更重要的东西永远都存在着…
+嘛，那又怎么样呢？</p>
+</blockquote>
+
+<p>就这样就可以了</p>
+
+<h2 id="改造成随机图片api">改造成随机图片API</h2>
+
+<p>那么一言api有了之后，我们该如何改造他变成一个随机图片api呢？</p>
+
+<p>http的303跳转的作用是：对于POST请求，它表示请求已经被处理，客户端可以接着使用GET方法去请求Location里的URI</p>
+
+<p>这样我们可以用</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>if (isset($url)) 
+{ 
+Header("HTTP/1.1 303 See Other"); 
+Header("Location: $url"); 
+exit; 
+} 
+</code></pre></div></div>
+
+<p>来进行跳转</p>
+
+<p>在原有的API基础上修改一下就是</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;?php
+//获取句子文件的绝对路径
+$path = dirname(__FILE__);
+$file = file($path."/pics.txt");
+//随机读取一行
+$arr  = mt_rand( 0, count( $file ) - 1 );
+$url  = trim($file[$arr]);
+//输出内容
+#echo $url;
+//303跳转
+if (isset($url)) 
+{ 
+Header("HTTP/1.1 303 See Other"); 
+Header("Location: $url"); 
+exit; 
+} 
+?&gt;
+</code></pre></div></div>
+
+<p>新建一个pics.txt写入你所需要的随机展示的图片即可食用</p>
+
+<p>我的和泉沙雾是</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>https://img.example.com/images/2018/01/15/mVKl.png
+https://img.example.com/images/2018/01/15/muqM.jpg
+https://img.example.com/images/2018/01/15/mj3d.png
+https://img.example.com/images/2018/01/15/mqJ9.jpg
+https://img.example.com/images/2018/01/15/mHNR.png
+https://img.example.com/images/2018/01/15/miMI.jpg
+https://img.example.com/images/2018/01/15/m291.jpg
+https://img.example.com/images/2018/01/15/m4Ca.jpg
+https://img.example.com/images/2018/01/15/mnng.jpg
+https://img.example.com/images/2018/01/15/mZEP.jpg
+https://img.example.com/images/2018/01/15/mfzT.jpg
+https://img.example.com/images/2018/01/15/mXTU.jpg
+https://img.example.com/images/2018/01/15/mW33.jpg
+https://img.example.com/images/2018/01/15/mMFV.jpg
+https://img.example.com/images/2018/01/15/msNJ.jpg
+https://img.example.com/images/2018/01/15/mDMs.jpg
+https://img.example.com/images/2018/01/15/mAek.jpg
+https://img.example.com/images/2018/01/15/m3C7.jpg
+https://img.example.com/images/2018/01/15/monX.jpg
+https://img.example.com/images/2018/01/15/mhBy.jpg
+https://img.example.com/images/2018/01/15/mPzp.jpg
+https://img.example.com/images/2018/01/15/mGTn.jpg
+https://img.example.com/images/2018/01/15/mEoS.jpg
+https://img.example.com/images/2018/01/15/mBFE.jpg
+https://img.example.com/images/2018/01/15/mr8i.jpg
+https://img.example.com/images/2018/01/15/mpwK.jpg
+https://img.example.com/images/2018/01/15/mmeh.jpg
+https://img.example.com/images/2018/01/15/meyj.jpg
+https://img.example.com/images/2018/01/15/m7n0.jpg
+https://img.example.com/images/2018/01/15/mxBA.jpg
+https://img.example.com/images/2018/01/15/mLg8.jpg
+https://img.example.com/images/2018/01/15/mJTl.jpg
+https://img.example.com/images/2018/01/15/mFoM.jpg
+https://img.example.com/images/2018/01/15/m00d.jpg
+https://img.example.com/images/2018/01/15/9U89.jpg
+https://img.example.com/images/2018/01/15/9OwR.jpg
+https://img.example.com/images/2018/01/15/9K7I.jpg
+https://img.example.com/images/2018/01/15/9gy1.jpg
+https://img.example.com/images/2018/01/15/9cZa.jpg
+https://img.example.com/images/2018/01/15/9S1g.jpg
+https://img.example.com/images/2018/01/15/9IgP.jpg
+https://img.example.com/images/2018/01/15/9CHT.jpg
+https://img.example.com/images/2018/01/15/9yhU.jpg
+https://img.example.com/images/2018/01/15/9t03.jpg
+https://img.example.com/images/2018/01/15/95bV.jpg
+https://img.example.com/images/2018/01/15/9kwJ.jpg
+https://img.example.com/images/2018/01/15/9N7s.jpg
+https://img.example.com/images/2018/01/15/9btk.jpg
+https://img.example.com/images/2018/01/15/9VZ7.jpg
+https://img.example.com/images/2018/01/15/9u1X.jpg
+https://img.example.com/images/2018/01/15/9qcy.jpg
+https://img.example.com/images/2018/01/15/9THp.jpg
+https://img.example.com/images/2018/01/15/9Hhn.jpg
+https://img.example.com/images/2018/01/15/92vS.jpg
+https://img.example.com/images/2018/01/15/9abE.jpg
+https://img.example.com/images/2018/01/15/94si.jpg
+</code></pre></div></div>
+
+<p>就这样，一份随机图片api就写好了，不用受到别人的约束，自己写的才是最好用的。</p>
+
+</article>
+      </div>
+    </main>
+    <div class="cprt">
+© 2015 - 至今 | Powered by <a href="https://jekyllrb.com">Jekyll</a> | Theme - <a href="https://github.com/riggraz/no-style-please">no style, please!</a>
+<br>主站：<a href="https://totoro.ink">TOTORO625</a> | 镜像：<a href="https://www.totoro.pub">橙汁不甜</a> | <a href="/feed.xml">站点地图</a>
+</div>
+<style type="text/css">
+.cprt {
+	max-width: 640px;
+	margin: 0 auto;
+	padding: 4rem 2rem;
+	text-align: center;
+	font-size: 16px;
+	opacity: 0.8;
+	color: #000;
+}
+}
+</style>
+</body>
+</html>

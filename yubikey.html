@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh_cn"><head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>yubikey使用初体验</title><!-- Begin Jekyll SEO tag v2.7.1 -->
+<meta name="generator" content="Jekyll v3.9.3" />
+<meta property="og:title" content="yubikey使用初体验" />
+<meta name="author" content="totoro625" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="觊觎 yubico 公司的 yubikey 很久了，最近又由于 lastpass 主密钥过长不方便的原因，索性买了一个回来研究。 我在购买前有了解到这是一个略微高端的玩具，国内外的教程都很少，而且新老教程都有些不尽准确的地方。yubikey 在设计使用上对于 MAC OS 以及 Linux 系统比较友好，而在 Windows 上的使用范围就相对小了很多，不过如果是仅仅用做固定密码输入器的话，也是够用的。 介绍 我先后查阅了官方的 yubikey 使用手册 (点此阅读) ，以及几乎是中文能搜索到的最早的博文（2012年）入手yubikey,一点小心得 和他的后续 YubiKey 4 简介与配置 ，还有康哥的 Yubikey OpenPGP Card 略高级折腾手记 ，赵一开的YubiKey入手和介绍、Yubikey使用一年总结 ，折腾录的二次验证神器yubikey ，还有可能是最好的 Yubikey + GPG/SSH 智能卡教程 。知乎专栏的把 Gpg4win 的 gpg-agent 转发到 WSL 中、配置新版 GPG SSH 认证代理 。感觉我还是能够驾驭的住这个精致的玩具的 首先说一下功能，YubiKey 4 可以同时工作在三种模式: 传统键盘设备模式: Yubico OTP, Challenge-Response, 静态密码, HOTP 等, 这个模式又有两个slot，对应于短按和长按操作，生成两种密码 Smartcard 模式: OpenPGP card 和 PIV card，可以用来安全地保存 RSA 私钥 U2F 模式: 一种两步认证协议，Google, Dropbox, Github 等网站都支持 @BlahGeek 之前入手 YubiKey 4 时写得 blog 描述得更详细一些，可以参考。 我的使用 而我日常主要使用的是 windows ，有时会用 WSL ，偶尔会用 Linux ，所以我主要使用到的功能则是静态密码模式以及 Smartcard 模式中的 OpenPGP card 来安全地保存 RSA 私钥。官网有一份 Windows 下如何使用的说明 根据教程我安装的 YubiKey for Windows Hello 总是不太好用，一方面可能是我的笔记本太过老旧的原因，另一方面可能是我的电脑没有内置TPM(可信赖平台模块)的原因，新的电脑（需要win 10）应该都可以支持。 Windows锁屏解锁 而针对 Windows 用户还有一个替代程序 yubico windows login tool (下载页)，可以适用于全部版本的 Windows 。我们只需要安装完成后重启电脑并打开管理程序即可食用，更加便捷的代价是他不能够在开机的时候使用，仅仅只能用作系统锁定时的解锁，远不如 YubiKey for Windows Hello 好用。 按理来说 yubikey 可以运行在 Smartcard 模式上为我在开机过程中解锁系统，但是我的 Smartcard 证书始终无法导入系统，可能是我的教育版 win10 有哪些地方没有设置好。 静态密码输入 另外一个我最常使用的就是传统键盘模式了，而且我用的还是最为人诟病的静态密码模式，既短按和长按分别输出两段预设好的密码。这是相当不安全的，但是由于是 windows 上使用，我也没什么应用可以使用其他高级的安全模式，反倒是总有一些人喜欢在我输入密码的时候偷窥我的密码，保存好两段静态密码再通过密码登入 lastpass 复制各种密码倒成了我的一个更加安全的手段。静态密码不安全无非在于，yubikey 离身后直接被熟人套取密码，但要知道你有两个静态密码，你就可以有很多种组合，例如A、B、AB、BA，以及在此基础上添加字符、删减字符，这样可以使得你的主密码更加安全。当然，做了这么多工作，最重要的还是 yubikey 尽可能的不要离身，这样静态密码才能安全。 在使用传统键盘模式前需要下载一个 YubiKey Personalization Tool 来管理你的 yubikey，MAC 用户与 Linux 用户则只需要通过包管理器安装 yubikey-personalization yubikey-personalization-gui 即可食用了。 打开程序，选择静态密码模式中的Scan Code，即可设置短按和长按分别输入的预设密码了 选择一个 Configuration Slot ，#1 是短按 #2 是长按 再把键盘模式选择一下，目前普遍是 US Keyboard 之后就可以输入你想要设置的静态密码了，可以根据需要选择静态密码输入完成之后是否需要在输入一个回车键，简化我们的输入过程 写好之后选择 Write Configuration 写入 yubikey 第一次写入需要保存一个历史写入文件，选择一个安全的地方放置一下即可 就这样，我们的 yubikey 就具备了基础的输入密码的功能了，经过测试，yubikey 的密码输入功能在任何可以接收键盘信号的设备上都是可以使用的，比如安卓手机。这样我就可以通过 yubikey 来输入我的 lastpass ，即使是在手机上也无需输入一连串超长的安全密码了。 OpenPGP card yubikey 工作在 Smartcard 模式上时可以支持 MAC OS 的 PIV card 解锁，而我等没有 MAC 的用户就用用 OpenPGP card 好了。 在接触 yubikey 之前我是没有接触过 OpenPGP 的，根据我看到的几篇博文，打都告诉我不要把主密钥丢在 yubikey 里面，否则永远都取不出来了。当然丢 yubikey 里面会更加的安全，但是如果丢了就真的丢了。。。 对于那些真正的需要安全的人而言，主密钥是肯定得丢在 yubikey 中的，但是就我这样丢三落四的人，还是算了吧。 作为一个 Windows 用户需要安装一个 gpg4win 来使得 Windows 能够支持在 Powershell 中运行 gpg 命令，这个时候你说 WSL ？抱歉，不加以设置，你在 WSL 中是看不到 yubikey 的 参考把 Gpg4win 的 gpg-agent 转发到 WSL 中 我是没读懂也没有设置成功。。。。。。 不过我在 Windows 下的 Powershell 中一样可以使用 yubikey 啊，我把主密钥导出备份之后，再将主密钥移动到 yubikey 中，使得电脑上每次使用主密钥的时候都需要我去插入 yubikey 才可以使用 而根据很多人说的，主密钥删除而单独使用子密钥的情况我却从未遇到过，测试了很多次都失败了，无法仅仅导出子密钥后单独使用子密钥，可能是我哪里设置的不正确的原因。 安卓手机上也有一个名为：OpenKeychain:Easy PGP 的程序，同样支持 yubikey 的使用。 当你安装过 gpg4win 软件之后，我们打开它，根据向导生成一份属于自己的 OpenPGP 证书，之后一定要导出绝密密钥，否则会在转移密钥到 yubikey 的过程中，主密钥再也取不出来了。我们可以多尝试几次，只要不把公钥证书上传到托管服务器，我们在本地都是可以随意删除的。 之后的更加复杂的操作我们将在 PowerShell 上进行 首先你需要设置一下 YubiKey。 gpg --card-edit # 打开设置 admin 打开管理模式 help 查看帮助 passwd 设置 PIN, Admin PIN 和 Reset Code PIN 的默认值是 123456，Admin PIN 的默认值是 12345678 需要先进入 admin 模式后，help 命令才会有更多的选项，passwd 才可以设置更多的密码 需要注意的是 PIN 码是平时最常用的密码，如果输错三次就会被锁定，需要使用 Reset Code 来解锁，Reset Code 输错三次，只能物理重置。 Admin PIN 是管理卡信息(如添加密钥、修改密码)使用的密码，不能短于 8 位，输错三次则管理功能被锁定，只能物理重置。 记住，千万不要在需要输入 Admin PIN 的时候输入短于 8 位的密码，这样会直接锁定 你可以继续设置一些其他信息，比如持卡人姓名、公钥的 URL 等等，也可以下次再弄。 建议将公钥的 URL 设置一下，这样插入新的电脑时可以通过 fetch 命令直接获取 yubikey 中密钥的公钥了 操作完后我们使用 quit 退出编辑 想必经过 gpg4win 软件的设置之后我们也有了自己的私钥（ Mac 用户有一个 GPGtools ） 首先我们可以生成一份子密钥 gpg --expert --edit-key i@example.com # 编辑这个密钥 之后进入 gpg&gt; 中执行命令，addkey gpg&gt; addkey Please select what kind of key you want: (3) DSA (sign only) (4) RSA (sign only) (5) Elgamal (encrypt only) (6) RSA (encrypt only) (7) DSA (set your own capabilities) (8) RSA (set your own capabilities) (10) ECC (sign only) (11) ECC (set your own capabilities) (12) ECC (encrypt only) (13) Existing key Your selection? 这里通常选择8 自定义的RSA 密钥 这个时候就让你选择这个 RSA 密钥具备的功能 Possible actions for a RSA key: Sign Encrypt Authenticate Current allowed actions: Sign Encrypt (S) Toggle the sign capability (E) Toggle the encrypt capability (A) Toggle the authenticate capability (Q) Finished Your selection? 默认情况是具备 Sign Encrypt ，常见 Current allowed actions: 后面的描述，我们通过反复选择 S E A来更改这个密钥的性质，成为你所需要的密钥 RSA keys may be between 1024 and 4096 bits long. # 密钥长度 What keysize do you want? (2048) Requested keysize is 2048 bits Please specify how long the key should be valid. # 过期时间 0 = key does not expire &lt;n&gt; = key expires in n days &lt;n&gt;w = key expires in n weeks &lt;n&gt;m = key expires in n months &lt;n&gt;y = key expires in n years Key is valid for? (0) 1Y Key expires at 03/15/19 02:17:39 中国标准时间 Is this correct? (y/N) Y Really create? (y/N) 之后一份子密钥就创建成功了，我们需要创建3份子密钥因为在 接下来的 keytocard 过程中我们将会把私钥转移到卡中再也取不出来，这个时候你再备份，就备份不出私钥了。 保存一下退出 gpg&gt; save 导出一下公私钥，离线存储到一个安全的地方。 gpg --export -a &quot;i@example.com&quot; &gt; public.key gpg --export-secret-key -a &quot;i@example.com&quot; &gt; private.key 如果有必要，可以将公钥上传到公钥服务器，命令是这个 gpg --send-keys 将私钥装载到 Yubikey gpg --edit-key &quot;i@example.com&quot; 会显示出你的主密钥和子密钥。 gpg&gt; toggle 用 key【空格】数字 定位到子密钥，先装载 signing 子密钥。数字按实际的来，不一定是1： gpg&gt; key 1 gpg&gt; keytocard Please select where to store the key: (1) Signature key (3) Authentication key Your selection? 1 先反选签名密钥，然后装载加密密钥： gpg&gt; key 1 gpg&gt; key 2 gpg&gt; keytocard Please select where to store the key: (2) Encryption key Your selection? 2 反选加密密钥，装载认证密钥至 Yubikey: gpg&gt; key 2 gpg&gt; key 3 gpg&gt; keytocard Please select where to store the key: (3) Authentication key Your selection? 3 最后保存： gpg&gt; save 这样就可以了！ 私钥想备份你现在也没办法了。 另外，加密命令用 gpg -r 接收人id -es 文件路径 解密用gpg -o 解压文件路径 -d 加密的文件 例如：gpg -r totoro625 -es do.xml ，输入密码后，在文件同目录就会生成一份名为 do.xml.gpg 的加密文件，此时我们删除 do.xml ，将 do.xml.gpg 保存即可 gpg -o do2.xml -d do.xml.gpg ,这样在文件同目录就会生成一份名为 do2.xml 的解密后文件，跟原先的 do.xml 一样，这就是解密文件。 U2F 模式 目前我的网站登录还在使用固定密码，一时半会不会改用 U2F 来麻烦自己。 实际应用 我主要用的就是 win10 的解锁和固定密码的输入功能，至于 OpenPGP 我是不打算怎么用的（毕竟也不太会用，还不熟悉），目前仅仅用于加密重要文件保存在各大云服务提供商，如百度云、微软云、谷歌云。我的 OpenPGP 公钥 指纹是 CF68BB23A52D176C57116CBCE4925DDF24118AF1 我真的不是很会用 OpenPGP ，目前能做到的仅仅是加密解密自己的文件与消息，验证别人的签名。" />
+<meta property="og:description" content="觊觎 yubico 公司的 yubikey 很久了，最近又由于 lastpass 主密钥过长不方便的原因，索性买了一个回来研究。 我在购买前有了解到这是一个略微高端的玩具，国内外的教程都很少，而且新老教程都有些不尽准确的地方。yubikey 在设计使用上对于 MAC OS 以及 Linux 系统比较友好，而在 Windows 上的使用范围就相对小了很多，不过如果是仅仅用做固定密码输入器的话，也是够用的。 介绍 我先后查阅了官方的 yubikey 使用手册 (点此阅读) ，以及几乎是中文能搜索到的最早的博文（2012年）入手yubikey,一点小心得 和他的后续 YubiKey 4 简介与配置 ，还有康哥的 Yubikey OpenPGP Card 略高级折腾手记 ，赵一开的YubiKey入手和介绍、Yubikey使用一年总结 ，折腾录的二次验证神器yubikey ，还有可能是最好的 Yubikey + GPG/SSH 智能卡教程 。知乎专栏的把 Gpg4win 的 gpg-agent 转发到 WSL 中、配置新版 GPG SSH 认证代理 。感觉我还是能够驾驭的住这个精致的玩具的 首先说一下功能，YubiKey 4 可以同时工作在三种模式: 传统键盘设备模式: Yubico OTP, Challenge-Response, 静态密码, HOTP 等, 这个模式又有两个slot，对应于短按和长按操作，生成两种密码 Smartcard 模式: OpenPGP card 和 PIV card，可以用来安全地保存 RSA 私钥 U2F 模式: 一种两步认证协议，Google, Dropbox, Github 等网站都支持 @BlahGeek 之前入手 YubiKey 4 时写得 blog 描述得更详细一些，可以参考。 我的使用 而我日常主要使用的是 windows ，有时会用 WSL ，偶尔会用 Linux ，所以我主要使用到的功能则是静态密码模式以及 Smartcard 模式中的 OpenPGP card 来安全地保存 RSA 私钥。官网有一份 Windows 下如何使用的说明 根据教程我安装的 YubiKey for Windows Hello 总是不太好用，一方面可能是我的笔记本太过老旧的原因，另一方面可能是我的电脑没有内置TPM(可信赖平台模块)的原因，新的电脑（需要win 10）应该都可以支持。 Windows锁屏解锁 而针对 Windows 用户还有一个替代程序 yubico windows login tool (下载页)，可以适用于全部版本的 Windows 。我们只需要安装完成后重启电脑并打开管理程序即可食用，更加便捷的代价是他不能够在开机的时候使用，仅仅只能用作系统锁定时的解锁，远不如 YubiKey for Windows Hello 好用。 按理来说 yubikey 可以运行在 Smartcard 模式上为我在开机过程中解锁系统，但是我的 Smartcard 证书始终无法导入系统，可能是我的教育版 win10 有哪些地方没有设置好。 静态密码输入 另外一个我最常使用的就是传统键盘模式了，而且我用的还是最为人诟病的静态密码模式，既短按和长按分别输出两段预设好的密码。这是相当不安全的，但是由于是 windows 上使用，我也没什么应用可以使用其他高级的安全模式，反倒是总有一些人喜欢在我输入密码的时候偷窥我的密码，保存好两段静态密码再通过密码登入 lastpass 复制各种密码倒成了我的一个更加安全的手段。静态密码不安全无非在于，yubikey 离身后直接被熟人套取密码，但要知道你有两个静态密码，你就可以有很多种组合，例如A、B、AB、BA，以及在此基础上添加字符、删减字符，这样可以使得你的主密码更加安全。当然，做了这么多工作，最重要的还是 yubikey 尽可能的不要离身，这样静态密码才能安全。 在使用传统键盘模式前需要下载一个 YubiKey Personalization Tool 来管理你的 yubikey，MAC 用户与 Linux 用户则只需要通过包管理器安装 yubikey-personalization yubikey-personalization-gui 即可食用了。 打开程序，选择静态密码模式中的Scan Code，即可设置短按和长按分别输入的预设密码了 选择一个 Configuration Slot ，#1 是短按 #2 是长按 再把键盘模式选择一下，目前普遍是 US Keyboard 之后就可以输入你想要设置的静态密码了，可以根据需要选择静态密码输入完成之后是否需要在输入一个回车键，简化我们的输入过程 写好之后选择 Write Configuration 写入 yubikey 第一次写入需要保存一个历史写入文件，选择一个安全的地方放置一下即可 就这样，我们的 yubikey 就具备了基础的输入密码的功能了，经过测试，yubikey 的密码输入功能在任何可以接收键盘信号的设备上都是可以使用的，比如安卓手机。这样我就可以通过 yubikey 来输入我的 lastpass ，即使是在手机上也无需输入一连串超长的安全密码了。 OpenPGP card yubikey 工作在 Smartcard 模式上时可以支持 MAC OS 的 PIV card 解锁，而我等没有 MAC 的用户就用用 OpenPGP card 好了。 在接触 yubikey 之前我是没有接触过 OpenPGP 的，根据我看到的几篇博文，打都告诉我不要把主密钥丢在 yubikey 里面，否则永远都取不出来了。当然丢 yubikey 里面会更加的安全，但是如果丢了就真的丢了。。。 对于那些真正的需要安全的人而言，主密钥是肯定得丢在 yubikey 中的，但是就我这样丢三落四的人，还是算了吧。 作为一个 Windows 用户需要安装一个 gpg4win 来使得 Windows 能够支持在 Powershell 中运行 gpg 命令，这个时候你说 WSL ？抱歉，不加以设置，你在 WSL 中是看不到 yubikey 的 参考把 Gpg4win 的 gpg-agent 转发到 WSL 中 我是没读懂也没有设置成功。。。。。。 不过我在 Windows 下的 Powershell 中一样可以使用 yubikey 啊，我把主密钥导出备份之后，再将主密钥移动到 yubikey 中，使得电脑上每次使用主密钥的时候都需要我去插入 yubikey 才可以使用 而根据很多人说的，主密钥删除而单独使用子密钥的情况我却从未遇到过，测试了很多次都失败了，无法仅仅导出子密钥后单独使用子密钥，可能是我哪里设置的不正确的原因。 安卓手机上也有一个名为：OpenKeychain:Easy PGP 的程序，同样支持 yubikey 的使用。 当你安装过 gpg4win 软件之后，我们打开它，根据向导生成一份属于自己的 OpenPGP 证书，之后一定要导出绝密密钥，否则会在转移密钥到 yubikey 的过程中，主密钥再也取不出来了。我们可以多尝试几次，只要不把公钥证书上传到托管服务器，我们在本地都是可以随意删除的。 之后的更加复杂的操作我们将在 PowerShell 上进行 首先你需要设置一下 YubiKey。 gpg --card-edit # 打开设置 admin 打开管理模式 help 查看帮助 passwd 设置 PIN, Admin PIN 和 Reset Code PIN 的默认值是 123456，Admin PIN 的默认值是 12345678 需要先进入 admin 模式后，help 命令才会有更多的选项，passwd 才可以设置更多的密码 需要注意的是 PIN 码是平时最常用的密码，如果输错三次就会被锁定，需要使用 Reset Code 来解锁，Reset Code 输错三次，只能物理重置。 Admin PIN 是管理卡信息(如添加密钥、修改密码)使用的密码，不能短于 8 位，输错三次则管理功能被锁定，只能物理重置。 记住，千万不要在需要输入 Admin PIN 的时候输入短于 8 位的密码，这样会直接锁定 你可以继续设置一些其他信息，比如持卡人姓名、公钥的 URL 等等，也可以下次再弄。 建议将公钥的 URL 设置一下，这样插入新的电脑时可以通过 fetch 命令直接获取 yubikey 中密钥的公钥了 操作完后我们使用 quit 退出编辑 想必经过 gpg4win 软件的设置之后我们也有了自己的私钥（ Mac 用户有一个 GPGtools ） 首先我们可以生成一份子密钥 gpg --expert --edit-key i@example.com # 编辑这个密钥 之后进入 gpg&gt; 中执行命令，addkey gpg&gt; addkey Please select what kind of key you want: (3) DSA (sign only) (4) RSA (sign only) (5) Elgamal (encrypt only) (6) RSA (encrypt only) (7) DSA (set your own capabilities) (8) RSA (set your own capabilities) (10) ECC (sign only) (11) ECC (set your own capabilities) (12) ECC (encrypt only) (13) Existing key Your selection? 这里通常选择8 自定义的RSA 密钥 这个时候就让你选择这个 RSA 密钥具备的功能 Possible actions for a RSA key: Sign Encrypt Authenticate Current allowed actions: Sign Encrypt (S) Toggle the sign capability (E) Toggle the encrypt capability (A) Toggle the authenticate capability (Q) Finished Your selection? 默认情况是具备 Sign Encrypt ，常见 Current allowed actions: 后面的描述，我们通过反复选择 S E A来更改这个密钥的性质，成为你所需要的密钥 RSA keys may be between 1024 and 4096 bits long. # 密钥长度 What keysize do you want? (2048) Requested keysize is 2048 bits Please specify how long the key should be valid. # 过期时间 0 = key does not expire &lt;n&gt; = key expires in n days &lt;n&gt;w = key expires in n weeks &lt;n&gt;m = key expires in n months &lt;n&gt;y = key expires in n years Key is valid for? (0) 1Y Key expires at 03/15/19 02:17:39 中国标准时间 Is this correct? (y/N) Y Really create? (y/N) 之后一份子密钥就创建成功了，我们需要创建3份子密钥因为在 接下来的 keytocard 过程中我们将会把私钥转移到卡中再也取不出来，这个时候你再备份，就备份不出私钥了。 保存一下退出 gpg&gt; save 导出一下公私钥，离线存储到一个安全的地方。 gpg --export -a &quot;i@example.com&quot; &gt; public.key gpg --export-secret-key -a &quot;i@example.com&quot; &gt; private.key 如果有必要，可以将公钥上传到公钥服务器，命令是这个 gpg --send-keys 将私钥装载到 Yubikey gpg --edit-key &quot;i@example.com&quot; 会显示出你的主密钥和子密钥。 gpg&gt; toggle 用 key【空格】数字 定位到子密钥，先装载 signing 子密钥。数字按实际的来，不一定是1： gpg&gt; key 1 gpg&gt; keytocard Please select where to store the key: (1) Signature key (3) Authentication key Your selection? 1 先反选签名密钥，然后装载加密密钥： gpg&gt; key 1 gpg&gt; key 2 gpg&gt; keytocard Please select where to store the key: (2) Encryption key Your selection? 2 反选加密密钥，装载认证密钥至 Yubikey: gpg&gt; key 2 gpg&gt; key 3 gpg&gt; keytocard Please select where to store the key: (3) Authentication key Your selection? 3 最后保存： gpg&gt; save 这样就可以了！ 私钥想备份你现在也没办法了。 另外，加密命令用 gpg -r 接收人id -es 文件路径 解密用gpg -o 解压文件路径 -d 加密的文件 例如：gpg -r totoro625 -es do.xml ，输入密码后，在文件同目录就会生成一份名为 do.xml.gpg 的加密文件，此时我们删除 do.xml ，将 do.xml.gpg 保存即可 gpg -o do2.xml -d do.xml.gpg ,这样在文件同目录就会生成一份名为 do2.xml 的解密后文件，跟原先的 do.xml 一样，这就是解密文件。 U2F 模式 目前我的网站登录还在使用固定密码，一时半会不会改用 U2F 来麻烦自己。 实际应用 我主要用的就是 win10 的解锁和固定密码的输入功能，至于 OpenPGP 我是不打算怎么用的（毕竟也不太会用，还不熟悉），目前仅仅用于加密重要文件保存在各大云服务提供商，如百度云、微软云、谷歌云。我的 OpenPGP 公钥 指纹是 CF68BB23A52D176C57116CBCE4925DDF24118AF1 我真的不是很会用 OpenPGP ，目前能做到的仅仅是加密解密自己的文件与消息，验证别人的签名。" />
+<link rel="canonical" href="https://totoro.ink/yubikey" />
+<meta property="og:url" content="https://totoro.ink/yubikey" />
+<meta property="og:site_name" content="TOTORO625" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2018-03-14T00:00:00+08:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="yubikey使用初体验" />
+<script type="application/ld+json">
+{"headline":"yubikey使用初体验","dateModified":"2018-03-14T00:00:00+08:00","datePublished":"2018-03-14T00:00:00+08:00","@type":"BlogPosting","url":"https://totoro.ink/yubikey","author":{"@type":"Person","name":"totoro625"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://totoro.ink/yubikey"},"description":"觊觎 yubico 公司的 yubikey 很久了，最近又由于 lastpass 主密钥过长不方便的原因，索性买了一个回来研究。 我在购买前有了解到这是一个略微高端的玩具，国内外的教程都很少，而且新老教程都有些不尽准确的地方。yubikey 在设计使用上对于 MAC OS 以及 Linux 系统比较友好，而在 Windows 上的使用范围就相对小了很多，不过如果是仅仅用做固定密码输入器的话，也是够用的。 介绍 我先后查阅了官方的 yubikey 使用手册 (点此阅读) ，以及几乎是中文能搜索到的最早的博文（2012年）入手yubikey,一点小心得 和他的后续 YubiKey 4 简介与配置 ，还有康哥的 Yubikey OpenPGP Card 略高级折腾手记 ，赵一开的YubiKey入手和介绍、Yubikey使用一年总结 ，折腾录的二次验证神器yubikey ，还有可能是最好的 Yubikey + GPG/SSH 智能卡教程 。知乎专栏的把 Gpg4win 的 gpg-agent 转发到 WSL 中、配置新版 GPG SSH 认证代理 。感觉我还是能够驾驭的住这个精致的玩具的 首先说一下功能，YubiKey 4 可以同时工作在三种模式: 传统键盘设备模式: Yubico OTP, Challenge-Response, 静态密码, HOTP 等, 这个模式又有两个slot，对应于短按和长按操作，生成两种密码 Smartcard 模式: OpenPGP card 和 PIV card，可以用来安全地保存 RSA 私钥 U2F 模式: 一种两步认证协议，Google, Dropbox, Github 等网站都支持 @BlahGeek 之前入手 YubiKey 4 时写得 blog 描述得更详细一些，可以参考。 我的使用 而我日常主要使用的是 windows ，有时会用 WSL ，偶尔会用 Linux ，所以我主要使用到的功能则是静态密码模式以及 Smartcard 模式中的 OpenPGP card 来安全地保存 RSA 私钥。官网有一份 Windows 下如何使用的说明 根据教程我安装的 YubiKey for Windows Hello 总是不太好用，一方面可能是我的笔记本太过老旧的原因，另一方面可能是我的电脑没有内置TPM(可信赖平台模块)的原因，新的电脑（需要win 10）应该都可以支持。 Windows锁屏解锁 而针对 Windows 用户还有一个替代程序 yubico windows login tool (下载页)，可以适用于全部版本的 Windows 。我们只需要安装完成后重启电脑并打开管理程序即可食用，更加便捷的代价是他不能够在开机的时候使用，仅仅只能用作系统锁定时的解锁，远不如 YubiKey for Windows Hello 好用。 按理来说 yubikey 可以运行在 Smartcard 模式上为我在开机过程中解锁系统，但是我的 Smartcard 证书始终无法导入系统，可能是我的教育版 win10 有哪些地方没有设置好。 静态密码输入 另外一个我最常使用的就是传统键盘模式了，而且我用的还是最为人诟病的静态密码模式，既短按和长按分别输出两段预设好的密码。这是相当不安全的，但是由于是 windows 上使用，我也没什么应用可以使用其他高级的安全模式，反倒是总有一些人喜欢在我输入密码的时候偷窥我的密码，保存好两段静态密码再通过密码登入 lastpass 复制各种密码倒成了我的一个更加安全的手段。静态密码不安全无非在于，yubikey 离身后直接被熟人套取密码，但要知道你有两个静态密码，你就可以有很多种组合，例如A、B、AB、BA，以及在此基础上添加字符、删减字符，这样可以使得你的主密码更加安全。当然，做了这么多工作，最重要的还是 yubikey 尽可能的不要离身，这样静态密码才能安全。 在使用传统键盘模式前需要下载一个 YubiKey Personalization Tool 来管理你的 yubikey，MAC 用户与 Linux 用户则只需要通过包管理器安装 yubikey-personalization yubikey-personalization-gui 即可食用了。 打开程序，选择静态密码模式中的Scan Code，即可设置短按和长按分别输入的预设密码了 选择一个 Configuration Slot ，#1 是短按 #2 是长按 再把键盘模式选择一下，目前普遍是 US Keyboard 之后就可以输入你想要设置的静态密码了，可以根据需要选择静态密码输入完成之后是否需要在输入一个回车键，简化我们的输入过程 写好之后选择 Write Configuration 写入 yubikey 第一次写入需要保存一个历史写入文件，选择一个安全的地方放置一下即可 就这样，我们的 yubikey 就具备了基础的输入密码的功能了，经过测试，yubikey 的密码输入功能在任何可以接收键盘信号的设备上都是可以使用的，比如安卓手机。这样我就可以通过 yubikey 来输入我的 lastpass ，即使是在手机上也无需输入一连串超长的安全密码了。 OpenPGP card yubikey 工作在 Smartcard 模式上时可以支持 MAC OS 的 PIV card 解锁，而我等没有 MAC 的用户就用用 OpenPGP card 好了。 在接触 yubikey 之前我是没有接触过 OpenPGP 的，根据我看到的几篇博文，打都告诉我不要把主密钥丢在 yubikey 里面，否则永远都取不出来了。当然丢 yubikey 里面会更加的安全，但是如果丢了就真的丢了。。。 对于那些真正的需要安全的人而言，主密钥是肯定得丢在 yubikey 中的，但是就我这样丢三落四的人，还是算了吧。 作为一个 Windows 用户需要安装一个 gpg4win 来使得 Windows 能够支持在 Powershell 中运行 gpg 命令，这个时候你说 WSL ？抱歉，不加以设置，你在 WSL 中是看不到 yubikey 的 参考把 Gpg4win 的 gpg-agent 转发到 WSL 中 我是没读懂也没有设置成功。。。。。。 不过我在 Windows 下的 Powershell 中一样可以使用 yubikey 啊，我把主密钥导出备份之后，再将主密钥移动到 yubikey 中，使得电脑上每次使用主密钥的时候都需要我去插入 yubikey 才可以使用 而根据很多人说的，主密钥删除而单独使用子密钥的情况我却从未遇到过，测试了很多次都失败了，无法仅仅导出子密钥后单独使用子密钥，可能是我哪里设置的不正确的原因。 安卓手机上也有一个名为：OpenKeychain:Easy PGP 的程序，同样支持 yubikey 的使用。 当你安装过 gpg4win 软件之后，我们打开它，根据向导生成一份属于自己的 OpenPGP 证书，之后一定要导出绝密密钥，否则会在转移密钥到 yubikey 的过程中，主密钥再也取不出来了。我们可以多尝试几次，只要不把公钥证书上传到托管服务器，我们在本地都是可以随意删除的。 之后的更加复杂的操作我们将在 PowerShell 上进行 首先你需要设置一下 YubiKey。 gpg --card-edit # 打开设置 admin 打开管理模式 help 查看帮助 passwd 设置 PIN, Admin PIN 和 Reset Code PIN 的默认值是 123456，Admin PIN 的默认值是 12345678 需要先进入 admin 模式后，help 命令才会有更多的选项，passwd 才可以设置更多的密码 需要注意的是 PIN 码是平时最常用的密码，如果输错三次就会被锁定，需要使用 Reset Code 来解锁，Reset Code 输错三次，只能物理重置。 Admin PIN 是管理卡信息(如添加密钥、修改密码)使用的密码，不能短于 8 位，输错三次则管理功能被锁定，只能物理重置。 记住，千万不要在需要输入 Admin PIN 的时候输入短于 8 位的密码，这样会直接锁定 你可以继续设置一些其他信息，比如持卡人姓名、公钥的 URL 等等，也可以下次再弄。 建议将公钥的 URL 设置一下，这样插入新的电脑时可以通过 fetch 命令直接获取 yubikey 中密钥的公钥了 操作完后我们使用 quit 退出编辑 想必经过 gpg4win 软件的设置之后我们也有了自己的私钥（ Mac 用户有一个 GPGtools ） 首先我们可以生成一份子密钥 gpg --expert --edit-key i@example.com # 编辑这个密钥 之后进入 gpg&gt; 中执行命令，addkey gpg&gt; addkey Please select what kind of key you want: (3) DSA (sign only) (4) RSA (sign only) (5) Elgamal (encrypt only) (6) RSA (encrypt only) (7) DSA (set your own capabilities) (8) RSA (set your own capabilities) (10) ECC (sign only) (11) ECC (set your own capabilities) (12) ECC (encrypt only) (13) Existing key Your selection? 这里通常选择8 自定义的RSA 密钥 这个时候就让你选择这个 RSA 密钥具备的功能 Possible actions for a RSA key: Sign Encrypt Authenticate Current allowed actions: Sign Encrypt (S) Toggle the sign capability (E) Toggle the encrypt capability (A) Toggle the authenticate capability (Q) Finished Your selection? 默认情况是具备 Sign Encrypt ，常见 Current allowed actions: 后面的描述，我们通过反复选择 S E A来更改这个密钥的性质，成为你所需要的密钥 RSA keys may be between 1024 and 4096 bits long. # 密钥长度 What keysize do you want? (2048) Requested keysize is 2048 bits Please specify how long the key should be valid. # 过期时间 0 = key does not expire &lt;n&gt; = key expires in n days &lt;n&gt;w = key expires in n weeks &lt;n&gt;m = key expires in n months &lt;n&gt;y = key expires in n years Key is valid for? (0) 1Y Key expires at 03/15/19 02:17:39 中国标准时间 Is this correct? (y/N) Y Really create? (y/N) 之后一份子密钥就创建成功了，我们需要创建3份子密钥因为在 接下来的 keytocard 过程中我们将会把私钥转移到卡中再也取不出来，这个时候你再备份，就备份不出私钥了。 保存一下退出 gpg&gt; save 导出一下公私钥，离线存储到一个安全的地方。 gpg --export -a &quot;i@example.com&quot; &gt; public.key gpg --export-secret-key -a &quot;i@example.com&quot; &gt; private.key 如果有必要，可以将公钥上传到公钥服务器，命令是这个 gpg --send-keys 将私钥装载到 Yubikey gpg --edit-key &quot;i@example.com&quot; 会显示出你的主密钥和子密钥。 gpg&gt; toggle 用 key【空格】数字 定位到子密钥，先装载 signing 子密钥。数字按实际的来，不一定是1： gpg&gt; key 1 gpg&gt; keytocard Please select where to store the key: (1) Signature key (3) Authentication key Your selection? 1 先反选签名密钥，然后装载加密密钥： gpg&gt; key 1 gpg&gt; key 2 gpg&gt; keytocard Please select where to store the key: (2) Encryption key Your selection? 2 反选加密密钥，装载认证密钥至 Yubikey: gpg&gt; key 2 gpg&gt; key 3 gpg&gt; keytocard Please select where to store the key: (3) Authentication key Your selection? 3 最后保存： gpg&gt; save 这样就可以了！ 私钥想备份你现在也没办法了。 另外，加密命令用 gpg -r 接收人id -es 文件路径 解密用gpg -o 解压文件路径 -d 加密的文件 例如：gpg -r totoro625 -es do.xml ，输入密码后，在文件同目录就会生成一份名为 do.xml.gpg 的加密文件，此时我们删除 do.xml ，将 do.xml.gpg 保存即可 gpg -o do2.xml -d do.xml.gpg ,这样在文件同目录就会生成一份名为 do2.xml 的解密后文件，跟原先的 do.xml 一样，这就是解密文件。 U2F 模式 目前我的网站登录还在使用固定密码，一时半会不会改用 U2F 来麻烦自己。 实际应用 我主要用的就是 win10 的解锁和固定密码的输入功能，至于 OpenPGP 我是不打算怎么用的（毕竟也不太会用，还不熟悉），目前仅仅用于加密重要文件保存在各大云服务提供商，如百度云、微软云、谷歌云。我的 OpenPGP 公钥 指纹是 CF68BB23A52D176C57116CBCE4925DDF24118AF1 我真的不是很会用 OpenPGP ，目前能做到的仅仅是加密解密自己的文件与消息，验证别人的签名。","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link type="application/atom+xml" rel="alternate" href="https://totoro.ink/feed.xml" title="TOTORO625" /><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="/assets/css/main.css" />
+</head><body a="light">
+    <main class="page-content" aria-label="Content">
+      <div class="w">
+        <a href="/">『返回』首页</a>
+
+<p class="post-meta">
+<a href="/archive">归档</a> | <a href="/link">大佬们</a> | <a href="/about">关于我</a>
+</p>
+<article>
+  <p class="post-meta">
+    <time datetime="2018-03-14 00:00:00 +0800">『时间』2018年03月14日</time>
+  </p>
+  
+  <h1>yubikey使用初体验</h1>
+
+  <p>觊觎 <a href="https://www.yubico.com/">yubico</a> 公司的 <a href="https://www.yubico.com/products/yubikey-hardware/">yubikey</a> 很久了，最近又由于 lastpass 主密钥过长不方便的原因，索性买了一个回来研究。</p>
+
+<p>我在购买前有了解到这是一个略微高端的玩具，国内外的教程都很少，而且新老教程都有些不尽准确的地方。yubikey 在设计使用上对于 MAC OS 以及 Linux 系统比较友好，而在 Windows 上的使用范围就相对小了很多，不过如果是仅仅用做固定密码输入器的话，也是够用的。
+<!--more--></p>
+
+<h2 id="介绍">介绍</h2>
+
+<p>我先后查阅了官方的 <a href="https://www.gitbook.com/book/iamtwz/yubikey-handbook-chinese/details">yubikey 使用手册</a> <a href="https://iamtwz.gitbooks.io/yubikey-handbook-chinese/content/">(点此阅读)</a>  ，以及几乎是中文能搜索到的最早的博文（2012年）<a href="https://bigeagle.me/2012/05/yubikey/">入手yubikey,一点小心得</a> 和他的后续 <a href="https://bigeagle.me/2016/02/yubikey-4/">YubiKey 4 简介与配置</a> ，还有康哥的 <a href="http://scateu.me/2018/01/20/gpg-yubikey-advanced-usage.html">Yubikey OpenPGP Card 略高级折腾手记</a> ，赵一开的<a href="https://blog.blahgeek.com/yubikey-intro/">YubiKey入手和介绍</a>、<a href="https://blog.blahgeek.com/yubikey-review/">Yubikey使用一年总结</a> ，折腾录的<a href="https://www.zhway.com/%E4%BA%8C%E6%AC%A1%E9%A9%97%E8%AD%89%E7%A5%9E%E5%99%A8yubikey/">二次验证神器yubikey</a> ，还有<a href="https://mechanus.io/ke-neng-shi-zui-hao-de-yubikey-gpg-ssh-zhi-neng-qia-jiao-cheng/">可能是最好的 Yubikey + GPG/SSH 智能卡教程</a> 。知乎专栏的<a href="https://zhuanlan.zhihu.com/p/31802760">把 Gpg4win 的 gpg-agent 转发到 WSL 中</a>、<a href="https://zhuanlan.zhihu.com/p/26712353">配置新版 GPG SSH 认证代理</a> 。感觉我还是能够驾驭的住这个精致的玩具的</p>
+
+<p><img src="https://img.totoro.pub/blog/yubikey-more.png" alt="yubikey4" /></p>
+
+<p>首先说一下功能，YubiKey 4 可以<strong>同时</strong>工作在三种模式:</p>
+
+<ul>
+  <li>传统键盘设备模式: Yubico OTP, Challenge-Response, 静态密码, HOTP 等, 这个模式又有两个slot，对应于短按和长按操作，生成两种密码</li>
+  <li>Smartcard 模式: OpenPGP card 和 PIV card，可以用来安全地保存 RSA 私钥</li>
+  <li>U2F 模式: 一种两步认证协议，Google, Dropbox, Github 等网站都支持</li>
+</ul>
+
+<p><a href="https://twitter.com/blahgeek">@BlahGeek</a> 之前入手 YubiKey 4 时写得 <a href="https://blog.blahgeek.com/yubikey-intro/">blog</a> 描述得更详细一些，可以参考。</p>
+
+<h2 id="我的使用">我的使用</h2>
+
+<p>而我日常主要使用的是 windows ，有时会用 WSL ，偶尔会用 Linux ，所以我主要使用到的功能则是静态密码模式以及 Smartcard 模式中的 OpenPGP card 来安全地保存 RSA 私钥。官网有一份 <a href="https://www.yubico.com/why-yubico/for-business/computer-login/windows-login/">Windows 下如何使用的说明</a></p>
+
+<p>根据教程我安装的 <a href="https://www.microsoft.com/en-us/store/p/yubikey-for-windows-hello/9nblggh511m5">YubiKey for Windows Hello</a> 总是不太好用，一方面可能是我的笔记本太过老旧的原因，另一方面可能是我的电脑没有内置<em>TPM</em>(可信赖平台模块)的原因，新的电脑（需要win 10）应该都可以支持。</p>
+
+<h3 id="windows锁屏解锁">Windows锁屏解锁</h3>
+
+<p>而针对 Windows 用户还有一个替代程序 <a href="https://www.yubico.com/support/knowledge-base/categories/articles/use-yubico-windows-login-tool/">yubico windows login tool</a> (<a href="https://www.yubico.com/support/knowledge-base/categories/articles/os-logon-tools/">下载页</a>)，可以适用于全部版本的 Windows 。我们只需要安装完成后重启电脑并打开管理程序即可食用，更加便捷的代价是他不能够在开机的时候使用，仅仅只能用作系统锁定时的解锁，远不如 YubiKey for Windows Hello 好用。</p>
+
+<p><img src="https://img.totoro.pub/blog/yubikey.png" alt="yubico windows login tool" /></p>
+
+<p>按理来说 <a href="https://www.yubico.com/support/knowledge-base/categories/articles/smart-card-tools/">yubikey 可以运行在 Smartcard 模式</a>上为我在开机过程中解锁系统，但是我的 Smartcard 证书始终无法导入系统，可能是我的教育版 win10 有哪些地方没有设置好。</p>
+
+<h3 id="静态密码输入">静态密码输入</h3>
+
+<p>另外一个我最常使用的就是传统键盘模式了，而且我用的还是最为人诟病的静态密码模式，既短按和长按分别输出两段预设好的密码。这是相当不安全的，但是由于是 windows 上使用，我也没什么应用可以使用其他高级的安全模式，反倒是总有一些人喜欢在我输入密码的时候偷窥我的密码，保存好两段静态密码再通过密码登入 lastpass 复制各种密码倒成了我的一个更加安全的手段。静态密码不安全无非在于，yubikey 离身后直接被熟人套取密码，但要知道你有两个静态密码，你就可以有很多种组合，例如A、B、AB、BA，以及在此基础上添加字符、删减字符，这样可以使得你的主密码更加安全。当然，做了这么多工作，最重要的还是 yubikey 尽可能的不要离身，这样静态密码才能安全。</p>
+
+<p>在使用传统键盘模式前需要下载一个 <a href="https://www.yubico.com/support/knowledge-base/categories/articles/yubikey-personalization-tools/">YubiKey Personalization Tool</a> 来管理你的 yubikey，MAC 用户与 Linux 用户则只需要通过包管理器安装 <code class="language-plaintext highlighter-rouge">yubikey-personalization yubikey-personalization-gui</code> 即可食用了。</p>
+
+<p>打开程序，选择静态密码模式中的Scan Code，即可设置短按和长按分别输入的预设密码了</p>
+
+<p><img src="https://img.totoro.pub/blog/yubikey2.png" alt="静态密码" /></p>
+
+<p>选择一个 Configuration Slot ，#1 是短按 #2 是长按</p>
+
+<p>再把键盘模式选择一下，目前普遍是 US Keyboard</p>
+
+<p>之后就可以输入你想要设置的静态密码了，可以根据需要选择静态密码输入完成之后是否需要在输入一个回车键，简化我们的输入过程</p>
+
+<p>写好之后选择 Write Configuration 写入 yubikey</p>
+
+<p>第一次写入需要保存一个历史写入文件，选择一个安全的地方放置一下即可</p>
+
+<p><img src="https://img.totoro.pub/blog/Rna8.png" alt="静态密码设置" /></p>
+
+<p>就这样，我们的 yubikey 就具备了基础的输入密码的功能了，经过测试，yubikey 的密码输入功能在任何可以接收键盘信号的设备上都是可以使用的，比如安卓手机。这样我就可以通过 yubikey 来输入我的 lastpass ，即使是在手机上也无需输入一连串超长的安全密码了。</p>
+
+<h3 id="openpgp-card">OpenPGP card</h3>
+
+<p>yubikey 工作在 Smartcard 模式上时可以支持 MAC OS 的 PIV card 解锁，而我等没有 MAC 的用户就用用 OpenPGP card 好了。</p>
+
+<p>在接触 yubikey 之前我是没有接触过 OpenPGP 的，根据我看到的几篇博文，打都告诉我不要把主密钥丢在 yubikey 里面，否则永远都取不出来了。当然丢 yubikey 里面会更加的安全，但是如果丢了就真的丢了。。。</p>
+
+<p>对于那些真正的需要安全的人而言，主密钥是肯定得丢在 yubikey 中的，但是就我这样丢三落四的人，还是算了吧。</p>
+
+<p>作为一个 Windows 用户需要安装一个 <a href="https://www.gpg4win.org/">gpg4win</a> 来使得 Windows 能够支持在 Powershell 中运行 gpg 命令，这个时候你说 WSL ？抱歉，不加以设置，你在 WSL 中是看不到 yubikey 的</p>
+
+<p>参考<a href="https://zhuanlan.zhihu.com/p/31802760">把 Gpg4win 的 gpg-agent 转发到 WSL 中</a></p>
+
+<p>我是没读懂也没有设置成功。。。。。。</p>
+
+<p>不过我在 Windows 下的 Powershell 中一样可以使用 yubikey 啊，我把主密钥导出备份之后，再将主密钥移动到 yubikey 中，使得电脑上每次使用主密钥的时候都需要我去插入 yubikey 才可以使用</p>
+
+<p>而根据很多人说的，主密钥删除而单独使用子密钥的情况我却从未遇到过，测试了很多次都失败了，无法仅仅导出子密钥后单独使用子密钥，可能是我哪里设置的不正确的原因。</p>
+
+<p>安卓手机上也有一个名为：OpenKeychain:Easy PGP 的程序，同样支持 yubikey 的使用。</p>
+
+<p>当你安装过 gpg4win 软件之后，我们打开它，根据向导生成一份属于自己的 OpenPGP 证书，之后一定要导出绝密密钥，否则会在转移密钥到 yubikey 的过程中，主密钥再也取不出来了。我们可以多尝试几次，只要不把公钥证书上传到托管服务器，我们在本地都是可以随意删除的。</p>
+
+<p><img src="img/R4QA.png" alt="Kleoptra" /></p>
+
+<p>之后的更加复杂的操作我们将在 PowerShell 上进行</p>
+
+<p>首先你需要设置一下 YubiKey。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gpg --card-edit  # 打开设置
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">admin</code> 打开管理模式 <code class="language-plaintext highlighter-rouge">help</code> 查看帮助  <code class="language-plaintext highlighter-rouge">passwd</code> 设置 PIN, Admin PIN 和 Reset Code</p>
+
+<p>PIN 的默认值是 <code class="language-plaintext highlighter-rouge">123456</code>，Admin PIN 的默认值是 <code class="language-plaintext highlighter-rouge">12345678</code></p>
+
+<p>需要先进入 admin 模式后，help 命令才会有更多的选项，passwd 才可以设置更多的密码</p>
+
+<p><img src="https://img.totoro.pub/blog/R2p0.png" alt="help" /></p>
+
+<p>需要注意的是</p>
+
+<ul>
+  <li>PIN 码是平时最常用的密码，如果输错三次就会被锁定，需要使用 Reset Code 来解锁，Reset Code 输错三次，只能<a href="https://developers.yubico.com/ykneo-openpgp/ResetApplet.html">物理重置</a>。</li>
+  <li>Admin PIN 是管理卡信息(如添加密钥、修改密码)使用的密码，不能短于 8 位，输错三次则管理功能被锁定，只能<a href="https://developers.yubico.com/ykneo-openpgp/ResetApplet.html">物理重置</a>。 <strong>记住，千万不要在需要输入 Admin PIN 的时候输入短于 8 位的密码，这样会直接锁定</strong></li>
+</ul>
+
+<p>你可以继续设置一些其他信息，比如持卡人姓名、公钥的 URL 等等，也可以下次再弄。</p>
+
+<p>建议将公钥的 URL 设置一下，这样插入新的电脑时可以通过 <code class="language-plaintext highlighter-rouge">fetch</code> 命令直接获取 yubikey 中密钥的公钥了</p>
+
+<p>操作完后我们使用 <code class="language-plaintext highlighter-rouge">quit </code> 退出编辑</p>
+
+<p>想必经过 gpg4win 软件的设置之后我们也有了自己的私钥（ Mac 用户有一个 <a href="https://gpgtools.org/">GPGtools</a> ）</p>
+
+<p>首先我们可以生成一份子密钥</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gpg --expert --edit-key i@example.com  # 编辑这个密钥
+</code></pre></div></div>
+
+<p>之后进入 <code class="language-plaintext highlighter-rouge">gpg&gt;</code> 中执行命令，<code class="language-plaintext highlighter-rouge">addkey </code></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gpg&gt; addkey
+Please select what kind of key you want:
+   (3) DSA (sign only)
+   (4) RSA (sign only)
+   (5) Elgamal (encrypt only)
+   (6) RSA (encrypt only)
+   (7) DSA (set your own capabilities)
+   (8) RSA (set your own capabilities)
+  (10) ECC (sign only)
+  (11) ECC (set your own capabilities)
+  (12) ECC (encrypt only)
+  (13) Existing key
+Your selection?
+</code></pre></div></div>
+
+<p>这里通常选择<code class="language-plaintext highlighter-rouge">8</code> 自定义的<code class="language-plaintext highlighter-rouge">RSA</code> 密钥</p>
+
+<p>这个时候就让你选择这个 RSA 密钥具备的功能</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Possible actions for a RSA key: Sign Encrypt Authenticate
+Current allowed actions: Sign Encrypt
+
+   (S) Toggle the sign capability
+   (E) Toggle the encrypt capability
+   (A) Toggle the authenticate capability
+   (Q) Finished
+
+Your selection?
+</code></pre></div></div>
+
+<p>默认情况是具备 Sign Encrypt ，常见 Current allowed actions: 后面的描述，我们通过反复选择 S E A来更改这个密钥的性质，成为你所需要的密钥</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>RSA keys may be between 1024 and 4096 bits long.	# 密钥长度
+What keysize do you want? (2048)
+Requested keysize is 2048 bits
+Please specify how long the key should be valid.	# 过期时间
+         0 = key does not expire
+      &lt;n&gt;  = key expires in n days
+      &lt;n&gt;w = key expires in n weeks
+      &lt;n&gt;m = key expires in n months
+      &lt;n&gt;y = key expires in n years
+Key is valid for? (0) 1Y
+Key expires at 03/15/19 02:17:39 中国标准时间
+Is this correct? (y/N) Y
+Really create? (y/N)
+</code></pre></div></div>
+
+<p>之后一份子密钥就创建成功了，我们需要创建3份子密钥因为在 接下来的 <code class="language-plaintext highlighter-rouge">keytocard</code> 过程中我们将会把私钥转移到卡中再也取不出来，这个时候你再备份，就备份不出私钥了。</p>
+
+<p>保存一下退出</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gpg&gt; save
+</code></pre></div></div>
+
+<p>导出一下公私钥，离线存储到一个安全的地方。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gpg --export -a "i@example.com" &gt; public.key
+gpg --export-secret-key -a "i@example.com" &gt; private.key
+</code></pre></div></div>
+
+<p>如果有必要，可以将公钥上传到公钥服务器，命令是这个</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gpg --send-keys
+</code></pre></div></div>
+
+<p>将私钥装载到 Yubikey</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gpg --edit-key "i@example.com"
+
+</code></pre></div></div>
+
+<p>会显示出你的主密钥和子密钥。</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gpg&gt; toggle
+</code></pre></div></div>
+
+<p>用 <code class="language-plaintext highlighter-rouge">key【空格】数字</code> 定位到子密钥，先装载 signing 子密钥。数字按实际的来，不一定是<code class="language-plaintext highlighter-rouge">1</code>：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gpg&gt; key 1
+gpg&gt; keytocard
+Please select where to store the key:
+   (1) Signature key
+   (3) Authentication key
+Your selection? 1
+</code></pre></div></div>
+
+<p>先反选签名密钥，然后装载加密密钥：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gpg&gt; key 1
+gpg&gt; key 2
+gpg&gt; keytocard
+Please select where to store the key:
+   (2) Encryption key
+Your selection? 2
+</code></pre></div></div>
+
+<p>反选加密密钥，装载认证密钥至 Yubikey:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gpg&gt; key 2
+gpg&gt; key 3
+gpg&gt; keytocard
+Please select where to store the key:
+   (3) Authentication key
+Your selection? 3
+</code></pre></div></div>
+
+<p>最后保存：</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gpg&gt; save
+</code></pre></div></div>
+
+<p>这样就可以了！</p>
+
+<p>私钥想备份你现在也没办法了。</p>
+
+<p>另外，加密命令用 <code class="language-plaintext highlighter-rouge">gpg -r 接收人id -es 文件路径</code></p>
+
+<p>解密用<code class="language-plaintext highlighter-rouge">gpg -o 解压文件路径 -d 加密的文件</code></p>
+
+<p>例如：<code class="language-plaintext highlighter-rouge">gpg -r totoro625 -es do.xml</code> ，输入密码后，在文件同目录就会生成一份名为 do.xml.gpg 的加密文件，此时我们删除 do.xml ，将 do.xml.gpg 保存即可</p>
+
+<p><code class="language-plaintext highlighter-rouge">gpg -o do2.xml -d do.xml.gpg</code> ,这样在文件同目录就会生成一份名为 do2.xml 的解密后文件，跟原先的 do.xml 一样，这就是解密文件。</p>
+
+<h3 id="u2f-模式">U2F 模式</h3>
+
+<p>目前我的网站登录还在使用固定密码，一时半会不会改用 U2F 来麻烦自己。</p>
+
+<h3 id="实际应用">实际应用</h3>
+
+<p>我主要用的就是 win10 的解锁和固定密码的输入功能，至于 OpenPGP 我是不打算怎么用的（毕竟也不太会用，还不熟悉），目前仅仅用于加密重要文件保存在各大云服务提供商，如百度云、微软云、谷歌云。我的 <a href="https://pan.totoro.ink/totoro625.asc">OpenPGP 公钥</a> 指纹是 CF68BB23A52D176C57116CBCE4925DDF24118AF1</p>
+
+<p>我真的不是很会用 OpenPGP ，目前能做到的仅仅是加密解密自己的文件与消息，验证别人的签名。</p>
+
+</article>
+      </div>
+    </main>
+    <div class="cprt">
+© 2015 - 至今 | Powered by <a href="https://jekyllrb.com">Jekyll</a> | Theme - <a href="https://github.com/riggraz/no-style-please">no style, please!</a>
+<br>主站：<a href="https://totoro.ink">TOTORO625</a> | 镜像：<a href="https://www.totoro.pub">橙汁不甜</a> | <a href="/feed.xml">站点地图</a>
+</div>
+<style type="text/css">
+.cprt {
+	max-width: 640px;
+	margin: 0 auto;
+	padding: 4rem 2rem;
+	text-align: center;
+	font-size: 16px;
+	opacity: 0.8;
+	color: #000;
+}
+}
+</style>
+</body>
+</html>
